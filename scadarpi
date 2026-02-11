@@ -1,0 +1,209 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+usage() {
+  cat <<'EOF'
+Usage:
+  ./scadarpi list
+  ./scadarpi compile [all|work_name...]
+  ./scadarpi run <work_name> [-- <main_args...>]
+  ./scadarpi runjar <work_name>
+  ./scadarpi clean [all|work_name...]
+
+Examples:
+  ./scadarpi list
+  ./scadarpi compile all
+  ./scadarpi compile mainpanel flowmeter
+  ./scadarpi run pcounter
+  ./scadarpi run work_rga -- --demo
+  ./scadarpi clean work_sqz
+
+Notes:
+  - work_name can be either full (work_mainpanel) or short (mainpanel).
+  - compile/clean default to all work_* directories when omitted.
+  - run executes Main with classpath ".:classes:../lib/*" from the selected work dir.
+  - JAVA_HOME, JAVA_BIN, and JAVAC_BIN can be used to override java/javac.
+EOF
+}
+
+die() {
+  printf 'Error: %s\n' "$*" >&2
+  exit 1
+}
+
+discover_works() {
+  local d
+  shopt -s nullglob
+  for d in "$ROOT_DIR"/work_*; do
+    [[ -d "$d" ]] || continue
+    printf '%s\n' "$(basename "$d")"
+  done | sort
+  shopt -u nullglob
+}
+
+resolve_work() {
+  local token="${1:-}"
+  local candidate
+
+  [[ -n "$token" ]] || die "Missing work target"
+
+  if [[ "$token" == work_* && -d "$ROOT_DIR/$token" ]]; then
+    printf '%s\n' "$token"
+    return 0
+  fi
+
+  candidate="work_${token}"
+  if [[ -d "$ROOT_DIR/$candidate" ]]; then
+    printf '%s\n' "$candidate"
+    return 0
+  fi
+
+  die "Unknown work target '$token'. Run './scadarpi list'."
+}
+
+targets_from_args() {
+  local -a args=("$@")
+  local -A seen=()
+  local item resolved
+
+  if ((${#args[@]} == 0)); then
+    discover_works
+    return 0
+  fi
+
+  for item in "${args[@]}"; do
+    if [[ "$item" == "all" ]]; then
+      discover_works
+      return 0
+    fi
+    resolved="$(resolve_work "$item")"
+    if [[ -z "${seen[$resolved]:-}" ]]; then
+      printf '%s\n' "$resolved"
+      seen["$resolved"]=1
+    fi
+  done
+}
+
+java_bin() {
+  if [[ -n "${JAVA_BIN:-}" ]]; then
+    printf '%s\n' "$JAVA_BIN"
+    return 0
+  fi
+  if [[ -n "${JAVA_HOME:-}" && -x "${JAVA_HOME}/bin/java" ]]; then
+    printf '%s\n' "${JAVA_HOME}/bin/java"
+    return 0
+  fi
+  printf 'java\n'
+}
+
+javac_bin() {
+  if [[ -n "${JAVAC_BIN:-}" ]]; then
+    printf '%s\n' "$JAVAC_BIN"
+    return 0
+  fi
+  if [[ -n "${JAVA_HOME:-}" && -x "${JAVA_HOME}/bin/javac" ]]; then
+    printf '%s\n' "${JAVA_HOME}/bin/javac"
+    return 0
+  fi
+  printf 'javac\n'
+}
+
+compile_work() {
+  local work="$1"
+  local work_dir="$ROOT_DIR/$work"
+  local javac_cmd
+
+  javac_cmd="$(javac_bin)"
+  printf '[compile] %s\n' "$work"
+  (
+    cd "$work_dir"
+    rm -f -- *.class
+    "$javac_cmd" -Xlint -Xlint:-serial -XDignore.symbol.file -classpath ".:../lib/*" -d . *.java
+  )
+}
+
+run_work() {
+  local work="$1"
+  shift
+  local work_dir="$ROOT_DIR/$work"
+  local java_cmd
+
+  java_cmd="$(java_bin)"
+  printf '[run] %s\n' "$work"
+  (
+    cd "$work_dir"
+    "$java_cmd" -classpath ".:classes:../lib/*" Main "$@"
+  )
+}
+
+runjar_work() {
+  local work="$1"
+  local work_dir="$ROOT_DIR/$work"
+
+  [[ -f "$work_dir/runJar" ]] || die "No runJar script found in $work"
+  printf '[runjar] %s\n' "$work"
+  (
+    cd "$work_dir"
+    bash ./runJar
+  )
+}
+
+clean_work() {
+  local work="$1"
+  local work_dir="$ROOT_DIR/$work"
+
+  printf '[clean] %s\n' "$work"
+  (
+    cd "$work_dir"
+    find . -type f -name '*.class' -delete
+    rm -f -- jpi.jar jpi.jmf
+    rm -rf -- META-INF
+  )
+}
+
+cmd="${1:-help}"
+if (($# > 0)); then
+  shift
+fi
+
+case "$cmd" in
+  help|-h|--help)
+    usage
+    ;;
+  list)
+    discover_works
+    ;;
+  compile)
+    mapfile -t works < <(targets_from_args "$@")
+    ((${#works[@]} > 0)) || die "No work directories found."
+    for work in "${works[@]}"; do
+      compile_work "$work"
+    done
+    ;;
+  run)
+    (($# >= 1)) || die "run requires a work target. Example: ./scadarpi run mainpanel"
+    work="$(resolve_work "$1")"
+    shift
+    if [[ "${1:-}" == "--" ]]; then
+      shift
+    fi
+    run_work "$work" "$@"
+    ;;
+  runjar|jar)
+    (($# == 1)) || die "runjar requires one work target. Example: ./scadarpi runjar work_rga"
+    work="$(resolve_work "$1")"
+    runjar_work "$work"
+    ;;
+  clean)
+    mapfile -t works < <(targets_from_args "$@")
+    ((${#works[@]} > 0)) || die "No work directories found."
+    for work in "${works[@]}"; do
+      clean_work "$work"
+    done
+    ;;
+  *)
+    die "Unknown command '$cmd'. Run './scadarpi help'."
+    ;;
+esac
