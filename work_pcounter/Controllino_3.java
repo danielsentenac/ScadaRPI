@@ -160,7 +160,7 @@ public class Controllino_3 extends Device {
         
         if (bitRead(i2c_buffer,AC_HIGH_ON_STATUS_BIT) == 0x01 && bitRead(i2c_buffer,AC_LOW_ON_STATUS_BIT) == 0x00)
            acst.value = 2; // AC HIGH NOISE ON
-        if (bitRead(i2c_buffer,AC_LOW_ON_STATUS_BIT) == 0x01 bitRead(i2c_buffer,AC_HIGH_ON_STATUS_BIT) == 0x00)
+        if (bitRead(i2c_buffer,AC_LOW_ON_STATUS_BIT) == 0x01 && bitRead(i2c_buffer,AC_HIGH_ON_STATUS_BIT) == 0x00)
            acst.value = 1; // AC LOW NOISE ON 
         if (bitRead(i2c_buffer,AC_HIGH_ON_STATUS_BIT) == 0x00 && bitRead(i2c_buffer,AC_LOW_ON_STATUS_BIT) == 0x00)
            acst.value = 0; // AC OFF
