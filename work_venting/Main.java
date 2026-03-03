@@ -118,7 +118,7 @@ public class Main {
         /**********************************************************************************************/
         // Create FlowMeterModbusMaster device for MKS 2000
         Device fm2000 = new FlowMeterModbusMaster("MKS2000",
-        					  "192.168.2.155",
+        					  "192.168.100.100",
         					  502,
         					  0); // Modbus start offset
         
@@ -128,7 +128,7 @@ public class Main {
         /**********************************************************************************************/
         // Create FlowMeterModbusMaster device for MKS 50000
         Device fm50000 = new FlowMeterModbusMaster("MKS50000",
-        					   "192.168.3.155",
+        					   "192.168.100.100",
         					   502,
         					   fm2000.mbRegisterEnd); // Modbus start offset
         

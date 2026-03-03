@@ -106,6 +106,23 @@ Clean generated artifacts:
 - `make run WORK=work_panel RUN_ARGS="--demo"`
 - `make clean WORK=work_panel`
 
+## Sanitizing confidential data
+
+Before publishing code, you can replace internal endpoints with generic values and later restore originals:
+
+```bash
+# Apply replacements defined in scripts/sanitize_rules.tsv
+./scripts/sanitize_public.sh apply
+
+# Check if a reversible sanitize state is active
+./scripts/sanitize_public.sh status
+
+# Restore original files exactly as they were before apply
+./scripts/sanitize_public.sh restore
+```
+
+The default rules file is `scripts/sanitize_rules.tsv` and is fully editable (supports `LITERAL` and `REGEX` rules).
+
 ## Current build status
 
 As of March 3, 2026 in this repository state:

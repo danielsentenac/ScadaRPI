@@ -111,7 +111,7 @@ public class SupervisorClient extends Device {
         popCommand();  // Execute commands in the loop is more reactive
    
         // Get data from (tomcat) supervisor server
-        URLConnection con = getServerConnection("http://olserver135.virgo.infn.it:8081/jchv/jchv");
+        URLConnection con = getServerConnection("http://example-host:8081/jchv/jchv");
         OutputStream outstream = con.getOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(outstream);
         oos.writeObject(svrNameList);
@@ -196,7 +196,7 @@ public class SupervisorClient extends Device {
          // Send command to (tomcat) supervisor
          try {
             // send data to the servlet
-	    URLConnection con = getServerConnection("http://olserver135.virgo.infn.it:8081/jcmd/jcmd");
+	    URLConnection con = getServerConnection("http://example-host:8081/jcmd/jcmd");
 	    OutputStream outstream = con.getOutputStream();
 	    ObjectOutputStream oos = new ObjectOutputStream(outstream);
 	    oos.writeObject(command);
@@ -224,7 +224,7 @@ public class SupervisorClient extends Device {
          // Send Reset command to (tomcat) supervisor
          try {
             // send data to the servlet
-	    URLConnection con = getServerConnection("http://olserver135.virgo.infn.it:8081/jcmd/jcmd");
+	    URLConnection con = getServerConnection("http://example-host:8081/jcmd/jcmd");
 	    OutputStream outstream = con.getOutputStream();
 	    ObjectOutputStream oos = new ObjectOutputStream(outstream);
 	    oos.writeObject(command);

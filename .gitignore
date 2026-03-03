@@ -1,1 +1,3 @@
 *.class
+.sanitize_state/
+scripts

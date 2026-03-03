@@ -180,7 +180,7 @@ public class DialogStop extends JDialog implements Runnable {
                
             try {
               // Send command to (tomcat) supervisor server
-              URLConnection con = getServerConnection("http://olserver135.virgo.infn.it:9081/jcmd/jcmd");
+              URLConnection con = getServerConnection("http://example-host:9081/jcmd/jcmd");
               OutputStream outstream = con.getOutputStream();
               ObjectOutputStream oos = new ObjectOutputStream(outstream);
               oos.writeObject(commandVect);

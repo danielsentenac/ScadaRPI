@@ -138,7 +138,7 @@ public class SupervisorClient extends Device {
         popCommand();  // Execute commands in the loop is more reactive
    
         // Get data from (tomcat) supervisor server
-        HttpURLConnection con = getServerConnection("http://olserver134.virgo.infn.it:8081/jchv/jchv");
+        HttpURLConnection con = getServerConnection("http://example-host:8081/jchv/jchv");
         
         OutputStream outstream = con.getOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(outstream);

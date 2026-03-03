@@ -47,7 +47,7 @@ public class ModbusSlaveThread implements Runnable, DataTypes  {
       try {
         TcpParameters tcpParameters = new TcpParameters();
         //listening on localhost
-        tcpParameters.setHost(InetAddress.getByName("192.168.224.70"));
+        tcpParameters.setHost(InetAddress.getByName("192.168.100.100"));
         tcpParameters.setPort(1288); // Listening port: must be > 1024 to be run by non admin user
         tcpParameters.setKeepAlive(true);
      
