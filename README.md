@@ -1,9 +1,13 @@
 # SCADARPI
 
-SCADARPI is a multi-application Java 8 project for SCADA/HMI stations.  
+SCADARPI is a multi-application Java 8 project for SCADA/HMI stations, designed primarily for [Raspberry Pi](https://www.raspberrypi.com/) embedded systems.  
 This work relies on the [GenLogic](https://www.genlogic.com/) GLG Toolkit for Java to build SCADA/HMI interfaces.
 Use GenLogic **GlgBuilder** to create and maintain the `.g` graphics files.
 Each `work_*` directory is a standalone application (own `Main.java`, device logic, GUI drawings, and logs), while top-level tooling (`scadarpi`, `Makefile`) gives one uniform way to compile and run them.
+
+## Illustration
+
+![Tube 1500W Station SCADA/HMI screen](Illustration.png)
 
 ## Project layout
 
@@ -25,6 +29,7 @@ Most modules follow this startup pattern:
 - Linux environment.
 - Java 8 JDK available (`java` and `javac` on PATH), or set `JAVA_HOME` / `JAVA_BIN` / `JAVAC_BIN`.
 - For hardware-backed modules on Raspberry Pi, access to required serial devices (`/dev/serial/...`), I2C, GPIO, and reachable instrument/network endpoints.
+- Hardware access is based on [Pi4J](https://pi4j.com/) **version `< 2`** (v1.x APIs), which relies on [WiringPi](https://github.com/WiringPi/WiringPi).
 - GUI execution requires an active X display.
 
 Verified in this workspace on March 3, 2026:
