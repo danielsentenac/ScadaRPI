@@ -1,6 +1,8 @@
 # SCADARPI
 
 SCADARPI is a multi-application Java 8 project for SCADA/HMI stations.  
+This work relies on the [GenLogic](https://www.genlogic.com/) GLG Toolkit for Java to build SCADA/HMI interfaces.
+Use GenLogic **GlgBuilder** to create and maintain the `.g` graphics files.
 Each `work_*` directory is a standalone application (own `Main.java`, device logic, GUI drawings, and logs), while top-level tooling (`scadarpi`, `Makefile`) gives one uniform way to compile and run them.
 
 ## Project layout
@@ -9,7 +11,7 @@ Each `work_*` directory is a standalone application (own `Main.java`, device log
 - `Makefile`: thin wrapper around `./scadarpi`.
 - `lib/`: all third-party JARs used by the applications (Pi4J, jlibmodbus, GLG, serial libs, sqlite, etc.).
 - `work_*`: application modules (for example `work_panel`, `work_rga`, `work_venting`, `work_mainpanel`).
-- `*.g` files in `work_*`: GLG drawing files used by the GUI classes.
+- `*.g` files in `work_*`: GLG drawing files (built/edited with GlgBuilder) used by the GUI classes.
 
 ## Runtime model (high level)
 
