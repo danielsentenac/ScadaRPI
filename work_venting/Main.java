@@ -23,6 +23,7 @@ import com.pi4j.io.serial.Parity;
 import com.pi4j.io.serial.StopBits;
 import com.pi4j.io.serial.DataBits;
 import com.pi4j.io.serial.FlowControl;
+import java.awt.GraphicsEnvironment;
 
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
@@ -37,6 +38,15 @@ public class Main {
     private static final int CONTROLLINO_1_ADDR = 0x08; 
 
     private static final Logger logger = Logger.getLogger("Main");
+
+    private static boolean isPi4jHardwareHost() {
+        String arch = System.getProperty("os.arch", "").toLowerCase();
+        return arch.contains("arm") || arch.contains("aarch64");
+    }
+
+    private static boolean shouldRunPi4jHardware() {
+        return Boolean.getBoolean("scadarpi.forceHardware") || isPi4jHardwareHost();
+    }
 
     /**
      * Program Test Main Entry Point
@@ -77,9 +87,34 @@ public class Main {
         }
         // print program title/header
         logger.finer("<-- JPiMain Tests-->");
-        
+
         // Create DeviceManager object
         DeviceManager deviceManager = new DeviceManager();
+
+        if (!shouldRunPi4jHardware()) {
+           // Create Venting Operation virtual device (Modbus OP_* channels)
+           Device opController = new VentingOperationController("OP", 0);
+           deviceManager.addDevice(opController);
+
+           logger.log(Level.WARNING,
+                      "Main: non-ARM host detected ({0}); hardware startup skipped. Set -Dscadarpi.forceHardware=true to override.",
+                      System.getProperty("os.arch", ""));
+
+           if (GraphicsEnvironment.isHeadless()) {
+              logger.log(Level.WARNING, "Main: headless mode detected; GUI will not be created.");
+              return;
+           }
+
+           GlgGui mainGui = new GlgGui(deviceManager,null,null,mainTitle);
+           Signal.handle(new Signal("INT"), new SignalHandler () {
+              public void handle(Signal sig) {
+                 logger.finer("Main: Interrupt received, Exiting program");
+                 mainGui.exitProgram();
+              }
+           });
+           return;
+        }
+
         /**********************************************************************************************/
         // Create FlowMeterModbusMaster device for MKS 2000
         Device fm2000 = new FlowMeterModbusMaster("MKS2000",
@@ -123,6 +158,11 @@ public class Main {
         // Add MaxiGauge to DeviceManager
         deviceManager.addDevice(mg);
         /**********************************************************************************************/
+
+        // Recreate Venting Operation virtual device at the end of the hardware map.
+        Device opController = new VentingOperationController("OP", mg.mbRegisterEnd);
+        deviceManager.addDevice(opController);
+        /**********************************************************************************************/
        
         // Create Operation instance
         Operation op2000 = new Operation(fm2000, 5);
@@ -144,6 +184,8 @@ public class Main {
         /**********************************************************************************************/
         // Start mg MAXIGAUGE device
         mg.doStart();
+        // Start OP virtual device
+        opController.doStart();
         // Start modbusSlaveThread thread
         modbusSlaveThread.doStart();
         /**********************************************************************************************/

@@ -46,12 +46,16 @@ public class PWM extends Device {
      logger.finer("PWM:PWM> " + name + " Modbus registers ends at offset " + mbRegisterEnd);
 
      // Initialize Gpio & PWM
-     // create GPIO controller instance
-     pwm = gpio.provisionPwmOutputPin(address, "PWM", 0);
-     com.pi4j.wiringpi.Gpio.pwmSetMode(com.pi4j.wiringpi.Gpio.PWM_MODE_MS);
-     com.pi4j.wiringpi.Gpio.pwmSetRange(100);
-     com.pi4j.wiringpi.Gpio.pwmSetClock(500);
-     pwm.setPwm(0);
+     if (gpio != null) {
+        // create GPIO controller instance
+        pwm = gpio.provisionPwmOutputPin(address, "PWM", 0);
+        com.pi4j.wiringpi.Gpio.pwmSetMode(com.pi4j.wiringpi.Gpio.PWM_MODE_MS);
+        com.pi4j.wiringpi.Gpio.pwmSetRange(100);
+        com.pi4j.wiringpi.Gpio.pwmSetClock(500);
+        pwm.setPwm(0);
+     } else {
+        logger.log(Level.INFO, "PWM:PWM> GPIO unavailable; PWM output disabled.");
+     }
      
      DataElement v = getDataElement("VOUT");   
      v.value = vOut = 0;
@@ -61,8 +65,10 @@ public class PWM extends Device {
       if (thread != null) thread.interrupt();
       // Change the states of variable
       thread = null;
-      gpio.shutdown();
-      gpio.unprovisionPin(pwm);
+      if (gpio != null && pwm != null) {
+         gpio.shutdown();
+         gpio.unprovisionPin(pwm);
+      }
    }
    public void updateDeviceData() {
      popCommand();  // Execute commands
@@ -72,6 +78,8 @@ public class PWM extends Device {
       logger.finer("PWM:executeCommand> change new value " + e.value);
       vOut = 100 * (e.value / vMax);
       logger.finer("PWM:executeCommand> write new vOut " + vOut);
-      pwm.setPwm((int)vOut);
+      if (pwm != null) {
+         pwm.setPwm((int)vOut);
+      }
    }
 }; 

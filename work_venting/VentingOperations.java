@@ -26,6 +26,7 @@ public class VentingOperations implements Runnable {
     private final String g2StatusKey;                  // e.g. "G2Val"
     private final String mks2000StatusKey;   // e.g. "FlowSetP2000Val"
     private final String mks50000StatusKey;  // e.g. "FlowSetP50000Val"
+    private final String stepStatusKey;      // e.g. "OP_STEP"
     private final JTable table;
     private volatile boolean stopRequested = false;
     
@@ -49,11 +50,13 @@ public class VentingOperations implements Runnable {
                          String g2StatusKey,
                          String mks2000StatusKey,
                          String mks50000StatusKey,
+                         String stepStatusKey,
                          JTable table) {
     this.deviceManager = deviceManager;
     this.g2StatusKey = g2StatusKey;
     this.mks2000StatusKey = mks2000StatusKey;
     this.mks50000StatusKey = mks50000StatusKey;
+    this.stepStatusKey = stepStatusKey;
     this.table = table; 
     this.steps = buildStepsFromModel(model);
     }
@@ -65,6 +68,7 @@ public class VentingOperations implements Runnable {
     @Override
     public void run() {
 	    logger.info("VentingOperations: starting sequence with " + steps.size() + " steps.");
+            setOperationStep(0);
 
 	    for (int i = 0; i < steps.size(); i++) {
 		// global stop check at top of loop
@@ -75,6 +79,7 @@ public class VentingOperations implements Runnable {
 
 		Step step = steps.get(i);
 		boolean isLastStep = (i == steps.size() - 1);
+                setOperationStep(step.step);
 
 		// 🔦 highlight active row
 		highlightRow(step.rowIndex);
@@ -108,6 +113,7 @@ public class VentingOperations implements Runnable {
 		}
 	    }
 
+            setOperationStep(0);
 	    logger.info("VentingOperations: sequence finished.");
     }
 
@@ -355,5 +361,31 @@ private boolean waitForPressure(double target) {
 
         return device.getDataElement(chName);
     }
-}
 
+    private void setOperationStep(int step) {
+        if (stepStatusKey == null || stepStatusKey.trim().isEmpty()) {
+            return;
+        }
+
+        String[] parts = stepStatusKey.split("_", 2);
+        if (parts.length < 2) {
+            logger.warning("VentingOperations: bad STEP STATUS mapping for '" + stepStatusKey + "'");
+            return;
+        }
+
+        String deviceName = parts[0];
+        String dataName = parts[1];
+        Device device = deviceManager.getDevice(deviceName);
+        if (device == null) {
+            logger.warning("VentingOperations: STEP device '" + deviceName + "' not found");
+            return;
+        }
+
+        DataElement stepDataElement = device.getDataElement(dataName);
+        if (stepDataElement == null) {
+            logger.warning("VentingOperations: STEP dataElement '" + dataName + "' not found in device '" + deviceName + "'");
+            return;
+        }
+        stepDataElement.value = step;
+    }
+}

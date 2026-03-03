@@ -51,19 +51,25 @@ public class DS2438 extends Device {
      logger.finer("DS2438:DS2438> " + name + " Modbus registers ends at offset " + mbRegisterEnd);
     
      if ( onoffInit == false ) {
-        // Switch on sensor with GPIO_20
-        logger.fine("DS2438:DS2438> Init Switch On/Off..." + name);
-        onoff = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_28, PinState.HIGH);
-        onoffInit = true;
-        hasOffOn = true;
+        if (gpio != null) {
+           // Switch on sensor with GPIO_20
+           logger.fine("DS2438:DS2438> Init Switch On/Off..." + name);
+           onoff = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_28, PinState.HIGH);
+           onoffInit = true;
+           hasOffOn = true;
+        } else {
+           logger.log(Level.INFO, "DS2438:DS2438> GPIO unavailable; OneWire power toggle disabled.");
+        }
      }
    }
    public void doStop() {
       if (thread != null) thread.interrupt();
       // Change the states of variable
       thread = null;
-      gpio.shutdown();
-      gpio.unprovisionPin(onoff);
+      if (gpio != null && onoff != null) {
+         gpio.shutdown();
+         gpio.unprovisionPin(onoff);
+      }
    }
    public void updateDeviceData() {
    

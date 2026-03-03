@@ -20,6 +20,7 @@ public abstract class Device extends DataManager implements Runnable, DataTypes 
    public final Lock modbusmutex = new ReentrantLock(true);  // Used to lock modbus register updates between device and modbusthread.
    public static final Lock busmutex = new ReentrantLock(true); // Useful mutex to lock comm on multiple slave device sharing the same bus 
    public String name;
+   protected boolean hasWarned = false;
    private Thread thread;
    public LinkedList<DataElement> commandSetQueue = new LinkedList<DataElement>();
 
@@ -109,6 +110,7 @@ public abstract class Device extends DataManager implements Runnable, DataTypes 
    }
    
    public void setErrorComStatus() {
+     hasWarned = true;
      for (Map.Entry<String, DataElement> e : this.dataList.entrySet()) {
         DataElement dataElement = e.getValue();
         if ( dataElement.type == DataType.READ_ONLY_VALUE )
@@ -119,6 +121,8 @@ public abstract class Device extends DataManager implements Runnable, DataTypes 
            dataElement.value = 0;
          else if ( dataElement.type == DataType.READ_AND_WRITE_STATUS )
            dataElement.value = 255;
+        else if ( dataElement.type == DataType.COM_STATUS )
+           dataElement.value = 1;
      }
    }
 

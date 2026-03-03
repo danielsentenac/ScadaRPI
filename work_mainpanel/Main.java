@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 import java.util.logging.LogRecord;
 import java.util.Date;
 import java.time.LocalDate; // import the LocalDate class
+import java.awt.GraphicsEnvironment;
 import com.pi4j.io.serial.Baud;
 import com.pi4j.io.serial.Parity;
 import com.pi4j.io.serial.StopBits;
@@ -96,15 +97,20 @@ public class Main {
         // Start (SupervisorClient2) O2 sensors panel
         supervisorclient2.doStart();
         /**********************************************************************************************/
-        // Start Glg GUI
-        GlgGui mainGui = new GlgGui(deviceManager,mainTitle);
+        boolean headlessMode = Boolean.getBoolean("scadarpi.headless") || GraphicsEnvironment.isHeadless();
+        if (headlessMode) {
+           logger.warning("Main: running in headless mode, GUI initialization skipped.");
+        } else {
+           // Start Glg GUI
+           GlgGui mainGui = new GlgGui(deviceManager,mainTitle);
 
-        // Handle CTRL-C interrupt to end cleanly the program
-        Signal.handle(new Signal("INT"), new SignalHandler () {
-           public void handle(Signal sig) {
-              logger.finer("Main: Interrupt received, Exiting program");
-              mainGui.exitProgram();
-           }
-        });
+           // Handle CTRL-C interrupt to end cleanly the program
+           Signal.handle(new Signal("INT"), new SignalHandler () {
+              public void handle(Signal sig) {
+                 logger.finer("Main: Interrupt received, Exiting program");
+                 mainGui.exitProgram();
+              }
+           });
+        }
     }
 }

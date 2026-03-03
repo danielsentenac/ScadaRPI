@@ -1,0 +1,6 @@
+[2026-02-11 17:00:37] [INFO   ] Device:initGpioController> Non-ARM host detected ({0}); GPIO disabled. 
+[2026-02-11 17:00:37] [CONFIG ] _OP_EXECUTE_CMD   0   1 
+[2026-02-11 17:00:37] [CONFIG ] _OP_STOP_CMD   1   1 
+[2026-02-11 17:00:37] [CONFIG ] _OP_STEP   2   1 
+[2026-02-11 17:00:37] [CONFIG ] _OP_COMST   3   1 
+[2026-02-11 17:00:37] [WARNING] Main: non-ARM host detected ({0}); hardware startup skipped. Set -Dscadarpi.forceHardware=true to override. 

@@ -27,6 +27,12 @@ put("START_RAMP","_STARTRAMP_CMD");   // Type 2 (TRIGGER)
 put("STOP_RAMP","_STOPRAMP_CMD");   // Type 2 (TRIGGER)
 
 //
+// Venting Operation commands (Supervisor: VAC_VENTING1_OP_*)
+//
+put("EXECUTE_CMD","OP_EXECUTE_CMD");   // Type 5 (READ_AND_WRITE_STATUS)
+put("STOP_CMD","OP_STOP_CMD");         // Type 5 (READ_AND_WRITE_STATUS)
+
+//
 // Valves
 //
 put("VBypass","M1_VBYPASSCMD");          // Type 2 (TRIGGER)
@@ -70,7 +76,6 @@ put("TimeVal","_OPTIME");
 //
 // Gauges
 //
-
 put("G1","MG_PR1SST");     // D resource type (visibility)
 put("G1Psub","MG_PR1ST");     // D resource type (visibility)
 put("G1Val","MG_PR1");    // D resource type
@@ -114,6 +119,19 @@ put("FlowMks50000Val","MKS50000_FLOW");
 put("FlowMks2000Val","MKS2000_FLOW");
 
 
+
+}};
+
+/***********************************************************************/
+// Non-GLG channels used by VentingTableView logic only.
+Hashtable<String, String> VENTINGVIEWSTATUS = new Hashtable<String, String>(){
+
+private static final long serialVersionUID = 354054054067L;
+{
+//
+// Venting Operation status (Supervisor: VAC_VENTING1_OP_*)
+//
+put("STEP","OP_STEP");                 // Type 0 (READ_ONLY_STATUS)
 
 }};
 

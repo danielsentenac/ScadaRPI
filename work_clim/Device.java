@@ -36,7 +36,25 @@ public abstract class Device extends DataManager implements Runnable, DataTypes 
 
    public abstract void executeCommand(DataElement e);
 
-   protected static final GpioController gpio = GpioFactory.getInstance();
+   protected static final GpioController gpio = initGpioController();
+
+   private static GpioController initGpioController() {
+      String arch = System.getProperty("os.arch", "").toLowerCase();
+      boolean isArm = arch.contains("arm") || arch.contains("aarch64");
+
+      if (!isArm) {
+         logger.log(Level.INFO, "Device:initGpioController> Non-ARM host detected ({0}); GPIO disabled.", arch);
+         return null;
+      }
+
+      try {
+         return GpioFactory.getInstance();
+      } catch (Throwable t) {
+         logger.log(Level.WARNING, "Device:initGpioController> GPIO init failed, continuing without GPIO: {0}", t.toString());
+         return null;
+      }
+   }
+
 
    public void doStart() {
       thread = new Thread(this);

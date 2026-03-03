@@ -15,6 +15,8 @@ import java.util.logging.FileHandler;
 import java.util.logging.SimpleFormatter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.Handler;
+import java.awt.GraphicsEnvironment;
 
 import com.pi4j.io.serial.Baud;
 import com.pi4j.io.serial.Parity;
@@ -31,6 +33,15 @@ public class Main {
     // Controllino I2C address
     public static final int CONTROLLINO_ADDR = 0x08; 
     private static final Logger logger = Logger.getLogger("Main");
+
+    private static boolean isPi4jHardwareHost() {
+        String arch = System.getProperty("os.arch", "").toLowerCase();
+        return arch.contains("arm") || arch.contains("aarch64");
+    }
+
+    private static boolean shouldRunPi4jHardware() {
+        return Boolean.getBoolean("scadarpi.forceHardware") || isPi4jHardwareHost();
+    }
 
     /**
      * Program Test Main Entry Point
@@ -49,6 +60,10 @@ public class Main {
 
         
         logger.setLevel(Level.FINE);
+        logger.setUseParentHandlers(false);
+        for (Handler handler : logger.getHandlers()) {
+           logger.removeHandler(handler);
+        }
 
          try {
              // create an appending file handler
@@ -66,9 +81,31 @@ public class Main {
         }
         // print program title/header
         logger.finer("<-- JPiMain Tests-->");
-        
+
         // Create DeviceManager object
         DeviceManager deviceManager = new DeviceManager();
+
+        if (!shouldRunPi4jHardware()) {
+           logger.log(Level.WARNING,
+                      "Main: non-ARM host detected ({0}); hardware startup skipped. Set -Dscadarpi.forceHardware=true to override.",
+                      System.getProperty("os.arch", ""));
+
+           if (GraphicsEnvironment.isHeadless()) {
+              logger.log(Level.WARNING, "Main: headless mode detected; GUI will not be created.");
+              return;
+           }
+
+           // Start GUI-only mode for development hosts without Pi4J hardware.
+           GlgGui mainGui = new GlgGui(deviceManager,"TUBE 600 WEST");
+           Signal.handle(new Signal("INT"), new SignalHandler () {
+              public void handle(Signal sig) {
+                 logger.finer("Main: Interrupt received, Exiting program");
+                 mainGui.exitProgram();
+              }
+           });
+           return;
+        }
+
         /**********************************************************************************************/
         // Create Qms200Pfeiffer device
         Device qms = new RgaPfeifferQms200("QMS",

@@ -1,0 +1,1 @@
+[2026-02-11 16:20:10] [WARNING] Main: non-ARM host detected ({0}); hardware startup skipped. Set -Dscadarpi.forceHardware=true to override. 

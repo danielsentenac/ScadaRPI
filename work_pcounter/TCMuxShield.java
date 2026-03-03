@@ -17,17 +17,35 @@ public class TCMuxShield extends Device {
    private I2C_Comm i2c;
    private static final Logger logger = Logger.getLogger("Main");
 
-   private final GpioController gpio = GpioFactory.getInstance();
-   private GpioPinDigitalInput pinso = gpio.provisionDigitalInputPin(RaspiPin.GPIO_00);
-   private GpioPinDigitalOutput pinen = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_02);
-   private GpioPinDigitalOutput pina0 = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_05);
-   private GpioPinDigitalOutput pina1 = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_06);
-   private GpioPinDigitalOutput pina2 = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_21);
-   private GpioPinDigitalOutput pincs = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_22);
-   private GpioPinDigitalOutput pinsc = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_23);
+   private final GpioController gpio = initGpioController();
+   private GpioPinDigitalInput pinso;
+   private GpioPinDigitalOutput pinen;
+   private GpioPinDigitalOutput pina0;
+   private GpioPinDigitalOutput pina1;
+   private GpioPinDigitalOutput pina2;
+   private GpioPinDigitalOutput pincs;
+   private GpioPinDigitalOutput pinsc;
 
    private int OPEN = -1000;
    private int SHORT = -1001;
+
+   private static GpioController initGpioController() {
+      String arch = System.getProperty("os.arch", "").toLowerCase();
+      boolean isArm = arch.contains("arm") || arch.contains("aarch64");
+
+      if (!isArm) {
+         logger.log(Level.INFO, "TCMuxShield:initGpioController> Non-ARM host detected ({0}); GPIO disabled.", arch);
+         return null;
+      }
+
+      try {
+         return GpioFactory.getInstance();
+      } catch (Throwable t) {
+         logger.log(Level.WARNING, "TCMuxShield:initGpioController> GPIO init failed, continuing without GPIO: {0}", t.toString());
+         return null;
+      }
+   }
+
 
    public TCMuxShield (String _name,
                        int _mbRegisterStart) {
@@ -58,9 +76,21 @@ public class TCMuxShield extends Device {
      logger.finer("TCMuxShield:TCMuxShield> " + name + " Modbus registers ends at offset " + mbRegisterEnd);
 
      // Init SPI communication
-     pinen.high();
-     pinsc.low();
-     pincs.low();
+     if (gpio != null) {
+        pinso = gpio.provisionDigitalInputPin(RaspiPin.GPIO_00);
+        pinen = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_02);
+        pina0 = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_05);
+        pina1 = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_06);
+        pina2 = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_21);
+        pincs = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_22);
+        pinsc = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_23);
+
+        pinen.high();
+        pinsc.low();
+        pincs.low();
+     } else {
+        logger.log(Level.INFO, "TCMuxShield:TCMuxShield> GPIO unavailable; thermocouple mux disabled on this host.");
+     }
    }
    
    public void updateDeviceData() {
@@ -72,6 +102,12 @@ public class TCMuxShield extends Device {
         temp.add(getDataElement("TEMP" + Integer.toString(i)));
      
      DataElement dcom = getDataElement("COMST");
+
+     if (gpio == null) {
+        setErrorComStatus();
+        return;
+     }
+
      logger.finer("TCMuxShield:updateDeviceData> GO!");
      try {
         byte ch = 0;

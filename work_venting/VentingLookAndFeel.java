@@ -242,11 +242,11 @@ public final class VentingLookAndFeel {
      */
     public static class TouchComboEditor extends DefaultCellEditor {
 
-        private final JComboBox<String> combo;
+        private final JComboBox<?> combo;
 
         public TouchComboEditor(String[] items) {
             super(new JComboBox<>(items));
-            this.combo = (JComboBox<String>) getComponent();
+            this.combo = (JComboBox<?>) getComponent();
 
             combo.setMaximumRowCount(items.length);
 
@@ -266,4 +266,3 @@ public final class VentingLookAndFeel {
         }
     }
 }
-

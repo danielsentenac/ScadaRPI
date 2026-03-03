@@ -25,6 +25,7 @@ Notes:
   - compile/clean default to all work_* directories when omitted.
   - run executes Main with classpath ".:classes:../lib/*" from the selected work dir.
   - JAVA_HOME, JAVA_BIN, and JAVAC_BIN can be used to override java/javac.
+  - set SCADARPI_FORCE_HARDWARE=1 to force hardware startup on non-ARM hosts.
 EOF
 }
 
@@ -120,7 +121,7 @@ compile_work() {
   (
     cd "$work_dir"
     rm -f -- *.class
-    "$javac_cmd" -Xlint -Xlint:-serial -XDignore.symbol.file -classpath ".:../lib/*" -d . *.java
+    "$javac_cmd" -Xlint -Xlint:-serial -Xlint:-path -XDignore.symbol.file -classpath ".:../lib/*" -d . *.java
   )
 }
 
@@ -129,12 +130,46 @@ run_work() {
   shift
   local work_dir="$ROOT_DIR/$work"
   local java_cmd
+  local -a java_opts=()
+  local force_gui="${SCADARPI_GUI:-0}"
+  local force_headless="${SCADARPI_HEADLESS:-0}"
+  local force_hardware="${SCADARPI_FORCE_HARDWARE:-0}"
+  local headless=0
+  local display_id
+  local x_socket
 
   java_cmd="$(java_bin)"
+
+  if [[ "$force_gui" == "1" ]]; then
+    headless=0
+  elif [[ "$force_headless" == "1" ]]; then
+    headless=1
+  elif [[ -z "${DISPLAY:-}" ]]; then
+    headless=1
+  elif command -v xdpyinfo >/dev/null 2>&1; then
+    if ! xdpyinfo >/dev/null 2>&1; then
+      headless=1
+    fi
+  elif [[ "${DISPLAY}" =~ ^:([0-9]+)(\..*)?$ ]]; then
+    display_id="${BASH_REMATCH[1]}"
+    x_socket="/tmp/.X11-unix/X${display_id}"
+    if [[ ! -S "$x_socket" ]]; then
+      headless=1
+    fi
+  fi
+
+  if ((headless)); then
+    java_opts+=("-Dscadarpi.headless=true" "-Djava.awt.headless=true")
+  fi
+
+  if [[ "$force_hardware" == "1" ]]; then
+    java_opts+=("-Dscadarpi.forceHardware=true")
+  fi
+
   printf '[run] %s\n' "$work"
   (
     cd "$work_dir"
-    "$java_cmd" -classpath ".:classes:../lib/*" Main "$@"
+    "$java_cmd" "${java_opts[@]}" -classpath ".:classes:../lib/*" Main "$@"
   )
 }
 

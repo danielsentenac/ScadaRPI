@@ -30,6 +30,17 @@ public class PCounterMasterRTU extends Device  {
     private SerialPort.Parity parity;
     private int stopbits;
     private String serial_port;
+
+    private String getConfigFilePath() {
+        String filename = "particlecounter" + name + ".properties";
+        File localPath = new File(filename);
+        if (localPath.exists()) {
+            return localPath.getPath();
+        }
+
+        return new File("work_pcounter", filename).getPath();
+    }
+
     public PCounterMasterRTU(String _name,
                              String _aliasName,
                            int _mbRegisterStart, 
@@ -107,7 +118,7 @@ public class PCounterMasterRTU extends Device  {
         
         // Initialize threashold calues from configuration file
          try {
-            String configFilePath = "/home/pi/Downloads/pi4j-1.2-SNAPSHOT/work_pcounter/particlecounter" + name + ".properties";
+            String configFilePath = getConfigFilePath();
             FileInputStream propsInput = new FileInputStream(configFilePath);
             Properties prop = new Properties();
             prop.load(propsInput);
@@ -371,7 +382,7 @@ public class PCounterMasterRTU extends Device  {
             System.out.println("executeCommand Assign to element name setvalue " + e.name + " value = " + e.setvalue);
             e.value = e.setvalue;
             holdingRegisters.setFloat32At(e.mbRegisterOffset, (float)e.value);
-            String configFilePath = "/home/pi/Downloads/pi4j-1.2-SNAPSHOT/work_pcounter/particlecounter" + name + ".properties";
+            String configFilePath = getConfigFilePath();
             FileInputStream propsInput = new FileInputStream(configFilePath);
             Properties prop = new Properties();
             prop.load(propsInput);
@@ -395,4 +406,3 @@ public class PCounterMasterRTU extends Device  {
      }
    }
 }
-

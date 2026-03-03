@@ -10,10 +10,13 @@ import java.util.logging.Level;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import javax.swing.SwingUtilities;
 import java.awt.event.*;
 import java.awt.Frame;
 import java.awt.Container;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.io.File;
 
 
 public class GlgGui extends JFrame implements ChannelList, DataTypes, Runnable  {
@@ -33,6 +36,15 @@ public class GlgGui extends JFrame implements ChannelList, DataTypes, Runnable  
     private VentingTableView ventingTableView;
     private String dbUrl;
 
+    private String resolveDbUrl() {
+       String dbName = "venting.db3";
+       File localDb = new File(dbName);
+       if (localDb.exists()) {
+          return "jdbc:sqlite:" + localDb.getPath();
+       }
+       return "jdbc:sqlite:" + new File("work_venting", dbName).getPath();
+    }
+
     public GlgGui (DeviceManager _deviceManager, Operation _op2000, Operation _op50000, String _title) {
 
        title = _title;
@@ -41,8 +53,7 @@ public class GlgGui extends JFrame implements ChannelList, DataTypes, Runnable  
        deviceManager = _deviceManager;
        parent = this;
        // --- DB path for venting operations table ---
-       // adjust this path if needed
-       dbUrl = "jdbc:sqlite:/home/pi/Downloads/pi4j-1.2-SNAPSHOT/work_venting/venting.db3";
+       dbUrl = resolveDbUrl();
 
        // Creating the display
        createAndShowGui();
@@ -88,13 +99,15 @@ public class GlgGui extends JFrame implements ChannelList, DataTypes, Runnable  
 			this,                // JFrame owner for dialogs
 			deviceManager,
 			VENTINGCMD,
-			VENTINGSTATUS,
+			VENTINGVIEWSTATUS,
 			dbUrl,
 			"MG_PR2",               // G2 status key
 			"MKS2000_FLOW_SETP",    // MKS2000 flow
 			"MKS50000_FLOW_SETP"    // MKS50000 flow
 		);
 		JPanel leftPanel = ventingTableView.getPanel();
+		leftPanel.setMinimumSize(new Dimension(420, 320));
+		leftPanel.setPreferredSize(new Dimension(560, 800));
 
 		//
 		// === RIGHT PANEL: main SCADA GLG view ===
@@ -102,6 +115,7 @@ public class GlgGui extends JFrame implements ChannelList, DataTypes, Runnable  
 		glg_bean = new GlgJLWBean();
 		glg_bean.SetDrawingFile(mainDrawing);   // VENTING.g
 		glg_bean.AddListener(GlgObject.INPUT_CB, new InputListener());
+		glg_bean.setMinimumSize(new Dimension(640, 320));
 		
 		//
 		// === Split pane: left (1/4) | right (3/4) ===
@@ -109,15 +123,30 @@ public class GlgGui extends JFrame implements ChannelList, DataTypes, Runnable  
 		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, glg_bean);
 		split.setContinuousLayout(true);
 		split.setOneTouchExpandable(true);
+                split.setDividerSize(15);
 
-		// 0.25 means roughly 25% of the width for the left component
-		split.setResizeWeight(0.40);
-		split.setDividerLocation(0.40);  // proportional location
-                split.setDividerSize(15);   // ← makes the drag bar 20px wide
+		// Keep left panel visible with a stable initial width.
+		split.setResizeWeight(0.35);
+		split.setDividerLocation(520);
 
 		content.add(split, BorderLayout.CENTER);
 
 		this.setVisible(true);
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        int width = getContentPane().getWidth();
+                        int divider = (int)Math.round(width * 0.35);
+                        int minLeft = 420;
+                        int minRight = 420;
+                        if (divider < minLeft) divider = minLeft;
+                        if (divider > width - minRight) divider = width - minRight;
+                        if (divider > 0) {
+                            split.setDividerLocation(divider);
+                        }
+                        split.revalidate();
+                        split.repaint();
+                    }
+                });
 
 	    } catch (Exception ex) {
 		logger.log(Level.SEVERE, "GlgGui:createAndShowGui> " + ex.getMessage(), ex);

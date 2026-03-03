@@ -26,7 +26,7 @@ public class VentingTableView {
 
     private final DeviceManager deviceManager;
     private final Hashtable<String,String> cmdMap;      // VENTINGCMD
-    private final Hashtable<String,String> statusMap;   // VENTINGSTATUS
+    private final Hashtable<String,String> viewStatusMap;   // VENTINGVIEWSTATUS (non-GLG channels)
 
     private final String g2StatusKey;
     private final String mks2000StatusKey;
@@ -50,9 +50,14 @@ public class VentingTableView {
     private VentingOperations currentVentingOp;
     private Thread ventingThread;
     private volatile boolean stoppedByUser = false;
+    private boolean dbEnabled = true;
+    private boolean dbWarningLogged = false;
     
     private Timer framePulseTimer;
     private boolean framePulseOn = false;
+    private Timer opCommandTimer;
+    private boolean executeCommandArmed = false;
+    private boolean stopCommandArmed = false;
 
     private boolean suppressModelEvents = false;
     
@@ -65,7 +70,7 @@ public class VentingTableView {
     public VentingTableView(JFrame ownerForDialogs,
                             DeviceManager deviceManager,
                             Hashtable<String,String> cmdMap,
-                            Hashtable<String,String> statusMap,
+                            Hashtable<String,String> viewStatusMap,
                             String dbUrl,
                             String g2StatusKey,
                             String mks2000StatusKey,
@@ -74,19 +79,14 @@ public class VentingTableView {
         this.ownerForDialogs = ownerForDialogs;
         this.deviceManager = deviceManager;
         this.cmdMap = cmdMap;
-        this.statusMap = statusMap;
+        this.viewStatusMap = viewStatusMap;
         this.dbUrl = dbUrl;
         this.g2StatusKey = g2StatusKey;
         this.mks2000StatusKey = mks2000StatusKey;
         this.mks50000StatusKey = mks50000StatusKey;
 
         // DB + model
-        createDbIfNeeded();
-        insertDefaultRowIfNeeded();
-        operationsModel = loadOperationsFromDb();
-        if (operationsModel == null) {
-            operationsModel = createEmptyModel();
-        }
+        operationsModel = initializeModel();
 
         operationsTable = new JTable(operationsModel);
         VentingLookAndFeel.styleOperationsTable(operationsTable);
@@ -151,6 +151,8 @@ public class VentingTableView {
         loadDbButton.addActionListener(e -> loadDbFromFile());
         executeButton.addActionListener(e -> startVentingSequence());
         stopButton.addActionListener(e -> stopVentingSequence());   
+
+        startOperationCommandPolling();
         
     }
 
@@ -195,6 +197,54 @@ public class VentingTableView {
                 return column != 0; // STEP not editable
             }
         };
+    }
+
+    private Object[] defaultRow(int step) {
+        return new Object[]{
+                step,       // STEP
+                "ON",       // P1
+                "OPEN",     // V1
+                "OPEN",     // VSOFT
+                "CLOSE",    // VMAIN
+                "CLOSE",    // VDRYER
+                "CLOSE",    // VRP
+                0,          // MKS2000
+                0,          // MKS50000
+                0.0         // G2
+        };
+    }
+
+    private boolean hasDbDriver() {
+        if (!dbEnabled) {
+            return false;
+        }
+        try {
+            DriverManager.getDriver(dbUrl);
+            return true;
+        } catch (SQLException e) {
+            dbEnabled = false;
+            if (!dbWarningLogged) {
+                dbWarningLogged = true;
+                logger.log(Level.WARNING,
+                        "SQLite JDBC driver not found. Venting table will run without DB persistence: " + e.getMessage());
+            }
+            return false;
+        }
+    }
+
+    private DefaultTableModel initializeModel() {
+        if (hasDbDriver()) {
+            createDbIfNeeded();
+            insertDefaultRowIfNeeded();
+            DefaultTableModel model = loadOperationsFromDb();
+            if (model != null) {
+                return model;
+            }
+        }
+
+        DefaultTableModel model = createEmptyModel();
+        model.addRow(defaultRow(1));
+        return model;
     }
 
     private void installNumericEditorHook() {
@@ -259,6 +309,10 @@ public class VentingTableView {
     /* ===================== DB LAYER ===================== */
 
     private void createDbIfNeeded() {
+        if (!hasDbDriver()) {
+            return;
+        }
+
         String sql = "CREATE TABLE IF NOT EXISTS operations ("
                 + " STEP INTEGER PRIMARY KEY,"
                 + " P1 TEXT NOT NULL,"
@@ -281,6 +335,10 @@ public class VentingTableView {
     }
 
     private void insertDefaultRowIfNeeded() {
+        if (!hasDbDriver()) {
+            return;
+        }
+
         String sql = "INSERT INTO operations (STEP,P1,V1,VSOFT,VMAIN,VDRYER,VRP,MKS2000,MKS50000,G2) "
                 + "VALUES (?,?,?,?,?,?,?,?,?,?)";
 
@@ -305,6 +363,10 @@ public class VentingTableView {
     }
 
     private DefaultTableModel loadOperationsFromDb() {
+        if (!hasDbDriver()) {
+            return null;
+        }
+
         DefaultTableModel model = null;
         String sql = "SELECT * FROM operations ORDER BY STEP";
 
@@ -349,6 +411,10 @@ public class VentingTableView {
     }
 
     private void insertRowInDb(Object[] row) {
+        if (!hasDbDriver()) {
+            return;
+        }
+
         String sql = "INSERT INTO operations (STEP,P1,V1,VSOFT,VMAIN,VDRYER,VRP,MKS2000,MKS50000,G2) "
                 + "VALUES (?,?,?,?,?,?,?,?,?,?)";
 
@@ -361,9 +427,10 @@ public class VentingTableView {
             pstmt.setString(4, (String) row[3]);
             pstmt.setString(5, (String) row[4]);
             pstmt.setString(6, (String) row[5]);
-            pstmt.setInt(7, ((Number) row[7]).intValue());
-            pstmt.setInt(8, ((Number) row[8]).intValue());
-            pstmt.setDouble(9, ((Number) row[9]).doubleValue());
+            pstmt.setString(7, (String) row[6]);
+            pstmt.setInt(8, ((Number) row[7]).intValue());
+            pstmt.setInt(9, ((Number) row[8]).intValue());
+            pstmt.setDouble(10, ((Number) row[9]).doubleValue());
 
             pstmt.executeUpdate();
         } catch (SQLException e) {
@@ -398,6 +465,10 @@ public class VentingTableView {
 		int mks50000 = getValidatedInt(rowIndex, 8, 0, 50000, "MKS50000");
 		double g2    = getValidatedDouble(rowIndex, 9, "G2");
 
+                if (!hasDbDriver()) {
+                    return;
+                }
+
 		try (Connection conn = DriverManager.getConnection(dbUrl);
 		     PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -423,6 +494,10 @@ public class VentingTableView {
 	    }
     }
     private void deleteRowFromDb(int step) {
+        if (!hasDbDriver()) {
+            return;
+        }
+
         String sql = "DELETE FROM operations WHERE STEP=?";
 
         try (Connection conn = DriverManager.getConnection(dbUrl);
@@ -440,6 +515,19 @@ public class VentingTableView {
      * in table order and update the DB accordingly.
      */
     private void renumberStepsAndSyncDb() {
+        if (!hasDbDriver()) {
+            suppressModelEvents = true;
+            try {
+                for (int row = 0; row < operationsModel.getRowCount(); row++) {
+                    operationsModel.setValueAt(row + 1, row, 0);
+                }
+            } finally {
+                suppressModelEvents = false;
+            }
+            operationsModel.fireTableDataChanged();
+            return;
+        }
+
         suppressModelEvents = true;
         Connection conn = null;
         try {
@@ -608,6 +696,16 @@ public class VentingTableView {
             dbUrl = "jdbc:sqlite:" + path;
             logger.info("Using DB: " + dbUrl);
 
+            if (!hasDbDriver()) {
+                JOptionPane.showMessageDialog(
+                        rootPanel,
+                        "SQLite JDBC driver is not available. Install sqlite-jdbc to enable DB load/save.",
+                        "DB driver missing",
+                        JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+
             DefaultTableModel newModel = loadOperationsFromDb();
             if (newModel != null) {
                 operationsModel = newModel;
@@ -738,16 +836,121 @@ public class VentingTableView {
         btn.setMargin(margin);
     }
 
+    private void startOperationCommandPolling() {
+        opCommandTimer = new Timer(250, e -> pollOperationCommands());
+        opCommandTimer.start();
+    }
+
+    private void pollOperationCommands() {
+        DataElement executeCmd = resolveDataElementFromMap(cmdMap.get("EXECUTE_CMD"));
+        if (executeCmd != null) {
+            boolean active = isCommandActive(executeCmd);
+            if (active && !executeCommandArmed) {
+                logger.info("VentingTableView: received OP_EXECUTE_CMD");
+                startVentingSequence(false, false);
+            }
+            executeCommandArmed = active;
+        } else {
+            executeCommandArmed = false;
+        }
+
+        DataElement stopCmd = resolveDataElementFromMap(cmdMap.get("STOP_CMD"));
+        if (stopCmd != null) {
+            boolean active = isCommandActive(stopCmd);
+            if (active && !stopCommandArmed) {
+                logger.info("VentingTableView: received OP_STOP_CMD");
+                stopVentingSequence(false, false);
+            }
+            stopCommandArmed = active;
+        } else {
+            stopCommandArmed = false;
+        }
+    }
+
+    private DataElement resolveDataElementFromMap(String mapping) {
+        if (mapping == null || mapping.trim().isEmpty()) {
+            return null;
+        }
+
+        String[] parts = mapping.split("_", 2);
+        if (parts.length < 2) {
+            return null;
+        }
+
+        Device device = deviceManager.getDevice(parts[0]);
+        if (device == null) {
+            return null;
+        }
+
+        return device.getDataElement(parts[1]);
+    }
+
+    private boolean isCommandActive(DataElement command) {
+        return ((int)command.value) != 0 || ((int)command.setvalue) != 0;
+    }
+
+    private void pulseOperationCommand(String commandKey) {
+        DataElement command = resolveDataElementFromMap(cmdMap.get(commandKey));
+        if (command == null) {
+            return;
+        }
+
+        Device device = deviceManager.getDevice(command.deviceName);
+
+        command.setvalue = 1;
+        command.value = 1;
+
+        if (device != null) {
+            if (!device.commandSetQueue.contains(command)) {
+                device.commandSetQueue.add(command);
+            }
+            if (device.holdingRegisters != null) {
+                try {
+                    device.holdingRegisters.setInt16At(command.mbRegisterOffset, 1);
+                } catch (Exception ex) {
+                    logger.finer("VentingTableView:pulseOperationCommand> unable to set holding register: " + ex.getMessage());
+                }
+            }
+        }
+
+        Timer fallbackReset = new Timer(2200, e -> {
+            if (isCommandActive(command)) {
+                command.value = 0;
+                command.setvalue = 0;
+                if (device != null && device.holdingRegisters != null) {
+                    try {
+                        device.holdingRegisters.setInt16At(command.mbRegisterOffset, 0);
+                    } catch (Exception ex) {
+                        logger.finer("VentingTableView:pulseOperationCommand> unable to clear holding register: " + ex.getMessage());
+                    }
+                }
+            }
+            ((Timer)e.getSource()).stop();
+        });
+        fallbackReset.setRepeats(false);
+        fallbackReset.start();
+    }
+
     /* ===================== VENTING SEQUENCE CONTROL ===================== */
 
     private void startVentingSequence() {
+        startVentingSequence(true, true);
+    }
+
+    private void startVentingSequence(boolean showDialogs) {
+        startVentingSequence(showDialogs, true);
+    }
+
+    private void startVentingSequence(boolean showDialogs, boolean emitCommandPulse) {
         if (ventingRunning) {
-            JOptionPane.showMessageDialog(
-                    rootPanel,
-                    "Venting sequence is already running.",
-                    "Info",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
+            if (showDialogs) {
+                JOptionPane.showMessageDialog(
+                        rootPanel,
+                        "Venting sequence is already running.",
+                        "Info",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+            }
             return;
         }
 
@@ -757,6 +960,10 @@ public class VentingTableView {
 
         // new run, assume not stopped by user yet
         stoppedByUser = false;
+
+        if (emitCommandPulse) {
+            pulseOperationCommand("EXECUTE_CMD");
+        }
         
         VentingOperations op = new VentingOperations(
                 deviceManager,
@@ -764,6 +971,7 @@ public class VentingTableView {
                 g2StatusKey,
                 mks2000StatusKey,
                 mks50000StatusKey,
+                viewStatusMap.get("STEP"),
                 operationsTable
         );
 
@@ -808,18 +1016,32 @@ public class VentingTableView {
     }
 
     private void stopVentingSequence() {
+        stopVentingSequence(true, true);
+    }
+
+    private void stopVentingSequence(boolean askConfirmation) {
+        stopVentingSequence(askConfirmation, true);
+    }
+
+    private void stopVentingSequence(boolean askConfirmation, boolean emitCommandPulse) {
         if (!ventingRunning || currentVentingOp == null) {
             return;
         }
 
-        int res = JOptionPane.showConfirmDialog(
-                rootPanel,
-                "Stop venting sequence?",
-                "Confirm stop",
-                JOptionPane.YES_NO_OPTION
-        );
-        if (res != JOptionPane.YES_OPTION) {
-            return;
+        if (askConfirmation) {
+            int res = JOptionPane.showConfirmDialog(
+                    rootPanel,
+                    "Stop venting sequence?",
+                    "Confirm stop",
+                    JOptionPane.YES_NO_OPTION
+            );
+            if (res != JOptionPane.YES_OPTION) {
+                return;
+            }
+        }
+
+        if (emitCommandPulse) {
+            pulseOperationCommand("STOP_CMD");
         }
 
         // remember this run was stopped manually by the user
@@ -841,4 +1063,3 @@ public class VentingTableView {
         }
     }
 }
-

@@ -23,6 +23,7 @@ import com.pi4j.io.serial.Parity;
 import com.pi4j.io.serial.StopBits;
 import com.pi4j.io.serial.DataBits;
 import com.pi4j.io.serial.FlowControl;
+import java.awt.GraphicsEnvironment;
 
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
@@ -42,6 +43,15 @@ public class Main {
     private static final int CONTROLLINO_3_ADDR = 0x10;
 
     private static final Logger logger = Logger.getLogger("Main");
+
+    private static boolean isPi4jHardwareHost() {
+        String arch = System.getProperty("os.arch", "").toLowerCase();
+        return arch.contains("arm") || arch.contains("aarch64");
+    }
+
+    private static boolean shouldRunPi4jHardware() {
+        return Boolean.getBoolean("scadarpi.forceHardware") || isPi4jHardwareHost();
+    }
 
     /**
      * Program Test Main Entry Point
@@ -82,9 +92,30 @@ public class Main {
         }
         // print program title/header
         logger.finer("<-- JPiMain Tests-->");
-        
+
         // Create DeviceManager object
         DeviceManager deviceManager = new DeviceManager();
+
+        if (!shouldRunPi4jHardware()) {
+           logger.log(Level.WARNING,
+                      "Main: non-ARM host detected ({0}); hardware startup skipped. Set -Dscadarpi.forceHardware=true to override.",
+                      System.getProperty("os.arch", ""));
+
+           if (GraphicsEnvironment.isHeadless()) {
+              logger.log(Level.WARNING, "Main: headless mode detected; GUI will not be created.");
+              return;
+           }
+
+           GlgGui mainGui = new GlgGui(deviceManager,mainTitle);
+           Signal.handle(new Signal("INT"), new SignalHandler () {
+              public void handle(Signal sig) {
+                 logger.finer("Main: Interrupt received, Exiting program");
+                 mainGui.exitProgram();
+              }
+           });
+           return;
+        }
+
         /**********************************************************************************************/
         // Create MaxiGauge device
         Device mg = new MaxiGauge("MG",
