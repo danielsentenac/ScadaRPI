@@ -22,6 +22,7 @@ Each `work_*` directory is a standalone application (own `Main.java`, device log
 Most modules follow this startup pattern:
 - `Main` builds a `DeviceManager`, creates one or more `Device` instances, starts their threads, starts a `ModbusSlaveThread`, then opens a `GlgGui`.
 - `Device` subclasses encapsulate hardware/network integration (I2C, serial, Modbus TCP, HTTP clients, etc.).
+- The Modbus server interface exposed to remote clients is implemented with [jlibmodbus](https://github.com/kochedykov/jlibmodbus).
 - Some modules include non-ARM safeguards and can skip hardware startup automatically unless forced.
 
 ## Requirements
@@ -30,6 +31,7 @@ Most modules follow this startup pattern:
 - Java 8 JDK available (`java` and `javac` on PATH), or set `JAVA_HOME` / `JAVA_BIN` / `JAVAC_BIN`.
 - For hardware-backed modules on Raspberry Pi, access to required serial devices (`/dev/serial/...`), I2C, GPIO, and reachable instrument/network endpoints.
 - Hardware access is based on [Pi4J](https://pi4j.com/) **version `< 2`** (v1.x APIs), which relies on [WiringPi](https://github.com/WiringPi/WiringPi).
+- Modbus communication with remote clients relies on [jlibmodbus](https://github.com/kochedykov/jlibmodbus).
 - GUI execution requires an active X display.
 
 Verified in this workspace on March 3, 2026:
