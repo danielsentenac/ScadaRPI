@@ -1,36 +1,137 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1100" viewBox="0 0 1800 1100">
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#f3f8ff"/>
-      <stop offset="100%" stop-color="#e7f0fc"/>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="1800"
+   height="1100"
+   viewBox="0 0 1800 1100"
+   version="1.1"
+   id="svg244"
+   sodipodi:docname="architecture_schema.svg"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   inkscape:export-filename="architecture_schema.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview246"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="0.75388889"
+     inkscape:cx="574.3552"
+     inkscape:cy="550.479"
+     inkscape:window-width="1499"
+     inkscape:window-height="749"
+     inkscape:window-x="223"
+     inkscape:window-y="186"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg244" />
+  <defs
+     id="defs32">
+    <linearGradient
+       id="bg"
+       x1="0"
+       y1="0"
+       x2="0"
+       y2="1">
+      <stop
+         offset="0%"
+         stop-color="#f3f8ff"
+         id="stop2" />
+      <stop
+         offset="100%"
+         stop-color="#e7f0fc"
+         id="stop4" />
     </linearGradient>
-    <linearGradient id="ctrlLane" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#edf5ff"/>
-      <stop offset="100%" stop-color="#e2eeff"/>
+    <linearGradient
+       id="ctrlLane"
+       x1="0"
+       y1="0"
+       x2="0"
+       y2="1">
+      <stop
+         offset="0%"
+         stop-color="#edf5ff"
+         id="stop7" />
+      <stop
+         offset="100%"
+         stop-color="#e2eeff"
+         id="stop9" />
     </linearGradient>
-    <linearGradient id="instLane" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#eefaf4"/>
-      <stop offset="100%" stop-color="#e0f3e9"/>
+    <linearGradient
+       id="instLane"
+       x1="0"
+       y1="0"
+       x2="0"
+       y2="1">
+      <stop
+         offset="0%"
+         stop-color="#eefaf4"
+         id="stop12" />
+      <stop
+         offset="100%"
+         stop-color="#e0f3e9"
+         id="stop14" />
     </linearGradient>
-    <linearGradient id="i2cBus" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#4b6e9e"/>
-      <stop offset="100%" stop-color="#7a99c2"/>
+    <linearGradient
+       id="i2cBus"
+       x1="0"
+       y1="0"
+       x2="1"
+       y2="0">
+      <stop
+         offset="0%"
+         stop-color="#4b6e9e"
+         id="stop17" />
+      <stop
+         offset="100%"
+         stop-color="#7a99c2"
+         id="stop19" />
     </linearGradient>
-    <linearGradient id="instBus" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#3f8668"/>
-      <stop offset="100%" stop-color="#6bab92"/>
+    <linearGradient
+       id="instBus"
+       x1="263.33914"
+       y1="2196.487"
+       x2="437.84415"
+       y2="2196.487"
+       gradientTransform="scale(3.7935873,0.26360274)"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         offset="0%"
+         stop-color="#3f8668"
+         id="stop22" />
+      <stop
+         offset="100%"
+         stop-color="#6bab92"
+         id="stop24" />
     </linearGradient>
-    <marker id="arrow" markerWidth="12" markerHeight="8" refX="10" refY="4" orient="auto">
-      <polygon points="0,0 12,4 0,8" fill="#2f537f"/>
+    <marker
+       id="arrow"
+       markerWidth="12"
+       markerHeight="8"
+       refX="10"
+       refY="4"
+       orient="auto">
+      <polygon
+         points="0,0 12,4 0,8"
+         fill="#1f3f66"
+         id="polygon27" />
     </marker>
-    <style>
-      .title { font: 700 44px "DejaVu Sans", Arial, sans-serif; fill: #113863; }
-      .subtitle { font: 600 22px "DejaVu Sans", Arial, sans-serif; fill: #224b78; }
-      .laneTitle { font: 700 26px "DejaVu Sans", Arial, sans-serif; fill: #18416d; }
-      .head { font: 700 28px "DejaVu Sans", Arial, sans-serif; fill: #143a61; }
-      .text { font: 500 21px "DejaVu Sans", Arial, sans-serif; fill: #1e3f63; }
-      .small { font: 500 18px "DejaVu Sans", Arial, sans-serif; fill: #2b4d72; }
+    <style
+       id="style30">
+      .title { font: 700 44px &quot;DejaVu Sans&quot;, Arial, sans-serif; fill: #113863; }
+      .subtitle { font: 600 22px &quot;DejaVu Sans&quot;, Arial, sans-serif; fill: #224b78; }
+      .laneTitle { font: 700 26px &quot;DejaVu Sans&quot;, Arial, sans-serif; fill: #18416d; }
+      .head { font: 700 28px &quot;DejaVu Sans&quot;, Arial, sans-serif; fill: #143a61; }
+      .text { font: 500 21px &quot;DejaVu Sans&quot;, Arial, sans-serif; fill: #1e3f63; }
+      .small { font: 500 18px &quot;DejaVu Sans&quot;, Arial, sans-serif; fill: #2b4d72; }
       .box { stroke: #335f8e; stroke-width: 3; rx: 18; ry: 18; }
       .rpi { fill: #f8fbff; }
       .remote { fill: #f3f8ff; }
@@ -39,126 +140,614 @@
       .plc { fill: #e8f5f0; }
       .field { fill: #fff9eb; }
       .inst { fill: #f1fff8; }
-      .line { stroke: #2f537f; stroke-width: 4; fill: none; marker-end: url(#arrow); }
-      .branch { stroke: #3d628f; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+      .line { stroke: #2f537f; stroke-width: 4.5; fill: none; marker-end: url(#arrow); }
+      .branch { stroke: #2f537f; stroke-width: 3.8; fill: none; marker-end: url(#arrow); }
+      .flowNet { stroke: #1f4c86; stroke-width: 5.2; fill: none; marker-end: url(#arrow); }
+      .flowI2C { stroke: #2f5d95; stroke-width: 5.2; fill: none; marker-end: url(#arrow); }
+      .flowInst { stroke: #2f7b60; stroke-width: 5.2; fill: none; marker-end: url(#arrow); }
       .split { stroke: #6d8fb7; stroke-width: 2; stroke-dasharray: 10 8; }
+      .tag { fill: #ffffff; stroke: #7f9cbc; stroke-width: 1.5; rx: 8; ry: 8; opacity: 0.96; }
+      .tagText { font: 600 15px &quot;DejaVu Sans&quot;, Arial, sans-serif; fill: #244a74; }
     </style>
+    <marker
+       id="arrow-3"
+       markerWidth="12"
+       markerHeight="8"
+       refX="10"
+       refY="4"
+       orient="auto">
+      <polygon
+         points="12,4 0,8 0,0 "
+         fill="#1f3f66"
+         id="polygon27-6" />
+    </marker>
+    <marker
+       id="arrow-5"
+       markerWidth="12"
+       markerHeight="8"
+       refX="10"
+       refY="4"
+       orient="auto">
+      <polygon
+         points="12,4 0,8 0,0 "
+         fill="#1f3f66"
+         id="polygon27-3" />
+    </marker>
   </defs>
-
-  <rect x="0" y="0" width="1800" height="1100" fill="url(#bg)"/>
-
-  <text class="title" x="900" y="64" text-anchor="middle">SCADARPI Architecture Schema (Generic)</text>
-  <text class="subtitle" x="900" y="100" text-anchor="middle">Raspberry Pi Main CPU + Controllino PLC real-time control + instrument interfaces</text>
-
+  <rect
+     x="0"
+     y="0"
+     width="1800"
+     height="1100"
+     fill="url(#bg)"
+     id="rect34" />
+  <text
+     class="title"
+     x="900"
+     y="64"
+     text-anchor="middle"
+     id="text36"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">SCADARPI Architecture Schema (Generic)</text>
+  <text
+     class="subtitle"
+     x="900"
+     y="100"
+     text-anchor="middle"
+     id="text38"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">Raspberry Pi Main CPU + Controllino PLC real-time control + instrument interfaces</text>
   <!-- Core compute and remote clients -->
-  <rect class="box rpi" x="70" y="130" width="780" height="250"/>
-  <text class="head" x="460" y="178" text-anchor="middle">Raspberry Pi Main CPU</text>
-  <text class="text" x="110" y="225">- SCADARPI Java runtime + GLG HMI</text>
-  <text class="text" x="110" y="260">- Control supervisor and sequencing logic</text>
-  <text class="text" x="110" y="295">- Direct sensor/instrument interfaces manager</text>
-  <text class="text" x="110" y="330">- Modbus TCP endpoint (jlibmodbus)</text>
-
-  <rect class="box remote" x="960" y="140" width="770" height="220"/>
-  <text class="head" x="1345" y="188" text-anchor="middle">Remote SCADA / Supervisory Clients</text>
-  <text class="text" x="1000" y="235">- Control room clients and remote HMIs</text>
-  <text class="text" x="1000" y="270">- Supervisor services and data collection</text>
-  <text class="text" x="1000" y="305">- Ethernet/TCP via Modbus TCP and HTTP</text>
-
-  <path class="line" d="M850,235 L960,235"/>
-  <text class="small" x="905" y="222" text-anchor="middle">Network link</text>
-
+  <rect
+     class="box rpi"
+     x="70"
+     y="130"
+     width="780"
+     height="250"
+     id="rect40" />
+  <text
+     class="head"
+     x="460"
+     y="178"
+     text-anchor="middle"
+     id="text42"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">Raspberry Pi Main CPU</text>
+  <text
+     class="text"
+     x="110"
+     y="225"
+     id="text44"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">- SCADARPI Java runtime + GLG HMI</text>
+  <text
+     class="text"
+     x="110"
+     y="260"
+     id="text46"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">- Control supervisor and sequencing logic</text>
+  <text
+     class="text"
+     x="110"
+     y="295"
+     id="text48"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">- Direct sensor/instrument interfaces manager</text>
+  <text
+     class="text"
+     x="110"
+     y="330"
+     id="text50"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">- Modbus TCP endpoint (jlibmodbus)</text>
+  <rect
+     class="box remote"
+     x="970"
+     y="140"
+     width="770"
+     height="220"
+     id="rect52" />
+  <text
+     class="head"
+     x="1355"
+     y="188"
+     text-anchor="middle"
+     id="text54"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:28px;line-height:normal;font-family:sans-serif;-inkscape-font-specification:sans-serif">Remote SCADA / Supervisor clients</text>
+  <text
+     class="text"
+     x="1010"
+     y="235"
+     id="text56"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:21px;line-height:normal;font-family:sans-serif;-inkscape-font-specification:sans-serif">- Control room clients and remote HMIs</text>
+  <text
+     class="text"
+     x="1010"
+     y="270"
+     id="text58"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:21px;line-height:normal;font-family:sans-serif;-inkscape-font-specification:sans-serif">- Supervisor services and data collection</text>
+  <path
+     class="flowNet"
+     d="M 850.35825,271.0873 H 960.73309"
+     id="path62" />
+  <text
+     class="tagText"
+     x="911.02979"
+     y="226.08041"
+     text-anchor="middle"
+     id="text66"
+     transform="rotate(0.15704316)"
+     style="font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;font-size:15px;line-height:normal;font-family:sans-serif;-inkscape-font-specification:sans-serif"><tspan
+       style="font-size:17.3333px"
+       id="tspan736">Modbus TCP</tspan></text>
   <!-- Architecture split line -->
-  <line class="split" x1="900" y1="415" x2="900" y2="1060"/>
-
+  <line
+     class="split"
+     x1="900"
+     y1="415"
+     x2="900"
+     y2="1060"
+     id="line68" />
   <!-- Left lane: PLC real-time control -->
-  <rect class="laneL" x="60" y="430" width="820" height="620"/>
-  <text class="laneTitle" x="470" y="470" text-anchor="middle">Path A: Real-time control (Controllino PLC, 24V digital I/O)</text>
-
-  <rect x="150" y="510" width="640" height="36" rx="18" ry="18" fill="url(#i2cBus)" stroke="#31517b" stroke-width="2"/>
-  <text class="small" x="470" y="502" text-anchor="middle">I2C link: Raspberry Pi to Controllino modules</text>
-  <text class="small" x="470" y="535" text-anchor="middle" fill="#ffffff">I2C control backbone</text>
-  <path class="line" d="M430,380 L430,510"/>
-
-  <rect class="box plc" x="100" y="600" width="220" height="170"/>
-  <text class="head" x="210" y="642" text-anchor="middle">Module A</text>
-  <text class="small" x="120" y="678">- Valve relays</text>
-  <text class="small" x="120" y="705">- Interlock outputs</text>
-  <text class="small" x="120" y="732">- 24V digital DO</text>
-
-  <rect class="box plc" x="360" y="600" width="220" height="170"/>
-  <text class="head" x="470" y="642" text-anchor="middle">Module B</text>
-  <text class="small" x="380" y="678">- Power relays</text>
-  <text class="small" x="380" y="705">- Aux control outputs</text>
-  <text class="small" x="380" y="732">- Status handling</text>
-
-  <rect class="box plc" x="620" y="600" width="220" height="170"/>
-  <text class="head" x="730" y="642" text-anchor="middle">Module C</text>
-  <text class="small" x="640" y="678">- Rack fans control</text>
-  <text class="small" x="640" y="705">- Low/High noise modes</text>
-  <text class="small" x="640" y="732">- Noise status feedback</text>
-
-  <path class="line" d="M210,546 L210,600"/>
-  <path class="line" d="M470,546 L470,600"/>
-  <path class="line" d="M730,546 L730,600"/>
-
-  <rect class="box field" x="85" y="890" width="180" height="130"/>
-  <text class="head" x="175" y="936" text-anchor="middle">Valves</text>
-  <text class="small" x="175" y="970" text-anchor="middle">Relay-actuated</text>
-
-  <rect class="box field" x="275" y="890" width="180" height="130"/>
-  <text class="head" x="365" y="936" text-anchor="middle">Power</text>
-  <text class="small" x="365" y="970" text-anchor="middle">On/Off relays</text>
-
-  <rect class="box field" x="465" y="890" width="180" height="130"/>
-  <text class="head" x="555" y="936" text-anchor="middle">Status DI</text>
-  <text class="small" x="555" y="970" text-anchor="middle">Feedback signals</text>
-
-  <rect class="box field" x="655" y="890" width="180" height="130"/>
-  <text class="head" x="745" y="936" text-anchor="middle">Rack Fans</text>
-  <text class="small" x="745" y="970" text-anchor="middle">Low/High noise</text>
-
-  <path class="branch" d="M210,770 L175,890"/>
-  <path class="branch" d="M470,770 L365,890"/>
-  <path class="branch" d="M730,770 L555,890"/>
-  <path class="branch" d="M730,770 L745,890"/>
-
+  <rect
+     class="laneL"
+     x="60"
+     y="430"
+     width="820"
+     height="620"
+     id="rect70" />
+  <text
+     class="laneTitle"
+     x="574"
+     y="464"
+     text-anchor="middle"
+     id="text72"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:26px;line-height:normal;font-family:sans-serif;-inkscape-font-specification:sans-serif">Path A: Controllino PLC, 24V digital I/O</text>
+  <rect
+     x="150"
+     y="510"
+     width="640"
+     height="36"
+     rx="18"
+     ry="18"
+     fill="url(#i2cBus)"
+     stroke="#31517b"
+     stroke-width="2"
+     id="rect74" />
+  <text
+     class="small"
+     x="470"
+     y="535"
+     text-anchor="middle"
+     fill="#ffffff"
+     id="text78"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">I2C control backbone</text>
+  <path
+     class="flowI2C"
+     d="M 230,380 V 502.14834"
+     id="path80" />
+  <text
+     class="tagText"
+     x="252"
+     y="411"
+     text-anchor="middle"
+     id="text84"
+     style="font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;font-size:15px;line-height:normal;font-family:sans-serif;-inkscape-font-specification:sans-serif"><tspan
+       style="font-size:17.3333px"
+       id="tspan734">I2C</tspan></text>
+  <rect
+     class="box plc"
+     x="100"
+     y="600"
+     width="220"
+     height="170"
+     id="rect90" />
+  <text
+     class="head"
+     x="210"
+     y="642"
+     text-anchor="middle"
+     id="text92"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">Module A</text>
+  <text
+     class="small"
+     x="120"
+     y="678"
+     id="text94"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">- Valve relays</text>
+  <text
+     class="small"
+     x="120"
+     y="705"
+     id="text96"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">- Interlock outputs</text>
+  <text
+     class="small"
+     x="120"
+     y="732"
+     id="text98"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">- 24V digital DO</text>
+  <rect
+     class="box plc"
+     x="360"
+     y="600"
+     width="220"
+     height="170"
+     id="rect100" />
+  <text
+     class="head"
+     x="470"
+     y="642"
+     text-anchor="middle"
+     id="text102"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">Module B</text>
+  <text
+     class="small"
+     x="380"
+     y="678"
+     id="text104"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">- Power relays</text>
+  <text
+     class="small"
+     x="380"
+     y="705"
+     id="text106"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">- Aux control outputs</text>
+  <text
+     class="small"
+     x="380"
+     y="732"
+     id="text108"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">- Status handling</text>
+  <rect
+     class="box plc"
+     x="620"
+     y="600"
+     width="220"
+     height="170"
+     id="rect110" />
+  <text
+     class="head"
+     x="730"
+     y="642"
+     text-anchor="middle"
+     id="text112"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">Module C</text>
+  <text
+     class="small"
+     x="640"
+     y="678"
+     id="text114"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">- Rack fans control</text>
+  <text
+     class="small"
+     x="640"
+     y="705"
+     id="text116"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">- Low/High noise modes</text>
+  <text
+     class="small"
+     x="640"
+     y="732"
+     id="text118"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">- Noise status feedback</text>
+  <path
+     class="line"
+     d="M210,546 L210,600"
+     id="path120" />
+  <path
+     class="line"
+     d="M470,546 L470,600"
+     id="path122" />
+  <path
+     class="line"
+     d="M730,546 L730,600"
+     id="path124" />
+  <rect
+     class="box field"
+     x="85"
+     y="890"
+     width="180"
+     height="130"
+     id="rect126" />
+  <text
+     class="head"
+     x="175"
+     y="936"
+     text-anchor="middle"
+     id="text128"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">Valves</text>
+  <text
+     class="small"
+     x="175"
+     y="970"
+     text-anchor="middle"
+     id="text130"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">Relay-actuated</text>
+  <rect
+     class="box field"
+     x="275"
+     y="890"
+     width="180"
+     height="130"
+     id="rect132" />
+  <text
+     class="head"
+     x="363"
+     y="920"
+     text-anchor="middle"
+     id="text134"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:28px;line-height:normal;font-family:sans-serif;-inkscape-font-specification:sans-serif"><tspan
+       sodipodi:role="line"
+       id="tspan678"
+       x="363"
+       y="920">Pumps</tspan><tspan
+       sodipodi:role="line"
+       id="tspan680"
+       x="363"
+       y="955">Power</tspan></text>
+  <text
+     class="small"
+     x="365"
+     y="992"
+     text-anchor="middle"
+     id="text136"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18px;line-height:normal;font-family:sans-serif;-inkscape-font-specification:sans-serif">On/Off relays</text>
+  <rect
+     class="box field"
+     x="465"
+     y="890"
+     width="180"
+     height="130"
+     id="rect138" />
+  <text
+     class="head"
+     x="555"
+     y="936"
+     text-anchor="middle"
+     id="text140"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">Status DI</text>
+  <text
+     class="small"
+     x="555"
+     y="970"
+     text-anchor="middle"
+     id="text142"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">Feedback signals</text>
+  <rect
+     class="box field"
+     x="655"
+     y="890"
+     width="180"
+     height="130"
+     id="rect144" />
+  <text
+     class="head"
+     x="745"
+     y="936"
+     text-anchor="middle"
+     id="text146"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">Rack Fans</text>
+  <text
+     class="small"
+     x="745"
+     y="970"
+     text-anchor="middle"
+     id="text148"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">Low/High noise</text>
+  <path
+     class="branch"
+     d="M210,770 L175,890"
+     id="path150" />
+  <path
+     class="branch"
+     d="M470,770 L365,890"
+     id="path152" />
+  <path
+     class="branch"
+     d="M 290.57578,770.93523 520.76769,886.88791"
+     id="path154" />
+  <path
+     class="branch"
+     d="M 700.77213,775.62714 555.44435,887.48026"
+     id="path154-5"
+     style="fill:none;stroke:#2f537f;stroke-width:3.34327;marker-end:url(#arrow-5)" />
+  <path
+     class="branch"
+     d="M730,770 L745,890"
+     id="path156" />
+  <text
+     class="tagText"
+     x="470"
+     y="1039"
+     text-anchor="middle"
+     id="text160"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;line-height:normal;font-family:sans-serif;-inkscape-font-specification:sans-serif">24V digital I/O (DO commands + DI feedback)</text>
   <!-- Right lane: direct instrument interfaces -->
-  <rect class="laneR" x="920" y="430" width="820" height="620"/>
-  <text class="laneTitle" x="1330" y="470" text-anchor="middle">Path B: Instrument interfaces managed directly by Raspberry Pi</text>
-
-  <rect x="1000" y="520" width="660" height="40" rx="20" ry="20" fill="url(#instBus)" stroke="#3f775f" stroke-width="2"/>
-  <text class="small" x="1330" y="510" text-anchor="middle">Instrument buses: RS232/RS485, SPI, I2C, USB-serial</text>
-  <text class="small" x="1330" y="546" text-anchor="middle" fill="#ffffff">Direct RPi instrument/sensor communication layer</text>
-  <path class="line" d="M570,380 L570,540 L1000,540"/>
-
-  <rect class="box inst" x="980" y="640" width="330" height="150"/>
-  <text class="head" x="1145" y="684" text-anchor="middle">Instruments Group 1</text>
-  <text class="small" x="1010" y="720">- Gauges</text>
-  <text class="small" x="1010" y="746">- Pumps</text>
-  <text class="small" x="1010" y="772">- RGA</text>
-
-  <rect class="box inst" x="1350" y="640" width="330" height="150"/>
-  <text class="head" x="1515" y="684" text-anchor="middle">Instruments Group 2</text>
-  <text class="small" x="1380" y="720">- Flowmeters</text>
-  <text class="small" x="1380" y="746">- Aux controllers</text>
-  <text class="small" x="1380" y="772">- Serial devices</text>
-
-  <rect class="box inst" x="980" y="840" width="330" height="160"/>
-  <text class="head" x="1145" y="885" text-anchor="middle">Temperature Sensors</text>
-  <text class="small" x="1010" y="922">- Read directly by Raspberry Pi</text>
-  <text class="small" x="1010" y="948">- Polled through local buses</text>
-  <text class="small" x="1010" y="974">- Integrated in SCADA logic</text>
-
-  <rect class="box inst" x="1350" y="840" width="330" height="160"/>
-  <text class="head" x="1515" y="885" text-anchor="middle">Instrument Status</text>
-  <text class="small" x="1380" y="922">- Telemetry and states</text>
-  <text class="small" x="1380" y="948">- Setpoints / commands</text>
-  <text class="small" x="1380" y="974">- Diagnostics feedback</text>
-
-  <path class="branch" d="M1145,560 L1145,640"/>
-  <path class="branch" d="M1515,560 L1515,640"/>
-  <path class="branch" d="M1145,560 L1145,840"/>
-  <path class="branch" d="M1515,560 L1515,840"/>
-
-  <text class="small" x="900" y="407" text-anchor="middle">Control architecture split: PLC real-time 24V control vs direct instrument interfaces</text>
+  <rect
+     class="laneR"
+     x="920"
+     y="430"
+     width="820"
+     height="620"
+     id="rect162" />
+  <text
+     class="laneTitle"
+     x="1432"
+     y="464"
+     text-anchor="middle"
+     id="text164"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:26px;line-height:normal;font-family:sans-serif;-inkscape-font-specification:sans-serif">Path B: Instrument controllers interface</text>
+  <rect
+     x="1000.1982"
+     y="531.23181"
+     width="660"
+     height="44"
+     rx="22"
+     ry="22"
+     fill="url(#instBus)"
+     stroke="#3f775f"
+     stroke-width="2"
+     id="rect166"
+     style="fill:url(#instBus)" />
+  <text
+     class="small"
+     x="998.25153"
+     y="-32.714104"
+     text-anchor="middle"
+     id="text168"
+     style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:18px;line-height:normal;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:0.747861"
+     transform="matrix(0.98434806,0.44840345,-0.59120287,0.74658815,0,0)">RS232/RS485, SPI, I2C, USB-serial</text>
+  <text
+     class="small"
+     x="1328"
+     y="559"
+     text-anchor="middle"
+     fill="#ffffff"
+     id="text170"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18px;line-height:normal;font-family:sans-serif;-inkscape-font-specification:sans-serif">Direct RPi instrument/sensor communication layer</text>
+  <path
+     class="flowInst"
+     d="m 849.86251,374.59831 -0.0244,-2.13251 339.36399,154.83677"
+     id="path172"
+     sodipodi:nodetypes="ccc" />
+  <rect
+     class="box inst"
+     x="980"
+     y="640"
+     width="330"
+     height="150"
+     id="rect178" />
+  <text
+     class="head"
+     x="1145"
+     y="684"
+     text-anchor="middle"
+     id="text180"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:28px;line-height:normal;font-family:sans-serif;-inkscape-font-specification:sans-serif">Instruments Group</text>
+  <text
+     class="small"
+     x="1010"
+     y="720"
+     id="text182"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">- Gauges</text>
+  <text
+     class="small"
+     x="1010"
+     y="746"
+     id="text184"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">- Pumps</text>
+  <text
+     class="small"
+     x="1010"
+     y="772"
+     id="text186"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">- RGA</text>
+  <rect
+     class="box inst"
+     x="1350"
+     y="640"
+     width="330"
+     height="150"
+     id="rect188" />
+  <text
+     class="head"
+     x="1515"
+     y="684"
+     text-anchor="middle"
+     id="text190"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:28px;line-height:normal;font-family:sans-serif;-inkscape-font-specification:sans-serif">Instruments Group</text>
+  <text
+     class="small"
+     x="1380"
+     y="720"
+     id="text192"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">- Flowmeters</text>
+  <text
+     class="small"
+     x="1380"
+     y="746"
+     id="text194"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">- Aux controllers</text>
+  <text
+     class="small"
+     x="1380"
+     y="772"
+     id="text196"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">- Serial devices</text>
+  <rect
+     class="box inst"
+     x="980"
+     y="840"
+     width="330"
+     height="160"
+     id="rect198" />
+  <text
+     class="head"
+     x="1178.1532"
+     y="850.09937"
+     text-anchor="middle"
+     id="text200"
+     transform="scale(0.97084731,1.0300281)"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:28px;line-height:normal;font-family:sans-serif;stroke-width:0.532927;-inkscape-font-specification:sans-serif">Temperature Sensors</text>
+  <text
+     class="small"
+     x="1010"
+     y="922"
+     id="text202"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">- Read directly by Raspberry Pi</text>
+  <text
+     class="small"
+     x="1010"
+     y="948"
+     id="text204"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">- Polled through local buses</text>
+  <text
+     class="small"
+     x="1010"
+     y="974"
+     id="text206"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">- Integrated in SCADA logic</text>
+  <rect
+     class="box inst"
+     x="1350"
+     y="840"
+     width="330"
+     height="160"
+     id="rect208" />
+  <text
+     class="head"
+     x="1511"
+     y="875"
+     text-anchor="middle"
+     id="text210"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:28px;line-height:normal;font-family:sans-serif;-inkscape-font-specification:sans-serif">Instrument Status</text>
+  <text
+     class="small"
+     x="1380"
+     y="922"
+     id="text212"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">- Telemetry and states</text>
+  <text
+     class="small"
+     x="1380"
+     y="948"
+     id="text214"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">- Setpoints / commands</text>
+  <text
+     class="small"
+     x="1380"
+     y="974"
+     id="text216"
+     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">- Diagnostics feedback</text>
+  <path
+     class="branch"
+     d="M1145,624 L1145,640"
+     id="path218" />
+  <path
+     class="branch"
+     d="M1515,624 L1515,640"
+     id="path220" />
+  <path
+     class="branch"
+     d="M1145,624 L1145,840"
+     id="path222" />
+  <path
+     class="branch"
+     d="M1515,624 L1515,840"
+     id="path224" />
 </svg>
