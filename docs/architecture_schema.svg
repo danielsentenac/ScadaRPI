@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="980" viewBox="0 0 1600 980">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#eef8ff"/>
+      <stop offset="100%" stop-color="#dcefff"/>
+    </linearGradient>
+    <linearGradient id="busGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#4f7fb4"/>
+      <stop offset="100%" stop-color="#7aa7d5"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="12" markerHeight="8" refX="10" refY="4" orient="auto">
+      <polygon points="0,0 12,4 0,8" fill="#2b4f7b"/>
+    </marker>
+    <style>
+      .title { font: 700 42px "DejaVu Sans", Arial, sans-serif; fill: #11345e; }
+      .subtitle { font: 600 20px "DejaVu Sans", Arial, sans-serif; fill: #1d446f; }
+      .heading { font: 700 27px "DejaVu Sans", Arial, sans-serif; fill: #14365f; }
+      .text { font: 500 21px "DejaVu Sans", Arial, sans-serif; fill: #1b3656; }
+      .small { font: 500 18px "DejaVu Sans", Arial, sans-serif; fill: #254a73; }
+      .block { stroke: #2d5887; stroke-width: 3; rx: 20; ry: 20; }
+      .pi { fill: #f8fcff; }
+      .remote { fill: #edf6ff; }
+      .module { fill: #e6f7f2; }
+      .instrument { fill: #fff9eb; }
+      .line { stroke: #2b4f7b; stroke-width: 4; fill: none; marker-end: url(#arrow); }
+      .branch { stroke: #3a628f; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="1600" height="980" fill="url(#bg)"/>
+
+  <text class="title" x="800" y="62" text-anchor="middle">Generic SCADA Architecture</text>
+  <text class="subtitle" x="800" y="96" text-anchor="middle">Raspberry Pi Main CPU + Controllino PLC Modules + Instruments</text>
+
+  <!-- Raspberry Pi Main Block -->
+  <rect class="block pi" x="70" y="145" width="500" height="290"/>
+  <text class="heading" x="320" y="190" text-anchor="middle">Raspberry Pi Main CPU</text>
+  <text class="text" x="105" y="238">- SCADARPI Java application</text>
+  <text class="text" x="105" y="274">- GLG Toolkit / HMI screens</text>
+  <text class="text" x="105" y="310">- Pi4J (hardware I/O layer)</text>
+  <text class="text" x="105" y="346">- jlibmodbus (remote Modbus)</text>
+  <text class="text" x="105" y="382">- Local control and monitoring logic</text>
+
+  <!-- Remote Clients Block -->
+  <rect class="block remote" x="1030" y="145" width="500" height="220"/>
+  <text class="heading" x="1280" y="190" text-anchor="middle">Remote Clients / Supervisors</text>
+  <text class="text" x="1068" y="238">- SCADA clients and control rooms</text>
+  <text class="text" x="1068" y="274">- Logging and supervisory services</text>
+  <text class="text" x="1068" y="310">- Modbus TCP / HTTP interfaces</text>
+
+  <!-- I2C Backbone -->
+  <rect x="130" y="470" width="1340" height="32" rx="16" ry="16" fill="url(#busGrad)" stroke="#315d8e" stroke-width="2"/>
+  <text class="heading" x="800" y="458" text-anchor="middle">I2C Backbone</text>
+
+  <!-- Pi to Remote -->
+  <path class="line" d="M570,235 L1030,235"/>
+  <text class="small" x="800" y="223" text-anchor="middle">Ethernet / TCP (Modbus TCP, HTTP)</text>
+
+  <!-- Pi to I2C -->
+  <path class="line" d="M320,435 L320,470"/>
+
+  <!-- Controllino modules -->
+  <rect class="block module" x="180" y="560" width="360" height="165"/>
+  <text class="heading" x="360" y="605" text-anchor="middle">Controllino Module A</text>
+  <text class="text" x="210" y="645">- Digital outputs / relays</text>
+  <text class="text" x="210" y="676">- Interlocks and valve control</text>
+
+  <rect class="block module" x="620" y="560" width="360" height="165"/>
+  <text class="heading" x="800" y="605" text-anchor="middle">Controllino Module B</text>
+  <text class="text" x="650" y="645">- Analog and digital channels</text>
+  <text class="text" x="650" y="676">- Pump and actuator commands</text>
+
+  <rect class="block module" x="1060" y="560" width="360" height="165"/>
+  <text class="heading" x="1240" y="605" text-anchor="middle">Controllino Module C</text>
+  <text class="text" x="1090" y="645">- Additional I/O expansion</text>
+  <text class="text" x="1090" y="676">- Safety and status collection</text>
+
+  <!-- I2C bus to modules -->
+  <path class="line" d="M360,502 L360,560"/>
+  <path class="line" d="M800,502 L800,560"/>
+  <path class="line" d="M1240,502 L1240,560"/>
+
+  <!-- Instruments -->
+  <rect class="block instrument" x="90" y="805" width="320" height="120"/>
+  <text class="heading" x="250" y="848" text-anchor="middle">Vacuum Valves</text>
+  <text class="small" x="250" y="882" text-anchor="middle">Solenoids, interlocks, safety loops</text>
+
+  <rect class="block instrument" x="450" y="805" width="320" height="120"/>
+  <text class="heading" x="610" y="848" text-anchor="middle">Gauges and Sensors</text>
+  <text class="small" x="610" y="882" text-anchor="middle">Pressure, temperature, status signals</text>
+
+  <rect class="block instrument" x="810" y="805" width="320" height="120"/>
+  <text class="heading" x="970" y="848" text-anchor="middle">Pumps and Actuators</text>
+  <text class="small" x="970" y="882" text-anchor="middle">Turbo, roughing, setpoint devices</text>
+
+  <rect class="block instrument" x="1170" y="805" width="320" height="120"/>
+  <text class="heading" x="1330" y="848" text-anchor="middle">Auxiliary Instruments</text>
+  <text class="small" x="1330" y="882" text-anchor="middle">Flowmeters, counters, RGA, others</text>
+
+  <!-- Module to instrument connections -->
+  <path class="branch" d="M300,725 L250,805"/>
+  <path class="branch" d="M420,725 L610,805"/>
+
+  <path class="branch" d="M760,725 L610,805"/>
+  <path class="branch" d="M840,725 L970,805"/>
+
+  <path class="branch" d="M1180,725 L970,805"/>
+  <path class="branch" d="M1300,725 L1330,805"/>
+
+  <text class="small" x="800" y="770" text-anchor="middle">Field communication via digital I/O, analog signals, serial links and protocol adapters</text>
+</svg>

@@ -1,6 +1,7 @@
 # SCADARPI
 
 SCADARPI is a multi-application Java 8 project for SCADA/HMI stations, designed primarily for [Raspberry Pi](https://www.raspberrypi.com/) embedded systems.  
+It has been designed for the Virgo vacuum subsystem and works in association with [Controllino PLC](https://www.controllino.com/), communicating with the main Raspberry Pi CPU through I2C.
 This work relies on the [GenLogic](https://www.genlogic.com/) GLG Toolkit for Java to build SCADA/HMI interfaces.
 Use GenLogic **GlgBuilder** to create and maintain the `.g` graphics files.
 Each `work_*` directory is a standalone application (own `Main.java`, device logic, GUI drawings, and logs), while top-level tooling (`scadarpi`, `Makefile`) gives one uniform way to compile and run them.
@@ -8,6 +9,10 @@ Each `work_*` directory is a standalone application (own `Main.java`, device log
 ## Illustration
 
 ![Tube 1500W Station SCADA/HMI screen](Illustration.png)
+
+## Architecture Schema
+
+![Generic SCADARPI architecture: Raspberry Pi + Controllino + instruments](docs/architecture_schema.png)
 
 ## Project layout
 
@@ -108,28 +113,10 @@ Clean generated artifacts:
 - `make run WORK=work_panel RUN_ARGS="--demo"`
 - `make clean WORK=work_panel`
 
-## Sanitizing confidential data
-
-Before publishing code, you can replace internal endpoints with generic values and later restore originals:
-
-```bash
-# Apply replacements defined in scripts/sanitize_rules.tsv
-./scripts/sanitize_public.sh apply
-
-# Check if a reversible sanitize state is active
-./scripts/sanitize_public.sh status
-
-# Restore original files exactly as they were before apply
-./scripts/sanitize_public.sh restore
-```
-
-The default rules file is `scripts/sanitize_rules.tsv` and is fully editable (supports `LITERAL` and `REGEX` rules).
-
 ## Current build status
 
 As of March 3, 2026 in this repository state:
-- All `work_*` targets compile except `work_pcounter`.
-- `work_pcounter` fails due to a Java syntax error at `work_pcounter/Controllino_3.java:163`.
+- Use `./scadarpi compile all` to validate the full build in your current environment.
 
 ## Notes for local testing
 
