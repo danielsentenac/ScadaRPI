@@ -1,0 +1,8 @@
+:root {
+  --primary-color: #1f4c86;
+  --primary-dark-color: #16385f;
+}
+
+.contents {
+  max-width: 1300px;
+}

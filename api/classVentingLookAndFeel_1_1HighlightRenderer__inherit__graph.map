@@ -1,0 +1,4 @@
+<map id="VentingLookAndFeel.HighlightRenderer" name="VentingLookAndFeel.HighlightRenderer">
+<area shape="rect" id="node1" title="Renderer that colors the active step row based on table client property." alt="" coords="5,80,223,121"/>
+<area shape="rect" id="node2" title=" " alt="" coords="20,5,208,32"/>
+</map>
