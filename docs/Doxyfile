@@ -1,0 +1,64 @@
+PROJECT_NAME           = "SCADARPI API"
+PROJECT_BRIEF          = "API documentation for SCADARPI Java applications"
+OUTPUT_DIRECTORY       = build/api-docs
+CREATE_SUBDIRS         = NO
+ALLOW_UNICODE_NAMES    = YES
+OUTPUT_LANGUAGE        = English
+
+INPUT                  = .
+FILE_PATTERNS          = *.java \
+                         *.md
+RECURSIVE              = YES
+EXCLUDE_PATTERNS       = */.git/* \
+                         */build/* \
+                         */lib/* \
+                         */docs/theme/* \
+                         */docs/doxygen/*
+USE_MDFILE_AS_MAINPAGE = README.md
+STRIP_FROM_PATH        = .
+
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = YES
+EXTRACT_STATIC         = YES
+EXTRACT_LOCAL_CLASSES  = YES
+HIDE_UNDOC_MEMBERS     = NO
+HIDE_UNDOC_CLASSES     = NO
+OPTIMIZE_OUTPUT_JAVA   = YES
+JAVADOC_AUTOBRIEF      = YES
+SORT_MEMBER_DOCS       = YES
+SORT_BRIEF_DOCS        = YES
+WARN_IF_UNDOCUMENTED   = NO
+WARN_IF_DOC_ERROR      = NO
+QUIET                  = YES
+
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+HTML_FILE_EXTENSION    = .html
+LAYOUT_FILE            = docs/doxygen/layout.xml
+HTML_EXTRA_STYLESHEET  = docs/theme/doxygen-awesome.css \
+                         docs/theme/doxygen-awesome-sidebar-only.css \
+                         docs/theme/zcm-awesome.css
+HTML_DYNAMIC_MENUS     = YES
+HTML_DYNAMIC_SECTIONS  = YES
+GENERATE_TREEVIEW      = YES
+DISABLE_INDEX          = NO
+SEARCHENGINE           = YES
+SOURCE_BROWSER         = YES
+INLINE_SOURCES         = NO
+REFERENCED_BY_RELATION = YES
+REFERENCES_RELATION    = YES
+ALPHABETICAL_INDEX     = YES
+
+HAVE_DOT               = YES
+DOT_IMAGE_FORMAT       = svg
+DOT_TRANSPARENT        = YES
+CLASS_DIAGRAMS         = YES
+COLLABORATION_GRAPH    = NO
+GROUP_GRAPHS           = NO
+CALL_GRAPH             = NO
+CALLER_GRAPH           = NO
+
+GENERATE_LATEX         = NO
+GENERATE_MAN           = NO
+GENERATE_RTF           = NO
+GENERATE_XML           = NO

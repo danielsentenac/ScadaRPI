@@ -1,3 +1,4 @@
 *.class
 .sanitize_state/
 scripts
+build/

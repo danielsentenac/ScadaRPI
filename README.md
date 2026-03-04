@@ -5,6 +5,7 @@ It has been designed for the Virgo vacuum subsystem and works in association wit
 This work relies on the [GenLogic](https://www.genlogic.com/) GLG Toolkit for Java to build SCADA/HMI interfaces.
 Use GenLogic **GlgBuilder** to create and maintain the `.g` graphics files.
 Each `work_*` directory is a standalone application (own `Main.java`, device logic, GUI drawings, and logs), while top-level tooling (`scadarpi`, `Makefile`) gives one uniform way to compile and run them.
+Live API docs: [https://danielsentenac.github.io/ScadaRPI/api/](https://danielsentenac.github.io/ScadaRPI/api/)
 
 ## Architecture Schema
 
@@ -13,6 +14,13 @@ Each `work_*` directory is a standalone application (own `Main.java`, device log
 ## GUI Example
 
 ![Tube 1500W Station SCADA/HMI screen](Illustration.png)
+
+## API Documentation
+
+- Published docs (GitHub Pages): [SCADARPI API](https://danielsentenac.github.io/ScadaRPI/api/)
+- Local generation: `./tools/generate_api_docs.sh`
+- Publish to `gh-pages`: `./tools/publish_api_docs.sh`
+- Styling/theme: [Doxygen Awesome CSS](https://github.com/jothepro/doxygen-awesome-css)
 
 ## Project layout
 

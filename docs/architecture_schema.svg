@@ -25,13 +25,13 @@
      inkscape:deskcolor="#d1d1d1"
      showgrid="false"
      inkscape:zoom="0.75388889"
-     inkscape:cx="574.3552"
-     inkscape:cy="550.479"
-     inkscape:window-width="1499"
-     inkscape:window-height="749"
-     inkscape:window-x="223"
-     inkscape:window-y="186"
-     inkscape:window-maximized="0"
+     inkscape:cx="855.56374"
+     inkscape:cy="551.80545"
+     inkscape:window-width="1920"
+     inkscape:window-height="1011"
+     inkscape:window-x="0"
+     inkscape:window-y="32"
+     inkscape:window-maximized="1"
      inkscape:current-layer="svg244" />
   <defs
      id="defs32">
@@ -172,6 +172,42 @@
          points="12,4 0,8 0,0 "
          fill="#1f3f66"
          id="polygon27-3" />
+    </marker>
+    <marker
+       id="arrow-5-7"
+       markerWidth="12"
+       markerHeight="8"
+       refX="10"
+       refY="4"
+       orient="auto">
+      <polygon
+         points="0,8 0,0 12,4 "
+         fill="#1f3f66"
+         id="polygon27-3-4" />
+    </marker>
+    <marker
+       id="arrow-2"
+       markerWidth="12"
+       markerHeight="8"
+       refX="10"
+       refY="4"
+       orient="auto">
+      <polygon
+         points="12,4 0,8 0,0 "
+         fill="#1f3f66"
+         id="polygon27-5" />
+    </marker>
+    <marker
+       id="arrow-7"
+       markerWidth="12"
+       markerHeight="8"
+       refX="10"
+       refY="4"
+       orient="auto">
+      <polygon
+         points="12,4 0,8 0,0 "
+         fill="#1f3f66"
+         id="polygon27-4" />
     </marker>
   </defs>
   <rect
@@ -439,117 +475,89 @@
      id="path124" />
   <rect
      class="box field"
-     x="85"
+     x="119"
      y="890"
      width="180"
      height="130"
      id="rect126" />
   <text
      class="head"
-     x="175"
+     x="209"
      y="936"
      text-anchor="middle"
      id="text128"
-     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">Valves</text>
+     style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:28px;line-height:normal;font-family:sans-serif;-inkscape-font-specification:sans-serif">Valves</text>
   <text
      class="small"
-     x="175"
+     x="209"
      y="970"
      text-anchor="middle"
      id="text130"
-     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">Relay-actuated</text>
+     style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:18px;line-height:normal;font-family:sans-serif;-inkscape-font-specification:sans-serif">Relay-actuated</text>
   <rect
      class="box field"
-     x="275"
+     x="371"
      y="890"
      width="180"
      height="130"
      id="rect132" />
   <text
      class="head"
-     x="363"
+     x="459"
      y="920"
      text-anchor="middle"
      id="text134"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:28px;line-height:normal;font-family:sans-serif;-inkscape-font-specification:sans-serif"><tspan
+     style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:28px;line-height:normal;font-family:sans-serif;-inkscape-font-specification:sans-serif"><tspan
        sodipodi:role="line"
        id="tspan678"
-       x="363"
+       x="459"
        y="920">Pumps</tspan><tspan
        sodipodi:role="line"
        id="tspan680"
-       x="363"
+       x="459"
        y="955">Power</tspan></text>
   <text
      class="small"
-     x="365"
+     x="461"
      y="992"
      text-anchor="middle"
      id="text136"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18px;line-height:normal;font-family:sans-serif;-inkscape-font-specification:sans-serif">On/Off relays</text>
+     style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:18px;line-height:normal;font-family:sans-serif;-inkscape-font-specification:sans-serif">On/Off relays</text>
   <rect
      class="box field"
-     x="465"
-     y="890"
-     width="180"
-     height="130"
-     id="rect138" />
-  <text
-     class="head"
-     x="555"
-     y="936"
-     text-anchor="middle"
-     id="text140"
-     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">Status DI</text>
-  <text
-     class="small"
-     x="555"
-     y="970"
-     text-anchor="middle"
-     id="text142"
-     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">Feedback signals</text>
-  <rect
-     class="box field"
-     x="655"
-     y="890"
+     x="639"
+     y="892"
      width="180"
      height="130"
      id="rect144" />
   <text
      class="head"
-     x="745"
-     y="936"
+     x="729"
+     y="938"
      text-anchor="middle"
      id="text146"
-     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">Rack Fans</text>
+     style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:28px;line-height:normal;font-family:sans-serif;-inkscape-font-specification:sans-serif">Rack Fans</text>
   <text
      class="small"
-     x="745"
-     y="970"
+     x="729"
+     y="972"
      text-anchor="middle"
      id="text148"
-     style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">Low/High noise</text>
+     style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:18px;line-height:normal;font-family:sans-serif;-inkscape-font-specification:sans-serif">Low/High noise</text>
   <path
      class="branch"
-     d="M210,770 L175,890"
-     id="path150" />
-  <path
-     class="branch"
-     d="M470,770 L365,890"
+     d="m 459.10635,768.22001 -1.52078,115.50262"
      id="path152" />
   <path
      class="branch"
-     d="M 290.57578,770.93523 520.76769,886.88791"
-     id="path154" />
+     d="m 204.06502,771.26927 -1.52078,115.50262"
+     id="path152-4"
+     style="fill:none;stroke:#2f537f;stroke-width:3.40046;marker-end:url(#arrow-2)" />
   <path
      class="branch"
-     d="M 700.77213,775.62714 555.44435,887.48026"
-     id="path154-5"
-     style="fill:none;stroke:#2f537f;stroke-width:3.34327;marker-end:url(#arrow-5)" />
-  <path
-     class="branch"
-     d="M730,770 L745,890"
-     id="path156" />
+     d="M 728.96939,770.13898 727.44861,885.6416"
+     id="path152-43"
+     style="fill:none;stroke:#2f537f;stroke-width:3.40046;marker-end:url(#arrow-7)" />
   <text
      class="tagText"
      x="470"
