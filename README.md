@@ -6,13 +6,13 @@ This work relies on the [GenLogic](https://www.genlogic.com/) GLG Toolkit for Ja
 Use GenLogic **GlgBuilder** to create and maintain the `.g` graphics files.
 Each `work_*` directory is a standalone application (own `Main.java`, device logic, GUI drawings, and logs), while top-level tooling (`scadarpi`, `Makefile`) gives one uniform way to compile and run them.
 
-## Illustration
-
-![Tube 1500W Station SCADA/HMI screen](Illustration.png)
-
 ## Architecture Schema
 
 ![Generic SCADARPI architecture: Raspberry Pi + Controllino + instruments](docs/architecture_schema.png)
+
+## GUI Example
+
+![Tube 1500W Station SCADA/HMI screen](Illustration.png)
 
 ## Project layout
 

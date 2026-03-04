@@ -9,6 +9,10 @@
       <stop offset="0%" stop-color="#4f7fb4"/>
       <stop offset="100%" stop-color="#7aa7d5"/>
     </linearGradient>
+    <linearGradient id="ifaceGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#4c8e75"/>
+      <stop offset="100%" stop-color="#79b49f"/>
+    </linearGradient>
     <marker id="arrow" markerWidth="12" markerHeight="8" refX="10" refY="4" orient="auto">
       <polygon points="0,0 12,4 0,8" fill="#2b4f7b"/>
     </marker>
@@ -25,6 +29,7 @@
       .instrument { fill: #fff9eb; }
       .line { stroke: #2b4f7b; stroke-width: 4; fill: none; marker-end: url(#arrow); }
       .branch { stroke: #3a628f; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+      .sepline { stroke: #6f8fb3; stroke-width: 2; stroke-dasharray: 8 8; fill: none; }
     </style>
   </defs>
 
@@ -81,32 +86,41 @@
   <path class="line" d="M800,502 L800,560"/>
   <path class="line" d="M1240,502 L1240,560"/>
 
-  <!-- Instruments -->
-  <rect class="block instrument" x="90" y="805" width="320" height="120"/>
-  <text class="heading" x="250" y="848" text-anchor="middle">Vacuum Valves</text>
-  <text class="small" x="250" y="882" text-anchor="middle">Solenoids, interlocks, safety loops</text>
+  <!-- Architecture split marker -->
+  <line class="sepline" x1="800" y1="540" x2="800" y2="930"/>
+  <text class="small" x="430" y="545" text-anchor="middle">Real-time control path (PLC 24V digital I/O)</text>
+  <text class="small" x="1180" y="545" text-anchor="middle">Instrument interface path (RPi serial/SPI/I2C buses)</text>
 
-  <rect class="block instrument" x="450" y="805" width="320" height="120"/>
-  <text class="heading" x="610" y="848" text-anchor="middle">Gauges and Sensors</text>
-  <text class="small" x="610" y="882" text-anchor="middle">Pressure, temperature, status signals</text>
+  <!-- Instrument interface bus -->
+  <rect x="850" y="744" width="660" height="28" rx="14" ry="14" fill="url(#ifaceGrad)" stroke="#3f7a64" stroke-width="2"/>
+  <text class="small" x="1180" y="734" text-anchor="middle">Instrument buses: RS232/RS485, SPI, I2C, USB-serial</text>
+  <path class="line" d="M500,435 L500,758"/>
 
-  <rect class="block instrument" x="810" y="805" width="320" height="120"/>
-  <text class="heading" x="970" y="848" text-anchor="middle">Pumps and Actuators</text>
-  <text class="small" x="970" y="882" text-anchor="middle">Turbo, roughing, setpoint devices</text>
+  <!-- Field endpoints -->
+  <rect class="block instrument" x="70" y="805" width="350" height="120"/>
+  <text class="heading" x="245" y="848" text-anchor="middle">Valve / Power Relays</text>
+  <text class="small" x="245" y="882" text-anchor="middle">Controllino-controlled 24V outputs</text>
 
-  <rect class="block instrument" x="1170" y="805" width="320" height="120"/>
-  <text class="heading" x="1330" y="848" text-anchor="middle">Auxiliary Instruments</text>
-  <text class="small" x="1330" y="882" text-anchor="middle">Flowmeters, counters, RGA, others</text>
+  <rect class="block instrument" x="450" y="805" width="350" height="120"/>
+  <text class="heading" x="625" y="848" text-anchor="middle">Status Signals (DI)</text>
+  <text class="small" x="625" y="882" text-anchor="middle">Valve status, power feedback, interlocks</text>
 
-  <!-- Module to instrument connections -->
-  <path class="branch" d="M300,725 L250,805"/>
-  <path class="branch" d="M420,725 L610,805"/>
+  <rect class="block instrument" x="850" y="805" width="320" height="120"/>
+  <text class="heading" x="1010" y="848" text-anchor="middle">Instruments</text>
+  <text class="small" x="1010" y="882" text-anchor="middle">Gauges, pumps, RGA, flowmeters</text>
 
-  <path class="branch" d="M760,725 L610,805"/>
-  <path class="branch" d="M840,725 L970,805"/>
+  <rect class="block instrument" x="1200" y="805" width="320" height="120"/>
+  <text class="heading" x="1360" y="848" text-anchor="middle">Temperature Sensors</text>
+  <text class="small" x="1360" y="882" text-anchor="middle">Read directly by Raspberry Pi</text>
 
-  <path class="branch" d="M1180,725 L970,805"/>
-  <path class="branch" d="M1300,725 L1330,805"/>
+  <!-- PLC connections -->
+  <path class="branch" d="M300,725 L245,805"/>
+  <path class="branch" d="M760,725 L625,805"/>
+  <path class="branch" d="M1180,725 L625,805"/>
 
-  <text class="small" x="800" y="770" text-anchor="middle">Field communication via digital I/O, analog signals, serial links and protocol adapters</text>
+  <!-- RPi instrument interface connections -->
+  <path class="branch" d="M1010,772 L1010,805"/>
+  <path class="branch" d="M1360,772 L1360,805"/>
+
+  <text class="small" x="800" y="770" text-anchor="middle">Architecture separates PLC real-time control from instrument controller interfaces</text>
 </svg>
