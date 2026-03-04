@@ -1,0 +1,10 @@
+<map id="GlgChildGui" name="GlgChildGui">
+<area shape="rect" id="node1" title=" " alt="" coords="220,80,319,107"/>
+<area shape="rect" id="node6" href="$classGlgPCounter2Gui.html" title=" " alt="" coords="5,155,139,181"/>
+<area shape="rect" id="node7" href="$classGlgPCounterStatusDetailsGui.html" title=" " alt="" coords="163,155,375,181"/>
+<area shape="rect" id="node8" href="$classGlgPCounterTempGui.html" title=" " alt="" coords="400,155,560,181"/>
+<area shape="rect" id="node2" title=" " alt="" coords="71,5,137,32"/>
+<area shape="rect" id="node3" href="$interfaceChannelList.html" title=" " alt="" coords="161,5,260,32"/>
+<area shape="rect" id="node4" href="$interfaceDataTypes.html" title=" " alt="" coords="284,5,375,32"/>
+<area shape="rect" id="node5" title=" " alt="" coords="399,5,481,32"/>
+</map>

@@ -1,0 +1,13 @@
+<map id="ChannelList" name="ChannelList">
+<area shape="rect" id="node1" title=" " alt="" coords="5,208,104,235"/>
+<area shape="rect" id="node2" href="$classGlgChildGui.html" title=" " alt="" coords="152,183,251,209"/>
+<area shape="rect" id="node11" href="$classGlgGui.html" title=" " alt="" coords="168,233,235,260"/>
+<area shape="rect" id="node3" href="$classGlgCryo1500wIntGui.html" title=" " alt="" coords="334,5,490,32"/>
+<area shape="rect" id="node4" href="$classGlgCryo1500wStatusDetailsGui.html" title=" " alt="" coords="299,56,525,83"/>
+<area shape="rect" id="node5" href="$classGlgCryo1500wTempGui.html" title=" " alt="" coords="325,107,499,133"/>
+<area shape="rect" id="node6" href="$classGlgDryGui.html" title=" " alt="" coords="367,157,457,184"/>
+<area shape="rect" id="node7" href="$classGlgGaugeGui.html" title=" " alt="" coords="358,208,466,235"/>
+<area shape="rect" id="node8" href="$classGlgTurboGui.html" title=" " alt="" coords="361,259,463,285"/>
+<area shape="rect" id="node9" href="$classGlgValveGui.html" title=" " alt="" coords="361,309,463,336"/>
+<area shape="rect" id="node10" href="$classGlgXGSGaugeGui.html" title=" " alt="" coords="345,360,479,387"/>
+</map>

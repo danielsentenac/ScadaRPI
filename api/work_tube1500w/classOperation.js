@@ -1,0 +1,27 @@
+var classOperation =
+[
+    [ "Operation", "classOperation.html#ade6c5092c6b65851d985dae392bb83dd", null ],
+    [ "doStart", "classOperation.html#ab3fa5fd55c7f2a3e31ae090f2f79ca7d", null ],
+    [ "doStop", "classOperation.html#a37576323b9caa1230df6d0d8ea850cb7", null ],
+    [ "operationStartRamp", "classOperation.html#a0d21ee2adb5ca94209e823618dfd5f16", null ],
+    [ "operationStopRamp", "classOperation.html#a06a58b0888c566427c3ea408b5e413ea", null ],
+    [ "run", "classOperation.html#a9ccc8d9db9d9d99e3a01b31add0abddc", null ],
+    [ "setMode", "classOperation.html#a44e91b24bcf70bc9c9999c190ba805f6", null ],
+    [ "setTempMax", "classOperation.html#aa7dc5080da4604e8c405f21993bcd30b", null ],
+    [ "setTempStep", "classOperation.html#abf3e934658deb452a75297bc559523d7", null ],
+    [ "setTime", "classOperation.html#adf8b4d54611432ba2c997e63fcca2792", null ],
+    [ "setTimeInter", "classOperation.html#a6de7cfa34adb07ab772b69e423799789", null ],
+    [ "setValue", "classOperation.html#af569100e8e6784148b14aa5ad4fbd09d", null ],
+    [ "cycleFreq", "classOperation.html#a513cac49559a92f0ba98c37631e431f3", null ],
+    [ "deviceManager", "classOperation.html#a1857b98cf8f18cbe53b78c2b8faf0c74", null ],
+    [ "lastIncrementTime", "classOperation.html#a511f00e348e36728503722335ace897f", null ],
+    [ "logger", "classOperation.html#ae994ede4c8ed300b7acff7c3f7ab5c21", null ],
+    [ "mode", "classOperation.html#af329a81c95f700ededefe0f531c97819", null ],
+    [ "serialVersionUID", "classOperation.html#ab55982579a96f37091d4a3e1e4abb938", null ],
+    [ "startTime", "classOperation.html#a50cd90cfdbf9b40f8f63cc4592b13a5f", null ],
+    [ "tempMax", "classOperation.html#a530df60a9d424c3f6e9c85b19d151edd", null ],
+    [ "tempStep", "classOperation.html#afb0a6477108573ee3dc49b75c7f78232", null ],
+    [ "thread", "classOperation.html#a496fd7f8216b058cfcd53c3ebccbf6f7", null ],
+    [ "time", "classOperation.html#a4eff36991b2320be25b5b7ddc968de14", null ],
+    [ "timeInter", "classOperation.html#aa370f7c671b0473abb8610168f755234", null ]
+];

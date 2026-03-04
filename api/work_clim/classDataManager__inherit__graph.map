@@ -1,0 +1,8 @@
+<map id="DataManager" name="DataManager">
+<area shape="rect" id="node1" title=" " alt="" coords="91,80,202,107"/>
+<area shape="rect" id="node3" href="$classDevice.html" title=" " alt="" coords="113,155,180,181"/>
+<area shape="rect" id="node2" href="$interfaceDataTypes.html" title=" " alt="" coords="101,5,192,32"/>
+<area shape="rect" id="node4" href="$classDS2438.html" title=" " alt="" coords="5,229,77,256"/>
+<area shape="rect" id="node5" href="$classIntesisBox.html" title=" " alt="" coords="101,229,192,256"/>
+<area shape="rect" id="node6" href="$classPWM.html" title=" " alt="" coords="217,229,271,256"/>
+</map>

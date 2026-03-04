@@ -1,0 +1,13 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$interfaceChannelList.html" title=" " alt="" coords="5,5,104,32"/>
+<area shape="rect" id="node2" href="$classGlgChildGui.html" title=" " alt="" coords="180,5,279,32"/>
+<area shape="rect" id="node3" href="$classGlgGui.html" title=" " alt="" coords="196,56,263,83"/>
+<area shape="rect" id="node4" href="$interfaceDataTypes.html" title=" " alt="" coords="9,208,100,235"/>
+<area shape="rect" id="node5" href="$classDataElement.html" title=" " alt="" coords="176,259,283,285"/>
+<area shape="rect" id="node6" href="$classDataManager.html" title=" " alt="" coords="174,208,285,235"/>
+<area shape="rect" id="node7" href="$classDevice.html" title=" " alt="" coords="355,208,421,235"/>
+<area shape="rect" id="node9" href="$classModbusSlaveThread.html" title=" " alt="" coords="152,157,307,184"/>
+<area shape="rect" id="node8" href="$classControllino.html" title=" " alt="" coords="469,208,563,235"/>
+<area shape="rect" id="node10" title=" " alt="" coords="13,107,96,133"/>
+<area shape="rect" id="node11" title=" " alt="" coords="21,56,88,83"/>
+</map>

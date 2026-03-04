@@ -1,0 +1,20 @@
+var searchData=
+[
+  ['v1_5fclose_5fcmd_5fbit_309',['V1_CLOSE_CMD_BIT',['../classControllino__1.html#a912b3859be92de88344fd674f35aef67',1,'Controllino_1']]],
+  ['v1_5fclose_5fstatus_5fbit_310',['V1_CLOSE_STATUS_BIT',['../classControllino__1.html#a37ea459e02848473a0ffd9acc18e527a',1,'Controllino_1']]],
+  ['v1_5fopen_5fcmd_5fbit_311',['V1_OPEN_CMD_BIT',['../classControllino__1.html#ad8cb25a83c43491a7e98f10fe90f74ce',1,'Controllino_1']]],
+  ['v1_5fopen_5fstatus_5fbit_312',['V1_OPEN_STATUS_BIT',['../classControllino__1.html#a68b09b2fbfa0d9530fa02237170bdbd0',1,'Controllino_1']]],
+  ['v21_5fclose_5fcmd_5fbit_313',['V21_CLOSE_CMD_BIT',['../classControllino__1.html#a0464c1ef9e694340b133adfee51f8897',1,'Controllino_1']]],
+  ['v21_5fclose_5fstatus_5fbit_314',['V21_CLOSE_STATUS_BIT',['../classControllino__1.html#adcf84126607bea909aedc7ad4bd44edf',1,'Controllino_1']]],
+  ['v21_5fopen_5fcmd_5fbit_315',['V21_OPEN_CMD_BIT',['../classControllino__1.html#aa225f696a38b12b9691304380a14b09f',1,'Controllino_1']]],
+  ['v21_5fopen_5fstatus_5fbit_316',['V21_OPEN_STATUS_BIT',['../classControllino__1.html#a01a82caf6dedb67c3bf1e5aed0358323',1,'Controllino_1']]],
+  ['v22_5fclose_5fcmd_5fbit_317',['V22_CLOSE_CMD_BIT',['../classControllino__1.html#aaff318605e35867a119e3fdc1b2c6594',1,'Controllino_1']]],
+  ['v22_5fclose_5fstatus_5fbit_318',['V22_CLOSE_STATUS_BIT',['../classControllino__1.html#a045af63b4450ce8fef81ee82f64aeefd',1,'Controllino_1']]],
+  ['v22_5fopen_5fcmd_5fbit_319',['V22_OPEN_CMD_BIT',['../classControllino__1.html#aad641bb8595e4d03752ebd6f1da58004',1,'Controllino_1']]],
+  ['v22_5fopen_5fstatus_5fbit_320',['V22_OPEN_STATUS_BIT',['../classControllino__1.html#ac85f002fd962139223e218a0625538f2',1,'Controllino_1']]],
+  ['v23_5fclose_5fstatus_5fbit_321',['V23_CLOSE_STATUS_BIT',['../classControllino__1.html#a1502c2acf17f80ad8641d610a11446e1',1,'Controllino_1']]],
+  ['v23_5fopen_5fstatus_5fbit_322',['V23_OPEN_STATUS_BIT',['../classControllino__1.html#a695389c93bca05031a0ca6e8c6a85999',1,'Controllino_1']]],
+  ['value_323',['value',['../classDataElement.html#a095a2be5a1049adaea4f3567c82db9dd',1,'DataElement']]],
+  ['valvecolorstatus_324',['ValveColorSTATUS',['../interfaceChannelList.html#ae2f39c79a06d9cb8a0507e90b447571e',1,'ChannelList']]],
+  ['valvestatus_325',['ValveSTATUS',['../interfaceChannelList.html#af5476bfa52a147acfd02e7d872512caa',1,'ChannelList']]]
+];

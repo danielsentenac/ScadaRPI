@@ -1,0 +1,7 @@
+<map id="DataManager" name="DataManager">
+<area shape="rect" id="node1" title=" " alt="" coords="134,80,245,107"/>
+<area shape="rect" id="node3" href="$classDevice.html" title=" " alt="" coords="156,155,223,181"/>
+<area shape="rect" id="node2" href="$interfaceDataTypes.html" title=" " alt="" coords="144,5,235,32"/>
+<area shape="rect" id="node4" href="$classFlowMeterModbusMaster.html" title=" " alt="" coords="5,229,192,256"/>
+<area shape="rect" id="node5" href="$classSupervisorClient.html" title=" " alt="" coords="217,229,346,256"/>
+</map>

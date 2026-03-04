@@ -1,0 +1,24 @@
+var searchData=
+[
+  ['v21_5fclose_5fcmd_5fbit_264',['V21_CLOSE_CMD_BIT',['../classControllino.html#a4f530d4629a922f44ea34d3f98b60ce1',1,'Controllino']]],
+  ['v21_5fclose_5fstatus_5fbit_265',['V21_CLOSE_STATUS_BIT',['../classControllino.html#a0e776de7cf492471f4555654b726f888',1,'Controllino']]],
+  ['v21_5fopen_5fcmd_5fbit_266',['V21_OPEN_CMD_BIT',['../classControllino.html#a85f49d8fdce2ebaef059e8e1985690e8',1,'Controllino']]],
+  ['v21_5fopen_5fstatus_5fbit_267',['V21_OPEN_STATUS_BIT',['../classControllino.html#a7d521dfe55725c958bc550fef105e27b',1,'Controllino']]],
+  ['v22_5fclose_5fcmd_5fbit_268',['V22_CLOSE_CMD_BIT',['../classControllino.html#a395885dd7c9302602ebe458551a9b32f',1,'Controllino']]],
+  ['v22_5fclose_5fstatus_5fbit_269',['V22_CLOSE_STATUS_BIT',['../classControllino.html#a2d095921d17ffbaf2e861d63f6983b89',1,'Controllino']]],
+  ['v22_5fopen_5fcmd_5fbit_270',['V22_OPEN_CMD_BIT',['../classControllino.html#a337c0b90e7f8ed6cbfad6788b1ae33e2',1,'Controllino']]],
+  ['v22_5fopen_5fstatus_5fbit_271',['V22_OPEN_STATUS_BIT',['../classControllino.html#a3b572ef6ed3e135273e78309fb72c083',1,'Controllino']]],
+  ['v23_5fclose_5fstatus_5fbit_272',['V23_CLOSE_STATUS_BIT',['../classControllino.html#a7c68fed42a4659e724134150ffbea51c',1,'Controllino']]],
+  ['v23_5fopen_5fstatus_5fbit_273',['V23_OPEN_STATUS_BIT',['../classControllino.html#a53ca4352c0c97ff91b4b350aa87badf6',1,'Controllino']]],
+  ['v31_5fclose_5fcmd_5fbit_274',['V31_CLOSE_CMD_BIT',['../classControllino.html#af155371e805b150300bd84709c4c8f8f',1,'Controllino']]],
+  ['v31_5fclose_5fstatus_5fbit_275',['V31_CLOSE_STATUS_BIT',['../classControllino.html#a3a9d29a308f4ba89ab3c3984acbf0c8c',1,'Controllino']]],
+  ['v31_5fopen_5fcmd_5fbit_276',['V31_OPEN_CMD_BIT',['../classControllino.html#ab2e7fa4656321dc4cb277835acd52066',1,'Controllino']]],
+  ['v31_5fopen_5fstatus_5fbit_277',['V31_OPEN_STATUS_BIT',['../classControllino.html#a6e29001f59d05037a473cc94420cfef5',1,'Controllino']]],
+  ['va1_5fclose_5fstatus_5fbit_278',['VA1_CLOSE_STATUS_BIT',['../classControllino.html#a7c667e8075262ccf5d755ebaec55327f',1,'Controllino']]],
+  ['va1_5fopen_5fstatus_5fbit_279',['VA1_OPEN_STATUS_BIT',['../classControllino.html#ab01bfb8bee848d4faff93be0c0ef6d5e',1,'Controllino']]],
+  ['va2_5fclose_5fstatus_5fbit_280',['VA2_CLOSE_STATUS_BIT',['../classControllino.html#a0ba3c073b4278b7cc27ceaa595a96bd2',1,'Controllino']]],
+  ['va2_5fopen_5fstatus_5fbit_281',['VA2_OPEN_STATUS_BIT',['../classControllino.html#a1328548292a620e3b4360e15d59b8be9',1,'Controllino']]],
+  ['value_282',['value',['../classDataElement.html#a095a2be5a1049adaea4f3567c82db9dd',1,'DataElement']]],
+  ['valvecolorstatus_283',['ValveColorSTATUS',['../interfaceChannelList.html#ae2f39c79a06d9cb8a0507e90b447571e',1,'ChannelList']]],
+  ['valvestatus_284',['ValveSTATUS',['../interfaceChannelList.html#af5476bfa52a147acfd02e7d872512caa',1,'ChannelList']]]
+];

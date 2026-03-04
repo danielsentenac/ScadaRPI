@@ -1,0 +1,17 @@
+<map id="ChannelList" name="ChannelList">
+<area shape="rect" id="node1" title=" " alt="" coords="5,309,104,336"/>
+<area shape="rect" id="node2" href="$classGlgChildGui.html" title=" " alt="" coords="152,284,251,311"/>
+<area shape="rect" id="node15" href="$classGlgGui.html" title=" " alt="" coords="168,335,235,361"/>
+<area shape="rect" id="node3" href="$classGlgDryGui.html" title=" " alt="" coords="342,5,431,32"/>
+<area shape="rect" id="node4" href="$classGlgGaugeGui.html" title=" " alt="" coords="333,56,441,83"/>
+<area shape="rect" id="node5" href="$classGlgIonicGui.html" title=" " alt="" coords="338,107,435,133"/>
+<area shape="rect" id="node6" href="$classGlgRGAGui.html" title=" " alt="" coords="339,157,434,184"/>
+<area shape="rect" id="node7" href="$classGlgSqzStatusDetailsGui.html" title=" " alt="" coords="299,208,475,235"/>
+<area shape="rect" id="node8" href="$classGlgSqzTempGui.html" title=" " alt="" coords="325,259,449,285"/>
+<area shape="rect" id="node9" href="$classGlgSqzVacuumGui.html" title=" " alt="" coords="316,309,457,336"/>
+<area shape="rect" id="node10" href="$classGlgTitane__22Gui.html" title=" " alt="" coords="321,360,452,387"/>
+<area shape="rect" id="node11" href="$classGlgTitane__32Gui.html" title=" " alt="" coords="321,411,452,437"/>
+<area shape="rect" id="node12" href="$classGlgTurboGui.html" title=" " alt="" coords="336,461,437,488"/>
+<area shape="rect" id="node13" href="$classGlgValveGui.html" title=" " alt="" coords="335,512,438,539"/>
+<area shape="rect" id="node14" href="$classGlgXGSGaugeGui.html" title=" " alt="" coords="319,563,454,589"/>
+</map>

@@ -1,0 +1,7 @@
+var searchData=
+[
+  ['updatedevicedata_462',['updateDeviceData',['../classControllino__1.html#a61537405955d16e87979fa624c014e08',1,'Controllino_1.updateDeviceData()'],['../classControllino__3.html#a9c85a63ad1c61959ea030a65676dae09',1,'Controllino_3.updateDeviceData()'],['../classDevice.html#afa3727b77edc3f2b14709664effd1364',1,'Device.updateDeviceData()'],['../classPCounterMasterRTU.html#a956a78cd09b665eb1c5383cb068c92b3',1,'PCounterMasterRTU.updateDeviceData()'],['../classTCMuxShield.html#af94226ebe7a859b3c9437d0963f53af8',1,'TCMuxShield.updateDeviceData()']]],
+  ['updategui_463',['updateGui',['../classGlgChildGui.html#a5a685f1981e45eea97c82fe352d05493',1,'GlgChildGui.updateGui()'],['../classGlgGui.html#aa3884b04309c3e4e873e998c2ea1fc0e',1,'GlgGui.updateGui()']]],
+  ['updateguifeatures_464',['updateGuiFeatures',['../classGlgChildGui.html#ae0e83e49df6811e8880f1da4bd832de3',1,'GlgChildGui.updateGuiFeatures()'],['../classGlgPCounter2Gui.html#a412e28ad58d1d891536e4812e86b0db4',1,'GlgPCounter2Gui.updateGuiFeatures()'],['../classGlgPCounterStatusDetailsGui.html#ac6aabe9477c768c6dfce26fa24270099',1,'GlgPCounterStatusDetailsGui.updateGuiFeatures()'],['../classGlgPCounterTempGui.html#a23662fa428e29d689d45a9b1c67eb899',1,'GlgPCounterTempGui.updateGuiFeatures()']]],
+  ['updatemodbusregisters_465',['updateModbusRegisters',['../classDataManager.html#a53bf4dedc372388132705443e64e2754',1,'DataManager']]]
+];

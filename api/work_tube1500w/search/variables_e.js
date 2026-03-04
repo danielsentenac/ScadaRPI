@@ -1,0 +1,22 @@
+var searchData=
+[
+  ['radius_677',['radius',['../classRoundedBorder.html#ac29207128582db3869213ebeccceab84',1,'RoundedBorder']]],
+  ['read_5fand_5fwrite_5fstatus_678',['READ_AND_WRITE_STATUS',['../enumDataTypes_1_1DataType.html#aa036b0ece6784550082dc15bc55fed2b',1,'DataTypes::DataType']]],
+  ['read_5fand_5fwrite_5fvalue_679',['READ_AND_WRITE_VALUE',['../enumDataTypes_1_1DataType.html#a07e2c029fe0fddc1d3f93ac75d743081',1,'DataTypes::DataType']]],
+  ['read_5fonly_5fstatus_680',['READ_ONLY_STATUS',['../enumDataTypes_1_1DataType.html#ae5a457a83e6b7f5a37d63183299f446d',1,'DataTypes::DataType']]],
+  ['read_5fonly_5fvalue_681',['READ_ONLY_VALUE',['../enumDataTypes_1_1DataType.html#ac62e4cf6cf3ce59bd9e87d54a31c913b',1,'DataTypes::DataType']]],
+  ['relaygeneralcolorstatus_682',['RelayGeneralColorSTATUS',['../interfaceChannelList.html#aa3fe8aefa3ca7923932b5166f990cdb1',1,'ChannelList']]],
+  ['relaygeneralstatus_683',['RelayGeneralSTATUS',['../interfaceChannelList.html#a996e886ec88ffaf487731fb185ec1fd3',1,'ChannelList']]],
+  ['rgadegasonoffstatus_684',['RGADegasONOFFSTATUS',['../interfaceChannelList.html#a1d50ff243c311c8740d7b0cca7c1eedb',1,'ChannelList']]],
+  ['rgaemissiononoffstatus_685',['RGAEmissionONOFFSTATUS',['../interfaceChannelList.html#a48df1aeb3af32f40b77275c7db669ab8',1,'ChannelList']]],
+  ['rgafilamentcolorstatus_686',['RGAFilamentColorSTATUS',['../interfaceChannelList.html#a0f929a0918f428f998317c3dc72cf3dd',1,'ChannelList']]],
+  ['rgafilamentstatus_687',['RGAFilamentSTATUS',['../interfaceChannelList.html#af50147d49b27b7d5b006c94c47a00c7b',1,'ChannelList']]],
+  ['rgamodestatus_688',['RGAMODESTATUS',['../interfaceChannelList.html#aefb486c8ced41d9370dae7edf41e4d4a',1,'ChannelList']]],
+  ['rgaonoffcolorstatus_689',['RGAONOFFColorSTATUS',['../interfaceChannelList.html#aab31cc981cab28c8d925a069b4c29e31',1,'ChannelList']]],
+  ['rgaoperationonoffstatus_690',['RGAOperationONOFFSTATUS',['../interfaceChannelList.html#a152eea28e8b86ef3f7799012d2ee6f84',1,'ChannelList']]],
+  ['rgarunningonoffstatus_691',['RGARunningONOFFSTATUS',['../interfaceChannelList.html#a31f6a97eba26b59ff16de3d64bf4f886',1,'ChannelList']]],
+  ['rotgaugeemissioncolorstatus_692',['ROTGaugeEmissionColorSTATUS',['../interfaceChannelList.html#ad35b55a6f43934112a88ddb604c935b4',1,'ChannelList']]],
+  ['rotgaugeemissionstatus_693',['ROTGaugeEmissionSTATUS',['../interfaceChannelList.html#a7d98f716596175733626288db8e9361e',1,'ChannelList']]],
+  ['rs232_694',['rs232',['../classMksRotor.html#af427d16edc0580d8fa40490624bad2d1',1,'MksRotor.rs232()'],['../classSicem.html#a4773cfc11addc73ebd43650600e3550f',1,'Sicem.rs232()'],['../classXGSGauge.html#a6eeaee24ccbea5117015450cf5fac70e',1,'XGSGauge.rs232()']]],
+  ['rs485_695',['rs485',['../classMaxiGauge.html#a554c7d49bc2ebe35415f92ec27d1e469',1,'MaxiGauge.rs485()'],['../classTurboPfeifferDCU.html#a4adc12eb71ceb929e7aaeabab0bb903f',1,'TurboPfeifferDCU.rs485()']]]
+];

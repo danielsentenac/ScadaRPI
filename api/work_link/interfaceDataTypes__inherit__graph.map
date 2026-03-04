@@ -1,0 +1,15 @@
+<map id="DataTypes" name="DataTypes">
+<area shape="rect" id="node1" title=" " alt="" coords="5,183,96,209"/>
+<area shape="rect" id="node2" href="$classDataElement.html" title=" " alt="" coords="168,107,275,133"/>
+<area shape="rect" id="node3" href="$classDataManager.html" title=" " alt="" coords="166,157,277,184"/>
+<area shape="rect" id="node4" href="$classDevice.html" title=" " alt="" coords="347,183,413,209"/>
+<area shape="rect" id="node13" href="$classModbusSlaveThread.html" title=" " alt="" coords="144,259,299,285"/>
+<area shape="rect" id="node5" href="$classControllino__1.html" title=" " alt="" coords="482,5,590,32"/>
+<area shape="rect" id="node6" href="$classControllino__2.html" title=" " alt="" coords="482,56,590,83"/>
+<area shape="rect" id="node7" href="$classControllino__3.html" title=" " alt="" coords="482,107,590,133"/>
+<area shape="rect" id="node8" href="$classMaxiGauge.html" title=" " alt="" coords="488,157,584,184"/>
+<area shape="rect" id="node9" href="$classRgaHidenHal201RC.html" title=" " alt="" coords="461,208,611,235"/>
+<area shape="rect" id="node10" href="$classSupervisorClient.html" title=" " alt="" coords="471,259,601,285"/>
+<area shape="rect" id="node11" href="$classTCMuxShield.html" title=" " alt="" coords="483,309,589,336"/>
+<area shape="rect" id="node12" href="$classTurboPfeifferDCU.html" title=" " alt="" coords="469,360,603,387"/>
+</map>

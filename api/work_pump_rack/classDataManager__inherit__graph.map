@@ -1,0 +1,14 @@
+<map id="DataManager" name="DataManager">
+<area shape="rect" id="node1" title=" " alt="" coords="144,208,255,235"/>
+<area shape="rect" id="node3" href="$classDevice.html" title=" " alt="" coords="303,208,369,235"/>
+<area shape="rect" id="node2" href="$interfaceDataTypes.html" title=" " alt="" coords="5,208,96,235"/>
+<area shape="rect" id="node4" href="$classControllino.html" title=" " alt="" coords="446,5,539,32"/>
+<area shape="rect" id="node5" href="$classIonicAgilentDual.html" title=" " alt="" coords="428,56,557,83"/>
+<area shape="rect" id="node6" href="$classMaxiGauge.html" title=" " alt="" coords="445,107,541,133"/>
+<area shape="rect" id="node7" href="$classRgaPfeifferQms200.html" title=" " alt="" coords="419,157,567,184"/>
+<area shape="rect" id="node8" href="$classTitaneVarianTSP__22.html" title=" " alt="" coords="417,208,568,235"/>
+<area shape="rect" id="node9" href="$classTitaneVarianTSP__32.html" title=" " alt="" coords="417,259,568,285"/>
+<area shape="rect" id="node10" href="$classTurboPfeifferDCU.html" title=" " alt="" coords="426,309,559,336"/>
+<area shape="rect" id="node11" href="$classTurboVarianV81AG.html" title=" " alt="" coords="421,360,564,387"/>
+<area shape="rect" id="node12" href="$classXGSGauge.html" title=" " alt="" coords="447,411,538,437"/>
+</map>

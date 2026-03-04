@@ -1,0 +1,27 @@
+var searchData=
+[
+  ['i2c_110',['i2c',['../classControllino__1.html#a67a83a95c0fb9abccd679282425f5b04',1,'Controllino_1.i2c()'],['../classControllino__3.html#a83da56bf0a1ca75d3b5367e7dc90ea33',1,'Controllino_3.i2c()'],['../classTCMuxShield.html#a1d36057520c07450a244754457bccf71',1,'TCMuxShield.i2c()']]],
+  ['i2c_5fcomm_111',['I2C_Comm',['../classI2C__Comm.html',1,'I2C_Comm'],['../classI2C__Comm.html#a547a8479808b96cc61245db1d6af8d35',1,'I2C_Comm.I2C_Comm()']]],
+  ['i2c_5fcomm_2ejava_112',['I2C_Comm.java',['../I2C__Comm_8java.html',1,'']]],
+  ['i2c_5fin_113',['i2c_in',['../classDevice.html#a4be703140175988cd4806afd4d17536d',1,'Device']]],
+  ['i2c_5fout_114',['i2c_out',['../classDevice.html#ae812122d4a8dafdac56e0d642455801d',1,'Device']]],
+  ['idle_115',['IDLE',['../enumDataTypes_1_1OpMode.html#a25c7d69057559e6f5368406ac2c67438',1,'DataTypes::OpMode']]],
+  ['initgpiocontroller_116',['initGpioController',['../classDevice.html#aa04e47a7fdc58895c2321950ab053a55',1,'Device.initGpioController()'],['../classTCMuxShield.html#a50a3aaaf148c08f7e9d4a8c1b0a6874c',1,'TCMuxShield.initGpioController()']]],
+  ['inputcallback_117',['InputCallback',['../classGlgPCounterTempGui_1_1InputListener.html#ab58f9a69e1095508998460df15503bde',1,'GlgPCounterTempGui.InputListener.InputCallback()'],['../classGlgPCounterStatusDetailsGui_1_1InputListener.html#a5792154fb28aeea9113d44c821bfe725',1,'GlgPCounterStatusDetailsGui.InputListener.InputCallback()'],['../classGlgPCounter2Gui_1_1InputListener.html#a27f1e1d06eb734ffe06cbeee97389bf1',1,'GlgPCounter2Gui.InputListener.InputCallback()']]],
+  ['inputlistener_118',['InputListener',['../classGlgPCounter2Gui_1_1InputListener.html',1,'GlgPCounter2Gui.InputListener'],['../classGlgPCounterStatusDetailsGui_1_1InputListener.html',1,'GlgPCounterStatusDetailsGui.InputListener'],['../classGlgPCounterTempGui_1_1InputListener.html',1,'GlgPCounterTempGui.InputListener']]],
+  ['int16_119',['INT16',['../enumDataTypes_1_1RegisterType.html#a4161c4ab5e19c513b13c75c8c6229b98',1,'DataTypes::RegisterType']]],
+  ['int32_120',['INT32',['../enumDataTypes_1_1RegisterType.html#aa706073fde628f20a73cdcd03ccbb0f4',1,'DataTypes::RegisterType']]],
+  ['int8_121',['INT8',['../enumDataTypes_1_1RegisterType.html#a56ab348ecba59545121e79c0fc190703',1,'DataTypes::RegisterType']]],
+  ['ioniconoffcolorstatus_122',['IonicONOFFColorSTATUS',['../interfaceChannelList.html#a2e30af960877cadfa0d1cc43194648fb',1,'ChannelList']]],
+  ['ioniconoffstatus_123',['IonicONOFFSTATUS',['../interfaceChannelList.html#ac21292370153da321a6946c47a8b7996',1,'ChannelList']]],
+  ['ionicoperatingmodecolorstatus_124',['IonicOperatingModeColorSTATUS',['../interfaceChannelList.html#abce1977639e89cee71bdcbb28b81d839',1,'ChannelList']]],
+  ['ionicoperatingmodestatus_125',['IonicOperatingModeSTATUS',['../interfaceChannelList.html#a4740beddc2cbd283a0228291e6d5bbb6',1,'ChannelList']]],
+  ['ionicremotecolorstatus_126',['IonicRemoteColorSTATUS',['../interfaceChannelList.html#a25b421bb4b88c8d43b49c947df27752d',1,'ChannelList']]],
+  ['ionicremotestatus_127',['IonicRemoteSTATUS',['../interfaceChannelList.html#a47618414e8654cc5c93f4e3b0a05f27d',1,'ChannelList']]],
+  ['ionicvoltagemodecolorstatus_128',['IonicVoltageModeColorSTATUS',['../interfaceChannelList.html#ad2eb6fbe7f0a094b6df9f61fe32d3258',1,'ChannelList']]],
+  ['ionicvoltagemodestatus_129',['IonicVoltageModeSTATUS',['../interfaceChannelList.html#ad39f9b956b5c44c74c8e4a7a5ac750f4',1,'ChannelList']]],
+  ['ipscolorstatus_130',['IPSColorSTATUS',['../interfaceChannelList.html#a029f6ba95fab7a76869f564dcf9265b8',1,'ChannelList']]],
+  ['ipsstatus_131',['IPSSTATUS',['../interfaceChannelList.html#a68a8c002cf9f361b10df8a88d860b89e',1,'ChannelList']]],
+  ['isborderopaque_132',['isBorderOpaque',['../classRoundedBorder.html#abad737fdd6b741791b68682d5977d582',1,'RoundedBorder']]],
+  ['issuspended_133',['isSuspended',['../classGlgChildGui.html#aacfbf7068deb47d7e2b00c294f7b4964',1,'GlgChildGui.isSuspended()'],['../classGlgGui.html#a8bf87b4196e3663d309cee8a8c6bb711',1,'GlgGui.isSuspended()']]]
+];

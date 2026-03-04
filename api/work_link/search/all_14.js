@@ -1,0 +1,21 @@
+var searchData=
+[
+  ['v1_5fclose_5fcmd_5fbit_322',['V1_CLOSE_CMD_BIT',['../classControllino__2.html#a8d626fc6389705a8716ea4cd70ee1971',1,'Controllino_2.V1_CLOSE_CMD_BIT()'],['../classControllino__1.html#a912b3859be92de88344fd674f35aef67',1,'Controllino_1.V1_CLOSE_CMD_BIT()']]],
+  ['v1_5fclose_5fstatus_5fbit_323',['V1_CLOSE_STATUS_BIT',['../classControllino__1.html#a37ea459e02848473a0ffd9acc18e527a',1,'Controllino_1.V1_CLOSE_STATUS_BIT()'],['../classControllino__2.html#a8d191e3a87b10b9b8eb1691af3c4f834',1,'Controllino_2.V1_CLOSE_STATUS_BIT()']]],
+  ['v1_5fopen_5fcmd_5fbit_324',['V1_OPEN_CMD_BIT',['../classControllino__1.html#ad8cb25a83c43491a7e98f10fe90f74ce',1,'Controllino_1.V1_OPEN_CMD_BIT()'],['../classControllino__2.html#aaf7b7622f8b8459a01cbc2e1b69191aa',1,'Controllino_2.V1_OPEN_CMD_BIT()']]],
+  ['v1_5fopen_5fstatus_5fbit_325',['V1_OPEN_STATUS_BIT',['../classControllino__1.html#a68b09b2fbfa0d9530fa02237170bdbd0',1,'Controllino_1.V1_OPEN_STATUS_BIT()'],['../classControllino__2.html#a3124cde845f006d224c0225c50d00fb7',1,'Controllino_2.V1_OPEN_STATUS_BIT()']]],
+  ['v21_5fclose_5fcmd_5fbit_326',['V21_CLOSE_CMD_BIT',['../classControllino__1.html#a0464c1ef9e694340b133adfee51f8897',1,'Controllino_1.V21_CLOSE_CMD_BIT()'],['../classControllino__2.html#ac04d73872c59f8cadb7a98a56e0e829a',1,'Controllino_2.V21_CLOSE_CMD_BIT()']]],
+  ['v21_5fclose_5fstatus_5fbit_327',['V21_CLOSE_STATUS_BIT',['../classControllino__1.html#adcf84126607bea909aedc7ad4bd44edf',1,'Controllino_1.V21_CLOSE_STATUS_BIT()'],['../classControllino__2.html#a8541b9abfcbbb7487b892884486b2426',1,'Controllino_2.V21_CLOSE_STATUS_BIT()']]],
+  ['v21_5fopen_5fcmd_5fbit_328',['V21_OPEN_CMD_BIT',['../classControllino__1.html#aa225f696a38b12b9691304380a14b09f',1,'Controllino_1.V21_OPEN_CMD_BIT()'],['../classControllino__2.html#a3b087531c979efa8769761b8806c64b2',1,'Controllino_2.V21_OPEN_CMD_BIT()']]],
+  ['v21_5fopen_5fstatus_5fbit_329',['V21_OPEN_STATUS_BIT',['../classControllino__1.html#a01a82caf6dedb67c3bf1e5aed0358323',1,'Controllino_1.V21_OPEN_STATUS_BIT()'],['../classControllino__2.html#a703c6360d42e547953376026630d37b3',1,'Controllino_2.V21_OPEN_STATUS_BIT()']]],
+  ['v22_5fclose_5fcmd_5fbit_330',['V22_CLOSE_CMD_BIT',['../classControllino__1.html#aaff318605e35867a119e3fdc1b2c6594',1,'Controllino_1.V22_CLOSE_CMD_BIT()'],['../classControllino__2.html#af1a9b948aed4360f8b92e8539b7d1b20',1,'Controllino_2.V22_CLOSE_CMD_BIT()']]],
+  ['v22_5fclose_5fstatus_5fbit_331',['V22_CLOSE_STATUS_BIT',['../classControllino__1.html#a045af63b4450ce8fef81ee82f64aeefd',1,'Controllino_1.V22_CLOSE_STATUS_BIT()'],['../classControllino__2.html#a221085810913334612c9569e4a882a70',1,'Controllino_2.V22_CLOSE_STATUS_BIT()']]],
+  ['v22_5fopen_5fcmd_5fbit_332',['V22_OPEN_CMD_BIT',['../classControllino__1.html#aad641bb8595e4d03752ebd6f1da58004',1,'Controllino_1.V22_OPEN_CMD_BIT()'],['../classControllino__2.html#aea3de178bd4cbe58225f48c1468e019e',1,'Controllino_2.V22_OPEN_CMD_BIT()']]],
+  ['v22_5fopen_5fstatus_5fbit_333',['V22_OPEN_STATUS_BIT',['../classControllino__1.html#ac85f002fd962139223e218a0625538f2',1,'Controllino_1.V22_OPEN_STATUS_BIT()'],['../classControllino__2.html#a02bd3cb31fc81d27080679e48bcb0c85',1,'Controllino_2.V22_OPEN_STATUS_BIT()']]],
+  ['v23_5fclose_5fstatus_5fbit_334',['V23_CLOSE_STATUS_BIT',['../classControllino__1.html#a1502c2acf17f80ad8641d610a11446e1',1,'Controllino_1.V23_CLOSE_STATUS_BIT()'],['../classControllino__2.html#ad2eadebf037a332b184c8328371d628e',1,'Controllino_2.V23_CLOSE_STATUS_BIT()']]],
+  ['v23_5fopen_5fstatus_5fbit_335',['V23_OPEN_STATUS_BIT',['../classControllino__1.html#a695389c93bca05031a0ca6e8c6a85999',1,'Controllino_1.V23_OPEN_STATUS_BIT()'],['../classControllino__2.html#a63f38ac4c7a1b483b24662a377f63efa',1,'Controllino_2.V23_OPEN_STATUS_BIT()']]],
+  ['value_336',['value',['../classDataElement.html#a095a2be5a1049adaea4f3567c82db9dd',1,'DataElement']]],
+  ['valuerunning_337',['valueRUNNING',['../classRgaHidenHal201RC.html#a9a9e38482878ccbc02ca82cfb42b3aa3',1,'RgaHidenHal201RC']]],
+  ['valvecolorstatus_338',['ValveColorSTATUS',['../interfaceChannelList.html#ae2f39c79a06d9cb8a0507e90b447571e',1,'ChannelList']]],
+  ['valvestatus_339',['ValveSTATUS',['../interfaceChannelList.html#af5476bfa52a147acfd02e7d872512caa',1,'ChannelList']]]
+];

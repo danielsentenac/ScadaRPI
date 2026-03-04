@@ -1,0 +1,10 @@
+<map id="DataTypes" name="DataTypes">
+<area shape="rect" id="node1" title=" " alt="" coords="193,5,284,32"/>
+<area shape="rect" id="node2" href="$classDataElement.html" title=" " alt="" coords="5,80,112,107"/>
+<area shape="rect" id="node3" href="$classDataManager.html" title=" " alt="" coords="137,80,247,107"/>
+<area shape="rect" id="node4" href="$classDevice.html" title=" " alt="" coords="205,155,272,181"/>
+<area shape="rect" id="node8" href="$classModbusSlaveThread.html" title=" " alt="" coords="323,80,477,107"/>
+<area shape="rect" id="node5" href="$classControllino__1.html" title=" " alt="" coords="58,229,166,256"/>
+<area shape="rect" id="node6" href="$classMaxiGauge.html" title=" " alt="" coords="191,229,287,256"/>
+<area shape="rect" id="node7" href="$classTurboVarianV81AG.html" title=" " alt="" coords="311,229,454,256"/>
+</map>

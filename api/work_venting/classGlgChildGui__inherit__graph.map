@@ -1,0 +1,11 @@
+<map id="GlgChildGui" name="GlgChildGui">
+<area shape="rect" id="node1" title=" " alt="" coords="209,80,307,107"/>
+<area shape="rect" id="node6" href="$classGlgDryGui.html" title=" " alt="" coords="5,155,95,181"/>
+<area shape="rect" id="node7" href="$classGlgFlowMeterGui.html" title=" " alt="" coords="119,155,253,181"/>
+<area shape="rect" id="node8" href="$classGlgGaugeGui.html" title=" " alt="" coords="277,155,385,181"/>
+<area shape="rect" id="node9" href="$classGlgValveGui.html" title=" " alt="" coords="409,155,512,181"/>
+<area shape="rect" id="node2" title=" " alt="" coords="59,5,126,32"/>
+<area shape="rect" id="node3" href="$interfaceChannelList.html" title=" " alt="" coords="150,5,249,32"/>
+<area shape="rect" id="node4" href="$interfaceDataTypes.html" title=" " alt="" coords="273,5,363,32"/>
+<area shape="rect" id="node5" title=" " alt="" coords="387,5,470,32"/>
+</map>

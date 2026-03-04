@@ -1,0 +1,22 @@
+var searchData=
+[
+  ['v21det_5fclose_5fcmd_5fbit_271',['V21DET_CLOSE_CMD_BIT',['../classControllino__1.html#a0498263d1136a9eab71c1773235e3ca8',1,'Controllino_1']]],
+  ['v21det_5fclose_5fstatus_5fbit_272',['V21DET_CLOSE_STATUS_BIT',['../classControllino__1.html#a01c72f54e415c41851fdde77903f5beb',1,'Controllino_1']]],
+  ['v21det_5fopen_5fcmd_5fbit_273',['V21DET_OPEN_CMD_BIT',['../classControllino__1.html#a8068a32931fe834a31176cd6ed69859e',1,'Controllino_1']]],
+  ['v21det_5fopen_5fstatus_5fbit_274',['V21DET_OPEN_STATUS_BIT',['../classControllino__1.html#a1d736c2f4324aaad56924d80f99b9cd5',1,'Controllino_1']]],
+  ['v21ib_5fclose_5fcmd_5fbit_275',['V21IB_CLOSE_CMD_BIT',['../classControllino__1.html#a11fc290b268c103bae4aa5c2f047d20e',1,'Controllino_1']]],
+  ['v21ib_5fclose_5fstatus_5fbit_276',['V21IB_CLOSE_STATUS_BIT',['../classControllino__1.html#a281033e833bc81ff1fe89db14db8542a',1,'Controllino_1']]],
+  ['v21ib_5fopen_5fcmd_5fbit_277',['V21IB_OPEN_CMD_BIT',['../classControllino__1.html#a94837c10d210039ce73d02d8e606c821',1,'Controllino_1']]],
+  ['v21ib_5fopen_5fstatus_5fbit_278',['V21IB_OPEN_STATUS_BIT',['../classControllino__1.html#ad0d534f9013ffcad2b57ff17bbcb8d97',1,'Controllino_1']]],
+  ['v22det_5fclose_5fcmd_5fbit_279',['V22DET_CLOSE_CMD_BIT',['../classControllino__1.html#a220c655861528e854c8391d160d5889a',1,'Controllino_1']]],
+  ['v22det_5fclose_5fstatus_5fbit_280',['V22DET_CLOSE_STATUS_BIT',['../classControllino__1.html#abba495fbae698d9eea0b045f3ac33104',1,'Controllino_1']]],
+  ['v22det_5fopen_5fcmd_5fbit_281',['V22DET_OPEN_CMD_BIT',['../classControllino__1.html#a1168ecacc7b6bf6c9998ad8eefa106c9',1,'Controllino_1']]],
+  ['v22det_5fopen_5fstatus_5fbit_282',['V22DET_OPEN_STATUS_BIT',['../classControllino__1.html#a908c9823603335d825059b1ded310681',1,'Controllino_1']]],
+  ['v22ib_5fclose_5fcmd_5fbit_283',['V22IB_CLOSE_CMD_BIT',['../classControllino__1.html#a2ed4e8a239706d97d79bc5fee3d61db4',1,'Controllino_1']]],
+  ['v22ib_5fclose_5fstatus_5fbit_284',['V22IB_CLOSE_STATUS_BIT',['../classControllino__1.html#a337d682831ea671e694f625387a4e4ea',1,'Controllino_1']]],
+  ['v22ib_5fopen_5fcmd_5fbit_285',['V22IB_OPEN_CMD_BIT',['../classControllino__1.html#a9fcaf28b4708429706f5b212d7c94485',1,'Controllino_1']]],
+  ['v22ib_5fopen_5fstatus_5fbit_286',['V22IB_OPEN_STATUS_BIT',['../classControllino__1.html#af6f5e5da48e04c0d30f5685dbed2b4b4',1,'Controllino_1']]],
+  ['value_287',['value',['../classDataElement.html#a095a2be5a1049adaea4f3567c82db9dd',1,'DataElement']]],
+  ['valvecolorstatus_288',['ValveColorSTATUS',['../interfaceChannelList.html#ae2f39c79a06d9cb8a0507e90b447571e',1,'ChannelList']]],
+  ['valvestatus_289',['ValveSTATUS',['../interfaceChannelList.html#af5476bfa52a147acfd02e7d872512caa',1,'ChannelList']]]
+];

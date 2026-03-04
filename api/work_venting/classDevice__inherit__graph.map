@@ -1,0 +1,10 @@
+<map id="Device" name="Device">
+<area shape="rect" id="node1" title=" " alt="" coords="281,155,347,181"/>
+<area shape="rect" id="node5" href="$classControllino__1.html" title=" " alt="" coords="5,229,113,256"/>
+<area shape="rect" id="node6" href="$classFlowMeterModbusMaster.html" title=" " alt="" coords="138,229,325,256"/>
+<area shape="rect" id="node7" href="$classMaxiGauge.html" title=" " alt="" coords="349,229,445,256"/>
+<area shape="rect" id="node8" href="$classVentingOperationController.html" title=" " alt="" coords="469,229,668,256"/>
+<area shape="rect" id="node2" href="$classDataManager.html" title=" " alt="" coords="259,80,369,107"/>
+<area shape="rect" id="node3" href="$interfaceDataTypes.html" title=" " alt="" coords="222,5,313,32"/>
+<area shape="rect" id="node4" title=" " alt="" coords="394,80,477,107"/>
+</map>

@@ -1,0 +1,17 @@
+<map id="GlgChildGui" name="GlgChildGui">
+<area shape="rect" id="node1" title=" " alt="" coords="152,259,251,285"/>
+<area shape="rect" id="node5" href="$classGlgDryGui.html" title=" " alt="" coords="367,5,457,32"/>
+<area shape="rect" id="node6" href="$classGlgGaugeGui.html" title=" " alt="" coords="358,56,466,83"/>
+<area shape="rect" id="node7" href="$classGlgIonicGui.html" title=" " alt="" coords="363,107,461,133"/>
+<area shape="rect" id="node8" href="$classGlgRGA3Gui.html" title=" " alt="" coords="361,157,463,184"/>
+<area shape="rect" id="node9" href="$classGlgTCMuxTempGui.html" title=" " alt="" coords="339,208,485,235"/>
+<area shape="rect" id="node10" href="$classGlgTitane__22Gui.html" title=" " alt="" coords="347,259,477,285"/>
+<area shape="rect" id="node11" href="$classGlgTitane__32Gui.html" title=" " alt="" coords="347,309,477,336"/>
+<area shape="rect" id="node12" href="$classGlgTube1500wStatusDetailsGui.html" title=" " alt="" coords="299,360,525,387"/>
+<area shape="rect" id="node13" href="$classGlgTurboGui.html" title=" " alt="" coords="361,411,463,437"/>
+<area shape="rect" id="node14" href="$classGlgValveGui.html" title=" " alt="" coords="361,461,463,488"/>
+<area shape="rect" id="node15" href="$classGlgXGSGaugeGui.html" title=" " alt="" coords="345,512,479,539"/>
+<area shape="rect" id="node2" title=" " alt="" coords="21,208,88,235"/>
+<area shape="rect" id="node3" href="$interfaceChannelList.html" title=" " alt="" coords="5,259,104,285"/>
+<area shape="rect" id="node4" title=" " alt="" coords="13,309,96,336"/>
+</map>

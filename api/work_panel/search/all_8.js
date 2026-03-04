@@ -1,0 +1,20 @@
+var searchData=
+[
+  ['i2c_5fin_59',['i2c_in',['../classDevice.html#a4be703140175988cd4806afd4d17536d',1,'Device']]],
+  ['i2c_5fout_60',['i2c_out',['../classDevice.html#ae812122d4a8dafdac56e0d642455801d',1,'Device']]],
+  ['initgpiocontroller_61',['initGpioController',['../classDevice.html#aa04e47a7fdc58895c2321950ab053a55',1,'Device']]],
+  ['inputcallback_62',['InputCallback',['../classGlg2Gui_1_1InputListener.html#a73eea76168668a382484477eb047fa57',1,'Glg2Gui::InputListener']]],
+  ['inputlistener_63',['InputListener',['../classGlg2Gui_1_1InputListener.html',1,'Glg2Gui']]],
+  ['int16_64',['INT16',['../enumDataTypes_1_1RegisterType.html#a4161c4ab5e19c513b13c75c8c6229b98',1,'DataTypes::RegisterType']]],
+  ['int32_65',['INT32',['../enumDataTypes_1_1RegisterType.html#aa706073fde628f20a73cdcd03ccbb0f4',1,'DataTypes::RegisterType']]],
+  ['int8_66',['INT8',['../enumDataTypes_1_1RegisterType.html#a56ab348ecba59545121e79c0fc190703',1,'DataTypes::RegisterType']]],
+  ['ioniconoffcolorstatus_67',['IonicONOFFColorSTATUS',['../interfaceChannelList.html#a2e30af960877cadfa0d1cc43194648fb',1,'ChannelList']]],
+  ['ioniconoffstatus_68',['IonicONOFFSTATUS',['../interfaceChannelList.html#ac21292370153da321a6946c47a8b7996',1,'ChannelList']]],
+  ['ionicoperatingmodecolorstatus_69',['IonicOperatingModeColorSTATUS',['../interfaceChannelList.html#abce1977639e89cee71bdcbb28b81d839',1,'ChannelList']]],
+  ['ionicoperatingmodestatus_70',['IonicOperatingModeSTATUS',['../interfaceChannelList.html#a4740beddc2cbd283a0228291e6d5bbb6',1,'ChannelList']]],
+  ['ionicremotecolorstatus_71',['IonicRemoteColorSTATUS',['../interfaceChannelList.html#a25b421bb4b88c8d43b49c947df27752d',1,'ChannelList']]],
+  ['ionicremotestatus_72',['IonicRemoteSTATUS',['../interfaceChannelList.html#a47618414e8654cc5c93f4e3b0a05f27d',1,'ChannelList']]],
+  ['ionicvoltagemodecolorstatus_73',['IonicVoltageModeColorSTATUS',['../interfaceChannelList.html#ad2eb6fbe7f0a094b6df9f61fe32d3258',1,'ChannelList']]],
+  ['ionicvoltagemodestatus_74',['IonicVoltageModeSTATUS',['../interfaceChannelList.html#ad39f9b956b5c44c74c8e4a7a5ac750f4',1,'ChannelList']]],
+  ['issuspended_75',['isSuspended',['../classGlgChildGui.html#aacfbf7068deb47d7e2b00c294f7b4964',1,'GlgChildGui.isSuspended()'],['../classGlgGui.html#a8bf87b4196e3663d309cee8a8c6bb711',1,'GlgGui.isSuspended()']]]
+];

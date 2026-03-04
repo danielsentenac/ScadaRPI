@@ -1,0 +1,9 @@
+<map id="ChannelList" name="ChannelList">
+<area shape="rect" id="node1" title=" " alt="" coords="262,5,361,32"/>
+<area shape="rect" id="node2" href="$classGlgChildGui.html" title=" " alt="" coords="209,80,307,107"/>
+<area shape="rect" id="node7" href="$classGlgGui.html" title=" " alt="" coords="331,80,398,107"/>
+<area shape="rect" id="node3" href="$classGlgDryGui.html" title=" " alt="" coords="5,155,95,181"/>
+<area shape="rect" id="node4" href="$classGlgFlowMeterGui.html" title=" " alt="" coords="119,155,253,181"/>
+<area shape="rect" id="node5" href="$classGlgGaugeGui.html" title=" " alt="" coords="277,155,385,181"/>
+<area shape="rect" id="node6" href="$classGlgValveGui.html" title=" " alt="" coords="409,155,512,181"/>
+</map>

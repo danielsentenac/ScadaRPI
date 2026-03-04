@@ -1,0 +1,25 @@
+var searchData=
+[
+  ['i2c_101',['i2c',['../classControllino.html#abc07d0c097d9741ad757219734711675',1,'Controllino']]],
+  ['i2c_5fcomm_102',['I2C_Comm',['../classI2C__Comm.html',1,'I2C_Comm'],['../classI2C__Comm.html#a547a8479808b96cc61245db1d6af8d35',1,'I2C_Comm.I2C_Comm()']]],
+  ['i2c_5fcomm_2ejava_103',['I2C_Comm.java',['../I2C__Comm_8java.html',1,'']]],
+  ['inputcallback_104',['InputCallback',['../classGlgXGSGaugeGui_1_1InputListener.html#a98381752c2b85ac23ce7c7ee9a840524',1,'GlgXGSGaugeGui.InputListener.InputCallback()'],['../classGlgValveGui_1_1InputListener.html#ad04451823288946474c512143097760c',1,'GlgValveGui.InputListener.InputCallback()'],['../classGlgTurboGui_1_1InputListener.html#ad643c115fd70ef97366478be6ca48f73',1,'GlgTurboGui.InputListener.InputCallback()'],['../classGlgTubeStatusDetailsGui_1_1InputListener.html#a82e4b92a574c780733ea70ecd3357fc1',1,'GlgTubeStatusDetailsGui.InputListener.InputCallback()'],['../classGlgTitane__32Gui_1_1InputListener.html#af2682cfab7a46c06ebcdfbffe51e7bd9',1,'GlgTitane_32Gui.InputListener.InputCallback()'],['../classGlgTitane__22Gui_1_1InputListener.html#a8927bdd50feb50fabf228925830eb9f4',1,'GlgTitane_22Gui.InputListener.InputCallback()'],['../classGlgRGAGui_1_1InputListener.html#ab85126d093f9f61e0da1d377e823430f',1,'GlgRGAGui.InputListener.InputCallback()'],['../classGlgIonicGui_1_1InputListener.html#ad589831fdf063a069dc1274fd9286995',1,'GlgIonicGui.InputListener.InputCallback()'],['../classGlgGaugeGui_1_1InputListener.html#a9c20711ffe8e8501e1d22a4d2e88b023',1,'GlgGaugeGui.InputListener.InputCallback()'],['../classGlgDryGui_1_1InputListener.html#a32f7728d0dca0a59b2672601f1e778eb',1,'GlgDryGui.InputListener.InputCallback()']]],
+  ['inputlistener_105',['InputListener',['../classGlgDryGui_1_1InputListener.html',1,'GlgDryGui.InputListener'],['../classGlgGaugeGui_1_1InputListener.html',1,'GlgGaugeGui.InputListener'],['../classGlgIonicGui_1_1InputListener.html',1,'GlgIonicGui.InputListener'],['../classGlgRGAGui_1_1InputListener.html',1,'GlgRGAGui.InputListener'],['../classGlgTitane__22Gui_1_1InputListener.html',1,'GlgTitane_22Gui.InputListener'],['../classGlgTitane__32Gui_1_1InputListener.html',1,'GlgTitane_32Gui.InputListener'],['../classGlgTubeStatusDetailsGui_1_1InputListener.html',1,'GlgTubeStatusDetailsGui.InputListener'],['../classGlgTurboGui_1_1InputListener.html',1,'GlgTurboGui.InputListener'],['../classGlgValveGui_1_1InputListener.html',1,'GlgValveGui.InputListener'],['../classGlgXGSGaugeGui_1_1InputListener.html',1,'GlgXGSGaugeGui.InputListener']]],
+  ['int16_106',['INT16',['../enumDataTypes_1_1RegisterType.html#a4161c4ab5e19c513b13c75c8c6229b98',1,'DataTypes::RegisterType']]],
+  ['int32_107',['INT32',['../enumDataTypes_1_1RegisterType.html#aa706073fde628f20a73cdcd03ccbb0f4',1,'DataTypes::RegisterType']]],
+  ['int8_108',['INT8',['../enumDataTypes_1_1RegisterType.html#a56ab348ecba59545121e79c0fc190703',1,'DataTypes::RegisterType']]],
+  ['ionicagilentdual_109',['IonicAgilentDual',['../classIonicAgilentDual.html',1,'IonicAgilentDual'],['../classIonicAgilentDual.html#aa390dc4df2e75a834a7f8115088802c2',1,'IonicAgilentDual.IonicAgilentDual()']]],
+  ['ionicagilentdual_2ejava_110',['IonicAgilentDual.java',['../IonicAgilentDual_8java.html',1,'']]],
+  ['ioniconoffcolorstatus_111',['IonicONOFFColorSTATUS',['../interfaceChannelList.html#a2e30af960877cadfa0d1cc43194648fb',1,'ChannelList']]],
+  ['ioniconoffstatus_112',['IonicONOFFSTATUS',['../interfaceChannelList.html#ac21292370153da321a6946c47a8b7996',1,'ChannelList']]],
+  ['ionicoperatingmodecolorstatus_113',['IonicOperatingModeColorSTATUS',['../interfaceChannelList.html#abce1977639e89cee71bdcbb28b81d839',1,'ChannelList']]],
+  ['ionicoperatingmodestatus_114',['IonicOperatingModeSTATUS',['../interfaceChannelList.html#a4740beddc2cbd283a0228291e6d5bbb6',1,'ChannelList']]],
+  ['ionicremotecolorstatus_115',['IonicRemoteColorSTATUS',['../interfaceChannelList.html#a25b421bb4b88c8d43b49c947df27752d',1,'ChannelList']]],
+  ['ionicremotestatus_116',['IonicRemoteSTATUS',['../interfaceChannelList.html#a47618414e8654cc5c93f4e3b0a05f27d',1,'ChannelList']]],
+  ['ionicvoltagemodecolorstatus_117',['IonicVoltageModeColorSTATUS',['../interfaceChannelList.html#ad2eb6fbe7f0a094b6df9f61fe32d3258',1,'ChannelList']]],
+  ['ionicvoltagemodestatus_118',['IonicVoltageModeSTATUS',['../interfaceChannelList.html#ad39f9b956b5c44c74c8e4a7a5ac750f4',1,'ChannelList']]],
+  ['isborderopaque_119',['isBorderOpaque',['../classRoundedBorder.html#abad737fdd6b741791b68682d5977d582',1,'RoundedBorder']]],
+  ['ispi4jhardwarehost_120',['isPi4jHardwareHost',['../classMain.html#a34b760bfe4e47cff5312ee81e26a2208',1,'Main']]],
+  ['isstarted_121',['isStarted',['../classRgaPfeifferQms200.html#a6bd5d0f5bb7154f03c8f0c3a91fe30a0',1,'RgaPfeifferQms200']]],
+  ['issuspended_122',['isSuspended',['../classGlgChildGui.html#aacfbf7068deb47d7e2b00c294f7b4964',1,'GlgChildGui.isSuspended()'],['../classGlgGui.html#a8bf87b4196e3663d309cee8a8c6bb711',1,'GlgGui.isSuspended()']]]
+];

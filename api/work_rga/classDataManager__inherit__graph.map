@@ -1,0 +1,8 @@
+<map id="DataManager" name="DataManager">
+<area shape="rect" id="node1" title=" " alt="" coords="157,80,268,107"/>
+<area shape="rect" id="node3" href="$classDevice.html" title=" " alt="" coords="179,155,246,181"/>
+<area shape="rect" id="node2" href="$interfaceDataTypes.html" title=" " alt="" coords="167,5,258,32"/>
+<area shape="rect" id="node4" href="$classControllino__3.html" title=" " alt="" coords="5,229,113,256"/>
+<area shape="rect" id="node5" href="$classRgaHidenHal201RC.html" title=" " alt="" coords="138,229,287,256"/>
+<area shape="rect" id="node6" href="$classTCMuxShield.html" title=" " alt="" coords="311,229,418,256"/>
+</map>

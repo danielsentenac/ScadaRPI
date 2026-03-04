@@ -1,0 +1,27 @@
+var searchData=
+[
+  ['scadarpi_215',['SCADARPI',['../index.html',1,'']]],
+  ['serial_216',['serial',['../classSerial__Comm.html#adf095a0285825e89531688e4451d3d29',1,'Serial_Comm']]],
+  ['serial_5fcomm_217',['Serial_Comm',['../classSerial__Comm.html',1,'Serial_Comm'],['../classSerial__Comm.html#ab7ce86cb8310e46fed7b792c22047f1b',1,'Serial_Comm.Serial_Comm()']]],
+  ['serial_5fcomm_2ejava_218',['Serial_Comm.java',['../Serial__Comm_8java.html',1,'']]],
+  ['serial_5fport_219',['serial_port',['../classSerial__Comm.html#a2f4c7ec6649741541bcbd3dde8b42eb3',1,'Serial_Comm.serial_port()'],['../classRgaHidenHal201RC.html#ad0e8f97dcbefa26d4233b0db88238339',1,'RgaHidenHal201RC.serial_port()']]],
+  ['serialversionuid_220',['serialVersionUID',['../classGlgChildGui.html#a203722ac82814feeccc66f4b510ab24f',1,'GlgChildGui.serialVersionUID()'],['../classGlgRgaTempGui.html#ab6b560d7881aa6532ae084f297a56385',1,'GlgRgaTempGui.serialVersionUID()'],['../classGlgRGA3Gui.html#aad88d146ff3fed84404c6acb65ba7a6e',1,'GlgRGA3Gui.serialVersionUID()'],['../classGlgGui.html#ababe7a683549089865244b0a9835b0e1',1,'GlgGui.serialVersionUID()'],['../classGlgRgaStatusDetailsGui.html#a277feae8e747937e1df3ecf652e51be0',1,'GlgRgaStatusDetailsGui.serialVersionUID()']]],
+  ['setbit_221',['setBit',['../classControllino__3.html#a23f860c253b1dbcb7f7b1d11355e61d1',1,'Controllino_3']]],
+  ['setcomponentsize_222',['setComponentSize',['../classDialogSetPoint.html#a822829301f872c1ac7fac294156a77cd',1,'DialogSetPoint']]],
+  ['setdataelementvalue_223',['setDataElementValue',['../classDataManager.html#a47c8795f3e11eb7dd2cd73a0b5eec90f',1,'DataManager']]],
+  ['seterrorcomstatus_224',['setErrorComStatus',['../classDevice.html#a98c00d9ca35b119d58fba62b13d69bd1',1,'Device']]],
+  ['setholdingregisters_225',['setHoldingRegisters',['../classDataManager.html#a89c9816008f2eeec4e55a64b4e826f68',1,'DataManager']]],
+  ['setvalue_226',['setvalue',['../classDataElement.html#a970f614feec8ea42684c144f39d51d21',1,'DataElement']]],
+  ['shape_227',['shape',['../classRoundJTextField.html#a4028fbb1ea6dc9601ce1921a572a1004',1,'RoundJTextField']]],
+  ['short_228',['SHORT',['../classTCMuxShield.html#aafbaff147c4b29a3de0e31e213473855',1,'TCMuxShield']]],
+  ['shouldrunpi4jhardware_229',['shouldRunPi4jHardware',['../classMain.html#aa0c5798cc797271593342ce5cc30ae7c',1,'Main']]],
+  ['showparent_230',['showParent',['../classGlgChildGui.html#ae4a1e349cb99190d3fa7cffc6e227c7c',1,'GlgChildGui']]],
+  ['slave_231',['slave',['../classModbusSlaveThread.html#acf1a0be95c99298f0ce324a51e3e6c70',1,'ModbusSlaveThread']]],
+  ['sleepperiod_232',['sleepPeriod',['../classDevice.html#a85d6ca919d358bb1d4c4723bda953471',1,'Device']]],
+  ['startdegasdevice_233',['StartDegasDevice',['../classRgaHidenHal201RC.html#abc09dd681fa6448db83b17b1edf1e70b',1,'RgaHidenHal201RC']]],
+  ['status_234',['STATUS',['../classGlgChildGui.html#a46f71e0082c444e9c73bcbe20561fb24',1,'GlgChildGui']]],
+  ['stopbits_235',['stopbits',['../classRgaHidenHal201RC.html#a16a51373559f590350527da69cf0e33b',1,'RgaHidenHal201RC.stopbits()'],['../classSerial__Comm.html#ab64e5bca93199ed3b0c9f64c4febbd93',1,'Serial_Comm.stopbits()']]],
+  ['stopdegasdevice_236',['StopDegasDevice',['../classRgaHidenHal201RC.html#a960d8eff5dd8b800f48759860abfca02',1,'RgaHidenHal201RC']]],
+  ['stopscandevice_237',['StopScanDevice',['../classRgaHidenHal201RC.html#a347bae163c45b2b999ac1ab67ab7e04b',1,'RgaHidenHal201RC']]],
+  ['subwindows_238',['subwindows',['../classGlgGui.html#a338f4448d622aacb1801bfd04a41c138',1,'GlgGui']]]
+];

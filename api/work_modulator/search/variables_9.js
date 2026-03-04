@@ -1,0 +1,4 @@
+var searchData=
+[
+  ['logger_318',['logger',['../classControllino.html#a0b3784572af20399522938108fe6be18',1,'Controllino.logger()'],['../classDataElement.html#ad756d2c315aae1fde6745a2b3fb91ab6',1,'DataElement.logger()'],['../classDataManager.html#ab58627603e5c060996ae1888880e5bbf',1,'DataManager.logger()'],['../classDevice.html#a5766ed9950a1c4b9bf9860bcd96c2601',1,'Device.logger()'],['../classDialogSetPoint.html#afc1f55070b4c20a6ece0a8f99ad67459',1,'DialogSetPoint.logger()'],['../classGlgChildGui.html#afaa8cf7da6a1395dffb765920640a05e',1,'GlgChildGui.logger()'],['../classGlgGui.html#a6f0314c81763a9a855e3ad3303c0596a',1,'GlgGui.logger()'],['../classI2C__Comm.html#a1fb52fb0c3d12fc441c2d57e7326e1de',1,'I2C_Comm.logger()'],['../classMain.html#a43b110a3f64eb67becd9ce6a14cc962b',1,'Main.logger()'],['../classModbusSlaveThread.html#a017bae96ae7e40cdf10b42b1edd3039c',1,'ModbusSlaveThread.logger()']]]
+];
