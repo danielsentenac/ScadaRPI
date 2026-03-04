@@ -1,126 +1,164 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="980" viewBox="0 0 1600 980">
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1100" viewBox="0 0 1800 1100">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#eef8ff"/>
-      <stop offset="100%" stop-color="#dcefff"/>
+      <stop offset="0%" stop-color="#f3f8ff"/>
+      <stop offset="100%" stop-color="#e7f0fc"/>
     </linearGradient>
-    <linearGradient id="busGrad" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#4f7fb4"/>
-      <stop offset="100%" stop-color="#7aa7d5"/>
+    <linearGradient id="ctrlLane" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#edf5ff"/>
+      <stop offset="100%" stop-color="#e2eeff"/>
     </linearGradient>
-    <linearGradient id="ifaceGrad" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#4c8e75"/>
-      <stop offset="100%" stop-color="#79b49f"/>
+    <linearGradient id="instLane" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#eefaf4"/>
+      <stop offset="100%" stop-color="#e0f3e9"/>
+    </linearGradient>
+    <linearGradient id="i2cBus" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#4b6e9e"/>
+      <stop offset="100%" stop-color="#7a99c2"/>
+    </linearGradient>
+    <linearGradient id="instBus" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#3f8668"/>
+      <stop offset="100%" stop-color="#6bab92"/>
     </linearGradient>
     <marker id="arrow" markerWidth="12" markerHeight="8" refX="10" refY="4" orient="auto">
-      <polygon points="0,0 12,4 0,8" fill="#2b4f7b"/>
+      <polygon points="0,0 12,4 0,8" fill="#2f537f"/>
     </marker>
     <style>
-      .title { font: 700 42px "DejaVu Sans", Arial, sans-serif; fill: #11345e; }
-      .subtitle { font: 600 20px "DejaVu Sans", Arial, sans-serif; fill: #1d446f; }
-      .heading { font: 700 27px "DejaVu Sans", Arial, sans-serif; fill: #14365f; }
-      .text { font: 500 21px "DejaVu Sans", Arial, sans-serif; fill: #1b3656; }
-      .small { font: 500 18px "DejaVu Sans", Arial, sans-serif; fill: #254a73; }
-      .block { stroke: #2d5887; stroke-width: 3; rx: 20; ry: 20; }
-      .pi { fill: #f8fcff; }
-      .remote { fill: #edf6ff; }
-      .module { fill: #e6f7f2; }
-      .instrument { fill: #fff9eb; }
-      .line { stroke: #2b4f7b; stroke-width: 4; fill: none; marker-end: url(#arrow); }
-      .branch { stroke: #3a628f; stroke-width: 3; fill: none; marker-end: url(#arrow); }
-      .sepline { stroke: #6f8fb3; stroke-width: 2; stroke-dasharray: 8 8; fill: none; }
+      .title { font: 700 44px "DejaVu Sans", Arial, sans-serif; fill: #113863; }
+      .subtitle { font: 600 22px "DejaVu Sans", Arial, sans-serif; fill: #224b78; }
+      .laneTitle { font: 700 26px "DejaVu Sans", Arial, sans-serif; fill: #18416d; }
+      .head { font: 700 28px "DejaVu Sans", Arial, sans-serif; fill: #143a61; }
+      .text { font: 500 21px "DejaVu Sans", Arial, sans-serif; fill: #1e3f63; }
+      .small { font: 500 18px "DejaVu Sans", Arial, sans-serif; fill: #2b4d72; }
+      .box { stroke: #335f8e; stroke-width: 3; rx: 18; ry: 18; }
+      .rpi { fill: #f8fbff; }
+      .remote { fill: #f3f8ff; }
+      .laneL { fill: url(#ctrlLane); stroke: #7e99bc; stroke-width: 2; rx: 22; ry: 22; }
+      .laneR { fill: url(#instLane); stroke: #7ca995; stroke-width: 2; rx: 22; ry: 22; }
+      .plc { fill: #e8f5f0; }
+      .field { fill: #fff9eb; }
+      .inst { fill: #f1fff8; }
+      .line { stroke: #2f537f; stroke-width: 4; fill: none; marker-end: url(#arrow); }
+      .branch { stroke: #3d628f; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+      .split { stroke: #6d8fb7; stroke-width: 2; stroke-dasharray: 10 8; }
     </style>
   </defs>
 
-  <rect x="0" y="0" width="1600" height="980" fill="url(#bg)"/>
+  <rect x="0" y="0" width="1800" height="1100" fill="url(#bg)"/>
 
-  <text class="title" x="800" y="62" text-anchor="middle">Generic SCADA Architecture</text>
-  <text class="subtitle" x="800" y="96" text-anchor="middle">Raspberry Pi Main CPU + Controllino PLC Modules + Instruments</text>
+  <text class="title" x="900" y="64" text-anchor="middle">SCADARPI Architecture Schema (Generic)</text>
+  <text class="subtitle" x="900" y="100" text-anchor="middle">Raspberry Pi Main CPU + Controllino PLC real-time control + instrument interfaces</text>
 
-  <!-- Raspberry Pi Main Block -->
-  <rect class="block pi" x="70" y="145" width="500" height="290"/>
-  <text class="heading" x="320" y="190" text-anchor="middle">Raspberry Pi Main CPU</text>
-  <text class="text" x="105" y="238">- SCADARPI Java application</text>
-  <text class="text" x="105" y="274">- GLG Toolkit / HMI screens</text>
-  <text class="text" x="105" y="310">- Pi4J (hardware I/O layer)</text>
-  <text class="text" x="105" y="346">- jlibmodbus (remote Modbus)</text>
-  <text class="text" x="105" y="382">- Local control and monitoring logic</text>
+  <!-- Core compute and remote clients -->
+  <rect class="box rpi" x="70" y="130" width="780" height="250"/>
+  <text class="head" x="460" y="178" text-anchor="middle">Raspberry Pi Main CPU</text>
+  <text class="text" x="110" y="225">- SCADARPI Java runtime + GLG HMI</text>
+  <text class="text" x="110" y="260">- Control supervisor and sequencing logic</text>
+  <text class="text" x="110" y="295">- Direct sensor/instrument interfaces manager</text>
+  <text class="text" x="110" y="330">- Modbus TCP endpoint (jlibmodbus)</text>
 
-  <!-- Remote Clients Block -->
-  <rect class="block remote" x="1030" y="145" width="500" height="220"/>
-  <text class="heading" x="1280" y="190" text-anchor="middle">Remote Clients / Supervisors</text>
-  <text class="text" x="1068" y="238">- SCADA clients and control rooms</text>
-  <text class="text" x="1068" y="274">- Logging and supervisory services</text>
-  <text class="text" x="1068" y="310">- Modbus TCP / HTTP interfaces</text>
+  <rect class="box remote" x="960" y="140" width="770" height="220"/>
+  <text class="head" x="1345" y="188" text-anchor="middle">Remote SCADA / Supervisory Clients</text>
+  <text class="text" x="1000" y="235">- Control room clients and remote HMIs</text>
+  <text class="text" x="1000" y="270">- Supervisor services and data collection</text>
+  <text class="text" x="1000" y="305">- Ethernet/TCP via Modbus TCP and HTTP</text>
 
-  <!-- I2C Backbone -->
-  <rect x="130" y="470" width="1340" height="32" rx="16" ry="16" fill="url(#busGrad)" stroke="#315d8e" stroke-width="2"/>
-  <text class="heading" x="800" y="458" text-anchor="middle">I2C Backbone</text>
+  <path class="line" d="M850,235 L960,235"/>
+  <text class="small" x="905" y="222" text-anchor="middle">Network link</text>
 
-  <!-- Pi to Remote -->
-  <path class="line" d="M570,235 L1030,235"/>
-  <text class="small" x="800" y="223" text-anchor="middle">Ethernet / TCP (Modbus TCP, HTTP)</text>
+  <!-- Architecture split line -->
+  <line class="split" x1="900" y1="415" x2="900" y2="1060"/>
 
-  <!-- Pi to I2C -->
-  <path class="line" d="M320,435 L320,470"/>
+  <!-- Left lane: PLC real-time control -->
+  <rect class="laneL" x="60" y="430" width="820" height="620"/>
+  <text class="laneTitle" x="470" y="470" text-anchor="middle">Path A: Real-time control (Controllino PLC, 24V digital I/O)</text>
 
-  <!-- Controllino modules -->
-  <rect class="block module" x="180" y="560" width="360" height="165"/>
-  <text class="heading" x="360" y="605" text-anchor="middle">Controllino Module A</text>
-  <text class="text" x="210" y="645">- Digital outputs / relays</text>
-  <text class="text" x="210" y="676">- Interlocks and valve control</text>
+  <rect x="150" y="510" width="640" height="36" rx="18" ry="18" fill="url(#i2cBus)" stroke="#31517b" stroke-width="2"/>
+  <text class="small" x="470" y="502" text-anchor="middle">I2C link: Raspberry Pi to Controllino modules</text>
+  <text class="small" x="470" y="535" text-anchor="middle" fill="#ffffff">I2C control backbone</text>
+  <path class="line" d="M430,380 L430,510"/>
 
-  <rect class="block module" x="620" y="560" width="360" height="165"/>
-  <text class="heading" x="800" y="605" text-anchor="middle">Controllino Module B</text>
-  <text class="text" x="650" y="645">- Analog and digital channels</text>
-  <text class="text" x="650" y="676">- Pump and actuator commands</text>
+  <rect class="box plc" x="100" y="600" width="220" height="170"/>
+  <text class="head" x="210" y="642" text-anchor="middle">Module A</text>
+  <text class="small" x="120" y="678">- Valve relays</text>
+  <text class="small" x="120" y="705">- Interlock outputs</text>
+  <text class="small" x="120" y="732">- 24V digital DO</text>
 
-  <rect class="block module" x="1060" y="560" width="360" height="165"/>
-  <text class="heading" x="1240" y="605" text-anchor="middle">Controllino Module C</text>
-  <text class="text" x="1090" y="645">- Additional I/O expansion</text>
-  <text class="text" x="1090" y="676">- Safety and status collection</text>
+  <rect class="box plc" x="360" y="600" width="220" height="170"/>
+  <text class="head" x="470" y="642" text-anchor="middle">Module B</text>
+  <text class="small" x="380" y="678">- Power relays</text>
+  <text class="small" x="380" y="705">- Aux control outputs</text>
+  <text class="small" x="380" y="732">- Status handling</text>
 
-  <!-- I2C bus to modules -->
-  <path class="line" d="M360,502 L360,560"/>
-  <path class="line" d="M800,502 L800,560"/>
-  <path class="line" d="M1240,502 L1240,560"/>
+  <rect class="box plc" x="620" y="600" width="220" height="170"/>
+  <text class="head" x="730" y="642" text-anchor="middle">Module C</text>
+  <text class="small" x="640" y="678">- Rack fans control</text>
+  <text class="small" x="640" y="705">- Low/High noise modes</text>
+  <text class="small" x="640" y="732">- Noise status feedback</text>
 
-  <!-- Architecture split marker -->
-  <line class="sepline" x1="800" y1="540" x2="800" y2="930"/>
-  <text class="small" x="430" y="545" text-anchor="middle">Real-time control path (PLC 24V digital I/O)</text>
-  <text class="small" x="1180" y="545" text-anchor="middle">Instrument interface path (RPi serial/SPI/I2C buses)</text>
+  <path class="line" d="M210,546 L210,600"/>
+  <path class="line" d="M470,546 L470,600"/>
+  <path class="line" d="M730,546 L730,600"/>
 
-  <!-- Instrument interface bus -->
-  <rect x="850" y="744" width="660" height="28" rx="14" ry="14" fill="url(#ifaceGrad)" stroke="#3f7a64" stroke-width="2"/>
-  <text class="small" x="1180" y="734" text-anchor="middle">Instrument buses: RS232/RS485, SPI, I2C, USB-serial</text>
-  <path class="line" d="M500,435 L500,758"/>
+  <rect class="box field" x="85" y="890" width="180" height="130"/>
+  <text class="head" x="175" y="936" text-anchor="middle">Valves</text>
+  <text class="small" x="175" y="970" text-anchor="middle">Relay-actuated</text>
 
-  <!-- Field endpoints -->
-  <rect class="block instrument" x="70" y="805" width="350" height="120"/>
-  <text class="heading" x="245" y="848" text-anchor="middle">Valve / Power Relays</text>
-  <text class="small" x="245" y="882" text-anchor="middle">Controllino-controlled 24V outputs</text>
+  <rect class="box field" x="275" y="890" width="180" height="130"/>
+  <text class="head" x="365" y="936" text-anchor="middle">Power</text>
+  <text class="small" x="365" y="970" text-anchor="middle">On/Off relays</text>
 
-  <rect class="block instrument" x="450" y="805" width="350" height="120"/>
-  <text class="heading" x="625" y="848" text-anchor="middle">Status Signals (DI)</text>
-  <text class="small" x="625" y="882" text-anchor="middle">Valve status, power feedback, interlocks</text>
+  <rect class="box field" x="465" y="890" width="180" height="130"/>
+  <text class="head" x="555" y="936" text-anchor="middle">Status DI</text>
+  <text class="small" x="555" y="970" text-anchor="middle">Feedback signals</text>
 
-  <rect class="block instrument" x="850" y="805" width="320" height="120"/>
-  <text class="heading" x="1010" y="848" text-anchor="middle">Instruments</text>
-  <text class="small" x="1010" y="882" text-anchor="middle">Gauges, pumps, RGA, flowmeters</text>
+  <rect class="box field" x="655" y="890" width="180" height="130"/>
+  <text class="head" x="745" y="936" text-anchor="middle">Rack Fans</text>
+  <text class="small" x="745" y="970" text-anchor="middle">Low/High noise</text>
 
-  <rect class="block instrument" x="1200" y="805" width="320" height="120"/>
-  <text class="heading" x="1360" y="848" text-anchor="middle">Temperature Sensors</text>
-  <text class="small" x="1360" y="882" text-anchor="middle">Read directly by Raspberry Pi</text>
+  <path class="branch" d="M210,770 L175,890"/>
+  <path class="branch" d="M470,770 L365,890"/>
+  <path class="branch" d="M730,770 L555,890"/>
+  <path class="branch" d="M730,770 L745,890"/>
 
-  <!-- PLC connections -->
-  <path class="branch" d="M300,725 L245,805"/>
-  <path class="branch" d="M760,725 L625,805"/>
-  <path class="branch" d="M1180,725 L625,805"/>
+  <!-- Right lane: direct instrument interfaces -->
+  <rect class="laneR" x="920" y="430" width="820" height="620"/>
+  <text class="laneTitle" x="1330" y="470" text-anchor="middle">Path B: Instrument interfaces managed directly by Raspberry Pi</text>
 
-  <!-- RPi instrument interface connections -->
-  <path class="branch" d="M1010,772 L1010,805"/>
-  <path class="branch" d="M1360,772 L1360,805"/>
+  <rect x="1000" y="520" width="660" height="40" rx="20" ry="20" fill="url(#instBus)" stroke="#3f775f" stroke-width="2"/>
+  <text class="small" x="1330" y="510" text-anchor="middle">Instrument buses: RS232/RS485, SPI, I2C, USB-serial</text>
+  <text class="small" x="1330" y="546" text-anchor="middle" fill="#ffffff">Direct RPi instrument/sensor communication layer</text>
+  <path class="line" d="M570,380 L570,540 L1000,540"/>
 
-  <text class="small" x="800" y="770" text-anchor="middle">Architecture separates PLC real-time control from instrument controller interfaces</text>
+  <rect class="box inst" x="980" y="640" width="330" height="150"/>
+  <text class="head" x="1145" y="684" text-anchor="middle">Instruments Group 1</text>
+  <text class="small" x="1010" y="720">- Gauges</text>
+  <text class="small" x="1010" y="746">- Pumps</text>
+  <text class="small" x="1010" y="772">- RGA</text>
+
+  <rect class="box inst" x="1350" y="640" width="330" height="150"/>
+  <text class="head" x="1515" y="684" text-anchor="middle">Instruments Group 2</text>
+  <text class="small" x="1380" y="720">- Flowmeters</text>
+  <text class="small" x="1380" y="746">- Aux controllers</text>
+  <text class="small" x="1380" y="772">- Serial devices</text>
+
+  <rect class="box inst" x="980" y="840" width="330" height="160"/>
+  <text class="head" x="1145" y="885" text-anchor="middle">Temperature Sensors</text>
+  <text class="small" x="1010" y="922">- Read directly by Raspberry Pi</text>
+  <text class="small" x="1010" y="948">- Polled through local buses</text>
+  <text class="small" x="1010" y="974">- Integrated in SCADA logic</text>
+
+  <rect class="box inst" x="1350" y="840" width="330" height="160"/>
+  <text class="head" x="1515" y="885" text-anchor="middle">Instrument Status</text>
+  <text class="small" x="1380" y="922">- Telemetry and states</text>
+  <text class="small" x="1380" y="948">- Setpoints / commands</text>
+  <text class="small" x="1380" y="974">- Diagnostics feedback</text>
+
+  <path class="branch" d="M1145,560 L1145,640"/>
+  <path class="branch" d="M1515,560 L1515,640"/>
+  <path class="branch" d="M1145,560 L1145,840"/>
+  <path class="branch" d="M1515,560 L1515,840"/>
+
+  <text class="small" x="900" y="407" text-anchor="middle">Control architecture split: PLC real-time 24V control vs direct instrument interfaces</text>
 </svg>
