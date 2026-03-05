@@ -13,7 +13,7 @@ Live API docs: [https://danielsentenac.github.io/ScadaRPI/api/](https://danielse
 
 ## GUI Example
 
-![Tube 1500W Station SCADA/HMI screen](Illustration.png)
+![Tube 1500W Station SCADA/HMI screen](docs/Illustration.png)
 
 ## API Documentation
 
