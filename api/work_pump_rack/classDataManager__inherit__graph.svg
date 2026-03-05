@@ -8,6 +8,7 @@
  viewBox="0.00 0.00 430.00 332.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 328)">
 <title>DataManager</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-328 426,-328 426,4 -4,4"/>
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
@@ -21,7 +22,7 @@
 <g id="node3" class="node">
 <title>Node3</title>
 <g id="a_node3"><a xlink:href="classDevice.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="223,-152.5 223,-171.5 273,-171.5 273,-152.5 223,-152.5"/>
+<polygon fill="white" stroke="black" points="223,-152.5 223,-171.5 273,-171.5 273,-152.5 223,-152.5"/>
 <text text-anchor="middle" x="248" y="-159.5" font-family="Helvetica,sans-Serif" font-size="10.00">Device</text>
 </a>
 </g>
@@ -36,7 +37,7 @@
 <g id="node2" class="node">
 <title>Node2</title>
 <g id="a_node2"><a xlink:href="interfaceDataTypes.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="0,-152.5 0,-171.5 68,-171.5 68,-152.5 0,-152.5"/>
+<polygon fill="white" stroke="black" points="0,-152.5 0,-171.5 68,-171.5 68,-152.5 0,-152.5"/>
 <text text-anchor="middle" x="34" y="-159.5" font-family="Helvetica,sans-Serif" font-size="10.00">DataTypes</text>
 </a>
 </g>
@@ -51,7 +52,7 @@
 <g id="node4" class="node">
 <title>Node4</title>
 <g id="a_node4"><a xlink:href="classControllino.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="330.5,-304.5 330.5,-323.5 400.5,-323.5 400.5,-304.5 330.5,-304.5"/>
+<polygon fill="white" stroke="black" points="330.5,-304.5 330.5,-323.5 400.5,-323.5 400.5,-304.5 330.5,-304.5"/>
 <text text-anchor="middle" x="365.5" y="-311.5" font-family="Helvetica,sans-Serif" font-size="10.00">Controllino</text>
 </a>
 </g>
@@ -66,7 +67,7 @@
 <g id="node5" class="node">
 <title>Node5</title>
 <g id="a_node5"><a xlink:href="classIonicAgilentDual.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="317,-266.5 317,-285.5 414,-285.5 414,-266.5 317,-266.5"/>
+<polygon fill="white" stroke="black" points="317,-266.5 317,-285.5 414,-285.5 414,-266.5 317,-266.5"/>
 <text text-anchor="middle" x="365.5" y="-273.5" font-family="Helvetica,sans-Serif" font-size="10.00">IonicAgilentDual</text>
 </a>
 </g>
@@ -81,7 +82,7 @@
 <g id="node6" class="node">
 <title>Node6</title>
 <g id="a_node6"><a xlink:href="classMaxiGauge.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="329.5,-228.5 329.5,-247.5 401.5,-247.5 401.5,-228.5 329.5,-228.5"/>
+<polygon fill="white" stroke="black" points="329.5,-228.5 329.5,-247.5 401.5,-247.5 401.5,-228.5 329.5,-228.5"/>
 <text text-anchor="middle" x="365.5" y="-235.5" font-family="Helvetica,sans-Serif" font-size="10.00">MaxiGauge</text>
 </a>
 </g>
@@ -96,7 +97,7 @@
 <g id="node7" class="node">
 <title>Node7</title>
 <g id="a_node7"><a xlink:href="classRgaPfeifferQms200.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="310,-190.5 310,-209.5 421,-209.5 421,-190.5 310,-190.5"/>
+<polygon fill="white" stroke="black" points="310,-190.5 310,-209.5 421,-209.5 421,-190.5 310,-190.5"/>
 <text text-anchor="middle" x="365.5" y="-197.5" font-family="Helvetica,sans-Serif" font-size="10.00">RgaPfeifferQms200</text>
 </a>
 </g>
@@ -111,7 +112,7 @@
 <g id="node8" class="node">
 <title>Node8</title>
 <g id="a_node8"><a xlink:href="classTitaneVarianTSP__22.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="309,-152.5 309,-171.5 422,-171.5 422,-152.5 309,-152.5"/>
+<polygon fill="white" stroke="black" points="309,-152.5 309,-171.5 422,-171.5 422,-152.5 309,-152.5"/>
 <text text-anchor="middle" x="365.5" y="-159.5" font-family="Helvetica,sans-Serif" font-size="10.00">TitaneVarianTSP_22</text>
 </a>
 </g>
@@ -126,7 +127,7 @@
 <g id="node9" class="node">
 <title>Node9</title>
 <g id="a_node9"><a xlink:href="classTitaneVarianTSP__32.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="309,-114.5 309,-133.5 422,-133.5 422,-114.5 309,-114.5"/>
+<polygon fill="white" stroke="black" points="309,-114.5 309,-133.5 422,-133.5 422,-114.5 309,-114.5"/>
 <text text-anchor="middle" x="365.5" y="-121.5" font-family="Helvetica,sans-Serif" font-size="10.00">TitaneVarianTSP_32</text>
 </a>
 </g>
@@ -141,7 +142,7 @@
 <g id="node10" class="node">
 <title>Node10</title>
 <g id="a_node10"><a xlink:href="classTurboPfeifferDCU.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="315.5,-76.5 315.5,-95.5 415.5,-95.5 415.5,-76.5 315.5,-76.5"/>
+<polygon fill="white" stroke="black" points="315.5,-76.5 315.5,-95.5 415.5,-95.5 415.5,-76.5 315.5,-76.5"/>
 <text text-anchor="middle" x="365.5" y="-83.5" font-family="Helvetica,sans-Serif" font-size="10.00">TurboPfeifferDCU</text>
 </a>
 </g>
@@ -156,7 +157,7 @@
 <g id="node11" class="node">
 <title>Node11</title>
 <g id="a_node11"><a xlink:href="classTurboVarianV81AG.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="312,-38.5 312,-57.5 419,-57.5 419,-38.5 312,-38.5"/>
+<polygon fill="white" stroke="black" points="312,-38.5 312,-57.5 419,-57.5 419,-38.5 312,-38.5"/>
 <text text-anchor="middle" x="365.5" y="-45.5" font-family="Helvetica,sans-Serif" font-size="10.00">TurboVarianV81AG</text>
 </a>
 </g>
@@ -171,7 +172,7 @@
 <g id="node12" class="node">
 <title>Node12</title>
 <g id="a_node12"><a xlink:href="classXGSGauge.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="331.5,-0.5 331.5,-19.5 399.5,-19.5 399.5,-0.5 331.5,-0.5"/>
+<polygon fill="white" stroke="black" points="331.5,-0.5 331.5,-19.5 399.5,-19.5 399.5,-0.5 331.5,-0.5"/>
 <text text-anchor="middle" x="365.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">XGSGauge</text>
 </a>
 </g>

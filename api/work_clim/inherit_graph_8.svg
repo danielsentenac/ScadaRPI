@@ -8,11 +8,12 @@
  viewBox="0.00 0.00 273.00 39.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 35)">
 <title>Graphical Class Hierarchy</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-35 269,-35 269,4 -4,4"/>
 <!-- Node23 -->
 <g id="node1" class="node">
 <title>Node23</title>
 <g id="a_node1"><a xlink:title=" ">
-<polygon fill="none" stroke="#bfbfbf" points="0,-6 0,-25 72,-25 72,-6 0,-6"/>
+<polygon fill="white" stroke="#bfbfbf" points="0,-6 0,-25 72,-25 72,-6 0,-6"/>
 <text text-anchor="middle" x="36" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">DataHolder</text>
 </a>
 </g>
@@ -21,7 +22,7 @@
 <g id="node2" class="node">
 <title>Node0</title>
 <g id="a_node2"><a xlink:href="classModbusSlaveThread_1_1ModbusSlaveDataHolder.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="108,-0.5 108,-30.5 265,-30.5 265,-0.5 108,-0.5"/>
+<polygon fill="white" stroke="black" points="108,-0.5 108,-30.5 265,-30.5 265,-0.5 108,-0.5"/>
 <text text-anchor="start" x="116" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">ModbusSlaveThread.Modbus</text>
 <text text-anchor="middle" x="186.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">SlaveDataHolder</text>
 </a>

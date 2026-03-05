@@ -8,6 +8,7 @@
  viewBox="0.00 0.00 200.00 196.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 192)">
 <title>FlowMeterModbusMaster</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-192 196,-192 196,4 -4,4"/>
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
@@ -21,7 +22,7 @@
 <g id="node2" class="node">
 <title>Node2</title>
 <g id="a_node2"><a xlink:href="classDevice.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="45,-56.5 45,-75.5 95,-75.5 95,-56.5 45,-56.5"/>
+<polygon fill="white" stroke="black" points="45,-56.5 45,-75.5 95,-75.5 95,-56.5 45,-56.5"/>
 <text text-anchor="middle" x="70" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">Device</text>
 </a>
 </g>
@@ -36,7 +37,7 @@
 <g id="node3" class="node">
 <title>Node3</title>
 <g id="a_node3"><a xlink:href="classDataManager.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="28.5,-112.5 28.5,-131.5 111.5,-131.5 111.5,-112.5 28.5,-112.5"/>
+<polygon fill="white" stroke="black" points="28.5,-112.5 28.5,-131.5 111.5,-131.5 111.5,-112.5 28.5,-112.5"/>
 <text text-anchor="middle" x="70" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">DataManager</text>
 </a>
 </g>
@@ -51,7 +52,7 @@
 <g id="node4" class="node">
 <title>Node4</title>
 <g id="a_node4"><a xlink:href="interfaceDataTypes.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="1,-168.5 1,-187.5 69,-187.5 69,-168.5 1,-168.5"/>
+<polygon fill="white" stroke="black" points="1,-168.5 1,-187.5 69,-187.5 69,-168.5 1,-168.5"/>
 <text text-anchor="middle" x="35" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">DataTypes</text>
 </a>
 </g>
@@ -72,7 +73,7 @@
 <g id="node5" class="node">
 <title>Node5</title>
 <g id="a_node5"><a xlink:title=" ">
-<polygon fill="none" stroke="#bfbfbf" points="130,-112.5 130,-131.5 192,-131.5 192,-112.5 130,-112.5"/>
+<polygon fill="white" stroke="#bfbfbf" points="130,-112.5 130,-131.5 192,-131.5 192,-112.5 130,-112.5"/>
 <text text-anchor="middle" x="161" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">Runnable</text>
 </a>
 </g>

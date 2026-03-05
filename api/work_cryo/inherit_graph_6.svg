@@ -8,11 +8,12 @@
  viewBox="0.00 0.00 309.00 381.50" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 377.5)">
 <title>Graphical Class Hierarchy</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-377.5 305,-377.5 305,4 -4,4"/>
 <!-- Node26 -->
 <g id="node1" class="node">
 <title>Node26</title>
 <g id="a_node1"><a xlink:title=" ">
-<polygon fill="none" stroke="#bfbfbf" points="0,-171.5 0,-190.5 97,-190.5 97,-171.5 0,-171.5"/>
+<polygon fill="white" stroke="#bfbfbf" points="0,-171.5 0,-190.5 97,-190.5 97,-171.5 0,-171.5"/>
 <text text-anchor="middle" x="48.5" y="-178.5" font-family="Helvetica,sans-Serif" font-size="10.00">GlgInputListener</text>
 </a>
 </g>
@@ -21,7 +22,7 @@
 <g id="node2" class="node">
 <title>Node0</title>
 <g id="a_node2"><a xlink:href="classGlgCryoIbDetStatusDetailsGui_1_1InputListener.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="143.5,-343 143.5,-373 290.5,-373 290.5,-343 143.5,-343"/>
+<polygon fill="white" stroke="black" points="143.5,-343 143.5,-373 290.5,-373 290.5,-343 143.5,-343"/>
 <text text-anchor="start" x="151.5" y="-361" font-family="Helvetica,sans-Serif" font-size="10.00">GlgCryoIbDetStatusDetails</text>
 <text text-anchor="middle" x="217" y="-350" font-family="Helvetica,sans-Serif" font-size="10.00">Gui.InputListener</text>
 </a>
@@ -37,7 +38,7 @@
 <g id="node3" class="node">
 <title>Node28</title>
 <g id="a_node3"><a xlink:href="classGlgDryGui_1_1InputListener.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="150,-304.5 150,-323.5 284,-323.5 284,-304.5 150,-304.5"/>
+<polygon fill="white" stroke="black" points="150,-304.5 150,-323.5 284,-323.5 284,-304.5 150,-304.5"/>
 <text text-anchor="middle" x="217" y="-311.5" font-family="Helvetica,sans-Serif" font-size="10.00">GlgDryGui.InputListener</text>
 </a>
 </g>
@@ -52,7 +53,7 @@
 <g id="node4" class="node">
 <title>Node29</title>
 <g id="a_node4"><a xlink:href="classGlgGaugeGui_1_1InputListener.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="143,-266.5 143,-285.5 291,-285.5 291,-266.5 143,-266.5"/>
+<polygon fill="white" stroke="black" points="143,-266.5 143,-285.5 291,-285.5 291,-266.5 143,-266.5"/>
 <text text-anchor="middle" x="217" y="-273.5" font-family="Helvetica,sans-Serif" font-size="10.00">GlgGaugeGui.InputListener</text>
 </a>
 </g>
@@ -67,7 +68,7 @@
 <g id="node5" class="node">
 <title>Node30</title>
 <g id="a_node5"><a xlink:href="classGlgIonicGui_1_1InputListener.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="147,-228.5 147,-247.5 287,-247.5 287,-228.5 147,-228.5"/>
+<polygon fill="white" stroke="black" points="147,-228.5 147,-247.5 287,-247.5 287,-228.5 147,-228.5"/>
 <text text-anchor="middle" x="217" y="-235.5" font-family="Helvetica,sans-Serif" font-size="10.00">GlgIonicGui.InputListener</text>
 </a>
 </g>
@@ -82,7 +83,7 @@
 <g id="node6" class="node">
 <title>Node31</title>
 <g id="a_node6"><a xlink:href="classGlgRGAGui_1_1InputListener.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="148.5,-190.5 148.5,-209.5 285.5,-209.5 285.5,-190.5 148.5,-190.5"/>
+<polygon fill="white" stroke="black" points="148.5,-190.5 148.5,-209.5 285.5,-209.5 285.5,-190.5 148.5,-190.5"/>
 <text text-anchor="middle" x="217" y="-197.5" font-family="Helvetica,sans-Serif" font-size="10.00">GlgRGAGui.InputListener</text>
 </a>
 </g>
@@ -97,7 +98,7 @@
 <g id="node7" class="node">
 <title>Node32</title>
 <g id="a_node7"><a xlink:href="classGlgTitane__22Gui_1_1InputListener.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="135,-152.5 135,-171.5 299,-171.5 299,-152.5 135,-152.5"/>
+<polygon fill="white" stroke="black" points="135,-152.5 135,-171.5 299,-171.5 299,-152.5 135,-152.5"/>
 <text text-anchor="middle" x="217" y="-159.5" font-family="Helvetica,sans-Serif" font-size="10.00">GlgTitane_22Gui.InputListener</text>
 </a>
 </g>
@@ -112,7 +113,7 @@
 <g id="node8" class="node">
 <title>Node33</title>
 <g id="a_node8"><a xlink:href="classGlgTitane__32Gui_1_1InputListener.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="135,-114.5 135,-133.5 299,-133.5 299,-114.5 135,-114.5"/>
+<polygon fill="white" stroke="black" points="135,-114.5 135,-133.5 299,-133.5 299,-114.5 135,-114.5"/>
 <text text-anchor="middle" x="217" y="-121.5" font-family="Helvetica,sans-Serif" font-size="10.00">GlgTitane_32Gui.InputListener</text>
 </a>
 </g>
@@ -127,7 +128,7 @@
 <g id="node9" class="node">
 <title>Node34</title>
 <g id="a_node9"><a xlink:href="classGlgTurboGui_1_1InputListener.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="145.5,-76.5 145.5,-95.5 288.5,-95.5 288.5,-76.5 145.5,-76.5"/>
+<polygon fill="white" stroke="black" points="145.5,-76.5 145.5,-95.5 288.5,-95.5 288.5,-76.5 145.5,-76.5"/>
 <text text-anchor="middle" x="217" y="-83.5" font-family="Helvetica,sans-Serif" font-size="10.00">GlgTurboGui.InputListener</text>
 </a>
 </g>
@@ -142,7 +143,7 @@
 <g id="node10" class="node">
 <title>Node35</title>
 <g id="a_node10"><a xlink:href="classGlgValveGui_1_1InputListener.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="145.5,-38.5 145.5,-57.5 288.5,-57.5 288.5,-38.5 145.5,-38.5"/>
+<polygon fill="white" stroke="black" points="145.5,-38.5 145.5,-57.5 288.5,-57.5 288.5,-38.5 145.5,-38.5"/>
 <text text-anchor="middle" x="217" y="-45.5" font-family="Helvetica,sans-Serif" font-size="10.00">GlgValveGui.InputListener</text>
 </a>
 </g>
@@ -157,7 +158,7 @@
 <g id="node11" class="node">
 <title>Node36</title>
 <g id="a_node11"><a xlink:href="classGlgXGSGaugeGui_1_1InputListener.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="133,-0.5 133,-19.5 301,-19.5 301,-0.5 133,-0.5"/>
+<polygon fill="white" stroke="black" points="133,-0.5 133,-19.5 301,-19.5 301,-0.5 133,-0.5"/>
 <text text-anchor="middle" x="217" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">GlgXGSGaugeGui.InputListener</text>
 </a>
 </g>

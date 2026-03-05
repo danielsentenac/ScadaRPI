@@ -8,6 +8,7 @@
  viewBox="0.00 0.00 271.50 84.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 80)">
 <title>ChannelList</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-80 267.5,-80 267.5,4 -4,4"/>
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
@@ -21,7 +22,7 @@
 <g id="node2" class="node">
 <title>Node2</title>
 <g id="a_node2"><a xlink:href="classGlgChildGui.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="0,-0.5 0,-19.5 74,-19.5 74,-0.5 0,-0.5"/>
+<polygon fill="white" stroke="black" points="0,-0.5 0,-19.5 74,-19.5 74,-0.5 0,-0.5"/>
 <text text-anchor="middle" x="37" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">GlgChildGui</text>
 </a>
 </g>
@@ -36,7 +37,7 @@
 <g id="node3" class="node">
 <title>Node3</title>
 <g id="a_node3"><a xlink:href="classGlgGui.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="92,-0.5 92,-19.5 142,-19.5 142,-0.5 92,-0.5"/>
+<polygon fill="white" stroke="black" points="92,-0.5 92,-19.5 142,-19.5 142,-0.5 92,-0.5"/>
 <text text-anchor="middle" x="117" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">GlgGui</text>
 </a>
 </g>
@@ -51,7 +52,7 @@
 <g id="node4" class="node">
 <title>Node4</title>
 <g id="a_node4"><a xlink:href="classSupervisorClient2.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="160.5,-0.5 160.5,-19.5 263.5,-19.5 263.5,-0.5 160.5,-0.5"/>
+<polygon fill="white" stroke="black" points="160.5,-0.5 160.5,-19.5 263.5,-19.5 263.5,-0.5 160.5,-0.5"/>
 <text text-anchor="middle" x="212" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">SupervisorClient2</text>
 </a>
 </g>

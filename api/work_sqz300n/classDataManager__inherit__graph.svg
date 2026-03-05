@@ -8,6 +8,7 @@
  viewBox="0.00 0.00 428.00 256.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 252)">
 <title>DataManager</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-252 424,-252 424,4 -4,4"/>
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
@@ -21,7 +22,7 @@
 <g id="node3" class="node">
 <title>Node3</title>
 <g id="a_node3"><a xlink:href="classDevice.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="223,-114.5 223,-133.5 273,-133.5 273,-114.5 223,-114.5"/>
+<polygon fill="white" stroke="black" points="223,-114.5 223,-133.5 273,-133.5 273,-114.5 223,-114.5"/>
 <text text-anchor="middle" x="248" y="-121.5" font-family="Helvetica,sans-Serif" font-size="10.00">Device</text>
 </a>
 </g>
@@ -36,7 +37,7 @@
 <g id="node2" class="node">
 <title>Node2</title>
 <g id="a_node2"><a xlink:href="interfaceDataTypes.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="0,-114.5 0,-133.5 68,-133.5 68,-114.5 0,-114.5"/>
+<polygon fill="white" stroke="black" points="0,-114.5 0,-133.5 68,-133.5 68,-114.5 0,-114.5"/>
 <text text-anchor="middle" x="34" y="-121.5" font-family="Helvetica,sans-Serif" font-size="10.00">DataTypes</text>
 </a>
 </g>
@@ -51,7 +52,7 @@
 <g id="node4" class="node">
 <title>Node4</title>
 <g id="a_node4"><a xlink:href="classControllino__1.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="324,-228.5 324,-247.5 405,-247.5 405,-228.5 324,-228.5"/>
+<polygon fill="white" stroke="black" points="324,-228.5 324,-247.5 405,-247.5 405,-228.5 324,-228.5"/>
 <text text-anchor="middle" x="364.5" y="-235.5" font-family="Helvetica,sans-Serif" font-size="10.00">Controllino_1</text>
 </a>
 </g>
@@ -66,7 +67,7 @@
 <g id="node5" class="node">
 <title>Node5</title>
 <g id="a_node5"><a xlink:href="classControllino__2.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="324,-190.5 324,-209.5 405,-209.5 405,-190.5 324,-190.5"/>
+<polygon fill="white" stroke="black" points="324,-190.5 324,-209.5 405,-209.5 405,-190.5 324,-190.5"/>
 <text text-anchor="middle" x="364.5" y="-197.5" font-family="Helvetica,sans-Serif" font-size="10.00">Controllino_2</text>
 </a>
 </g>
@@ -81,7 +82,7 @@
 <g id="node6" class="node">
 <title>Node6</title>
 <g id="a_node6"><a xlink:href="classControllino__3.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="324,-152.5 324,-171.5 405,-171.5 405,-152.5 324,-152.5"/>
+<polygon fill="white" stroke="black" points="324,-152.5 324,-171.5 405,-171.5 405,-152.5 324,-152.5"/>
 <text text-anchor="middle" x="364.5" y="-159.5" font-family="Helvetica,sans-Serif" font-size="10.00">Controllino_3</text>
 </a>
 </g>
@@ -96,7 +97,7 @@
 <g id="node7" class="node">
 <title>Node7</title>
 <g id="a_node7"><a xlink:href="classMaxiGauge.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="328.5,-114.5 328.5,-133.5 400.5,-133.5 400.5,-114.5 328.5,-114.5"/>
+<polygon fill="white" stroke="black" points="328.5,-114.5 328.5,-133.5 400.5,-133.5 400.5,-114.5 328.5,-114.5"/>
 <text text-anchor="middle" x="364.5" y="-121.5" font-family="Helvetica,sans-Serif" font-size="10.00">MaxiGauge</text>
 </a>
 </g>
@@ -111,7 +112,7 @@
 <g id="node8" class="node">
 <title>Node8</title>
 <g id="a_node8"><a xlink:href="classRgaPfeifferQms200.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="309,-76.5 309,-95.5 420,-95.5 420,-76.5 309,-76.5"/>
+<polygon fill="white" stroke="black" points="309,-76.5 309,-95.5 420,-95.5 420,-76.5 309,-76.5"/>
 <text text-anchor="middle" x="364.5" y="-83.5" font-family="Helvetica,sans-Serif" font-size="10.00">RgaPfeifferQms200</text>
 </a>
 </g>
@@ -126,7 +127,7 @@
 <g id="node9" class="node">
 <title>Node9</title>
 <g id="a_node9"><a xlink:href="classTCMuxShield.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="324.5,-38.5 324.5,-57.5 404.5,-57.5 404.5,-38.5 324.5,-38.5"/>
+<polygon fill="white" stroke="black" points="324.5,-38.5 324.5,-57.5 404.5,-57.5 404.5,-38.5 324.5,-38.5"/>
 <text text-anchor="middle" x="364.5" y="-45.5" font-family="Helvetica,sans-Serif" font-size="10.00">TCMuxShield</text>
 </a>
 </g>
@@ -141,7 +142,7 @@
 <g id="node10" class="node">
 <title>Node10</title>
 <g id="a_node10"><a xlink:href="classTurboPfeifferDCU.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="314.5,-0.5 314.5,-19.5 414.5,-19.5 414.5,-0.5 314.5,-0.5"/>
+<polygon fill="white" stroke="black" points="314.5,-0.5 314.5,-19.5 414.5,-19.5 414.5,-0.5 314.5,-0.5"/>
 <text text-anchor="middle" x="364.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">TurboPfeifferDCU</text>
 </a>
 </g>

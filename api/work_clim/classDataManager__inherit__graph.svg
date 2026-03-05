@@ -8,6 +8,7 @@
  viewBox="0.00 0.00 207.50 196.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 192)">
 <title>DataManager</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-192 203.5,-192 203.5,4 -4,4"/>
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
@@ -21,7 +22,7 @@
 <g id="node3" class="node">
 <title>Node3</title>
 <g id="a_node3"><a xlink:href="classDevice.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="81,-56.5 81,-75.5 131,-75.5 131,-56.5 81,-56.5"/>
+<polygon fill="white" stroke="black" points="81,-56.5 81,-75.5 131,-75.5 131,-56.5 81,-56.5"/>
 <text text-anchor="middle" x="106" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">Device</text>
 </a>
 </g>
@@ -36,7 +37,7 @@
 <g id="node2" class="node">
 <title>Node2</title>
 <g id="a_node2"><a xlink:href="interfaceDataTypes.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="72,-168.5 72,-187.5 140,-187.5 140,-168.5 72,-168.5"/>
+<polygon fill="white" stroke="black" points="72,-168.5 72,-187.5 140,-187.5 140,-168.5 72,-168.5"/>
 <text text-anchor="middle" x="106" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">DataTypes</text>
 </a>
 </g>
@@ -51,7 +52,7 @@
 <g id="node4" class="node">
 <title>Node4</title>
 <g id="a_node4"><a xlink:href="classDS2438.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="0,-0.5 0,-19.5 54,-19.5 54,-0.5 0,-0.5"/>
+<polygon fill="white" stroke="black" points="0,-0.5 0,-19.5 54,-19.5 54,-0.5 0,-0.5"/>
 <text text-anchor="middle" x="27" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">DS2438</text>
 </a>
 </g>
@@ -66,7 +67,7 @@
 <g id="node5" class="node">
 <title>Node5</title>
 <g id="a_node5"><a xlink:href="classIntesisBox.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="72,-0.5 72,-19.5 140,-19.5 140,-0.5 72,-0.5"/>
+<polygon fill="white" stroke="black" points="72,-0.5 72,-19.5 140,-19.5 140,-0.5 72,-0.5"/>
 <text text-anchor="middle" x="106" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">IntesisBox</text>
 </a>
 </g>
@@ -81,7 +82,7 @@
 <g id="node6" class="node">
 <title>Node6</title>
 <g id="a_node6"><a xlink:href="classPWM.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="158.5,-0.5 158.5,-19.5 199.5,-19.5 199.5,-0.5 158.5,-0.5"/>
+<polygon fill="white" stroke="black" points="158.5,-0.5 158.5,-19.5 199.5,-19.5 199.5,-0.5 158.5,-0.5"/>
 <text text-anchor="middle" x="179" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">PWM</text>
 </a>
 </g>

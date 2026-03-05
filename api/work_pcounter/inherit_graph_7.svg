@@ -8,11 +8,12 @@
  viewBox="0.00 0.00 308.00 126.50" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 122.5)">
 <title>Graphical Class Hierarchy</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-122.5 304,-122.5 304,4 -4,4"/>
 <!-- Node21 -->
 <g id="node1" class="node">
 <title>Node21</title>
 <g id="a_node1"><a xlink:title=" ">
-<polygon fill="none" stroke="#bfbfbf" points="0,-55 0,-74 97,-74 97,-55 0,-55"/>
+<polygon fill="white" stroke="#bfbfbf" points="0,-55 0,-74 97,-74 97,-55 0,-55"/>
 <text text-anchor="middle" x="48.5" y="-62" font-family="Helvetica,sans-Serif" font-size="10.00">GlgInputListener</text>
 </a>
 </g>
@@ -21,7 +22,7 @@
 <g id="node2" class="node">
 <title>Node0</title>
 <g id="a_node2"><a xlink:href="classGlgPCounter2Gui_1_1InputListener.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="133,-99 133,-118 300,-118 300,-99 133,-99"/>
+<polygon fill="white" stroke="black" points="133,-99 133,-118 300,-118 300,-99 133,-99"/>
 <text text-anchor="middle" x="216.5" y="-106" font-family="Helvetica,sans-Serif" font-size="10.00">GlgPCounter2Gui.InputListener</text>
 </a>
 </g>
@@ -36,7 +37,7 @@
 <g id="node3" class="node">
 <title>Node23</title>
 <g id="a_node3"><a xlink:href="classGlgPCounterStatusDetailsGui_1_1InputListener.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="145,-49.5 145,-79.5 288,-79.5 288,-49.5 145,-49.5"/>
+<polygon fill="white" stroke="black" points="145,-49.5 145,-79.5 288,-79.5 288,-49.5 145,-49.5"/>
 <text text-anchor="start" x="153" y="-67.5" font-family="Helvetica,sans-Serif" font-size="10.00">GlgPCounterStatusDetails</text>
 <text text-anchor="middle" x="216.5" y="-56.5" font-family="Helvetica,sans-Serif" font-size="10.00">Gui.InputListener</text>
 </a>
@@ -52,7 +53,7 @@
 <g id="node4" class="node">
 <title>Node24</title>
 <g id="a_node4"><a xlink:href="classGlgPCounterTempGui_1_1InputListener.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="142.5,-0.5 142.5,-30.5 290.5,-30.5 290.5,-0.5 142.5,-0.5"/>
+<polygon fill="white" stroke="black" points="142.5,-0.5 142.5,-30.5 290.5,-30.5 290.5,-0.5 142.5,-0.5"/>
 <text text-anchor="start" x="150.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">GlgPCounterTempGui.Input</text>
 <text text-anchor="middle" x="216.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">Listener</text>
 </a>

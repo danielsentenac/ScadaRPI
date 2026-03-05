@@ -8,11 +8,12 @@
  viewBox="0.00 0.00 538.00 598.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 594)">
 <title>Graphical Class Hierarchy</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-594 534,-594 534,4 -4,4"/>
 <!-- Node0 -->
 <g id="node1" class="node">
 <title>Node0</title>
 <g id="a_node1"><a xlink:href="interfaceChannelList.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="0,-370.5 0,-389.5 74,-389.5 74,-370.5 0,-370.5"/>
+<polygon fill="white" stroke="black" points="0,-370.5 0,-389.5 74,-389.5 74,-370.5 0,-370.5"/>
 <text text-anchor="middle" x="37" y="-377.5" font-family="Helvetica,sans-Serif" font-size="10.00">ChannelList</text>
 </a>
 </g>
@@ -21,7 +22,7 @@
 <g id="node2" class="node">
 <title>Node1</title>
 <g id="a_node2"><a xlink:href="classGlgChildGui.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="131,-332.5 131,-351.5 205,-351.5 205,-332.5 131,-332.5"/>
+<polygon fill="white" stroke="black" points="131,-332.5 131,-351.5 205,-351.5 205,-332.5 131,-332.5"/>
 <text text-anchor="middle" x="168" y="-339.5" font-family="Helvetica,sans-Serif" font-size="10.00">GlgChildGui</text>
 </a>
 </g>
@@ -36,7 +37,7 @@
 <g id="node15" class="node">
 <title>Node14</title>
 <g id="a_node15"><a xlink:href="classGlgGui.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="143,-370.5 143,-389.5 193,-389.5 193,-370.5 143,-370.5"/>
+<polygon fill="white" stroke="black" points="143,-370.5 143,-389.5 193,-389.5 193,-370.5 143,-370.5"/>
 <text text-anchor="middle" x="168" y="-377.5" font-family="Helvetica,sans-Serif" font-size="10.00">GlgGui</text>
 </a>
 </g>
@@ -51,7 +52,7 @@
 <g id="node3" class="node">
 <title>Node2</title>
 <g id="a_node3"><a xlink:href="classGlgDryGui.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="294.5,-456.5 294.5,-475.5 361.5,-475.5 361.5,-456.5 294.5,-456.5"/>
+<polygon fill="white" stroke="black" points="294.5,-456.5 294.5,-475.5 361.5,-475.5 361.5,-456.5 294.5,-456.5"/>
 <text text-anchor="middle" x="328" y="-463.5" font-family="Helvetica,sans-Serif" font-size="10.00">GlgDryGui</text>
 </a>
 </g>
@@ -66,7 +67,7 @@
 <g id="node4" class="node">
 <title>Node3</title>
 <g id="a_node4"><a xlink:href="classGlgGaugeGui.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="287.5,-418.5 287.5,-437.5 368.5,-437.5 368.5,-418.5 287.5,-418.5"/>
+<polygon fill="white" stroke="black" points="287.5,-418.5 287.5,-437.5 368.5,-437.5 368.5,-418.5 287.5,-418.5"/>
 <text text-anchor="middle" x="328" y="-425.5" font-family="Helvetica,sans-Serif" font-size="10.00">GlgGaugeGui</text>
 </a>
 </g>
@@ -81,7 +82,7 @@
 <g id="node5" class="node">
 <title>Node4</title>
 <g id="a_node5"><a xlink:href="classGlgIonicGui.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="291.5,-380.5 291.5,-399.5 364.5,-399.5 364.5,-380.5 291.5,-380.5"/>
+<polygon fill="white" stroke="black" points="291.5,-380.5 291.5,-399.5 364.5,-399.5 364.5,-380.5 291.5,-380.5"/>
 <text text-anchor="middle" x="328" y="-387.5" font-family="Helvetica,sans-Serif" font-size="10.00">GlgIonicGui</text>
 </a>
 </g>
@@ -96,7 +97,7 @@
 <g id="node6" class="node">
 <title>Node5</title>
 <g id="a_node6"><a xlink:href="classGlgRGAGui.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="292.5,-342.5 292.5,-361.5 363.5,-361.5 363.5,-342.5 292.5,-342.5"/>
+<polygon fill="white" stroke="black" points="292.5,-342.5 292.5,-361.5 363.5,-361.5 363.5,-342.5 292.5,-342.5"/>
 <text text-anchor="middle" x="328" y="-349.5" font-family="Helvetica,sans-Serif" font-size="10.00">GlgRGAGui</text>
 </a>
 </g>
@@ -111,7 +112,7 @@
 <g id="node7" class="node">
 <title>Node6</title>
 <g id="a_node7"><a xlink:href="classGlgSqzStatusDetailsGui.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="262,-304.5 262,-323.5 394,-323.5 394,-304.5 262,-304.5"/>
+<polygon fill="white" stroke="black" points="262,-304.5 262,-323.5 394,-323.5 394,-304.5 262,-304.5"/>
 <text text-anchor="middle" x="328" y="-311.5" font-family="Helvetica,sans-Serif" font-size="10.00">GlgSqzStatusDetailsGui</text>
 </a>
 </g>
@@ -126,7 +127,7 @@
 <g id="node8" class="node">
 <title>Node7</title>
 <g id="a_node8"><a xlink:href="classGlgSqzTempGui.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="281.5,-266.5 281.5,-285.5 374.5,-285.5 374.5,-266.5 281.5,-266.5"/>
+<polygon fill="white" stroke="black" points="281.5,-266.5 281.5,-285.5 374.5,-285.5 374.5,-266.5 281.5,-266.5"/>
 <text text-anchor="middle" x="328" y="-273.5" font-family="Helvetica,sans-Serif" font-size="10.00">GlgSqzTempGui</text>
 </a>
 </g>
@@ -141,7 +142,7 @@
 <g id="node9" class="node">
 <title>Node8</title>
 <g id="a_node9"><a xlink:href="classGlgSqzVacuumGui.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="275,-228.5 275,-247.5 381,-247.5 381,-228.5 275,-228.5"/>
+<polygon fill="white" stroke="black" points="275,-228.5 275,-247.5 381,-247.5 381,-228.5 275,-228.5"/>
 <text text-anchor="middle" x="328" y="-235.5" font-family="Helvetica,sans-Serif" font-size="10.00">GlgSqzVacuumGui</text>
 </a>
 </g>
@@ -156,7 +157,7 @@
 <g id="node10" class="node">
 <title>Node9</title>
 <g id="a_node10"><a xlink:href="classGlgTitane__22Gui.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="279,-190.5 279,-209.5 377,-209.5 377,-190.5 279,-190.5"/>
+<polygon fill="white" stroke="black" points="279,-190.5 279,-209.5 377,-209.5 377,-190.5 279,-190.5"/>
 <text text-anchor="middle" x="328" y="-197.5" font-family="Helvetica,sans-Serif" font-size="10.00">GlgTitane_22Gui</text>
 </a>
 </g>
@@ -171,7 +172,7 @@
 <g id="node11" class="node">
 <title>Node10</title>
 <g id="a_node11"><a xlink:href="classGlgTitane__32Gui.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="279,-152.5 279,-171.5 377,-171.5 377,-152.5 279,-152.5"/>
+<polygon fill="white" stroke="black" points="279,-152.5 279,-171.5 377,-171.5 377,-152.5 279,-152.5"/>
 <text text-anchor="middle" x="328" y="-159.5" font-family="Helvetica,sans-Serif" font-size="10.00">GlgTitane_32Gui</text>
 </a>
 </g>
@@ -186,7 +187,7 @@
 <g id="node12" class="node">
 <title>Node11</title>
 <g id="a_node12"><a xlink:href="classGlgTurboGui.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="290,-570.5 290,-589.5 366,-589.5 366,-570.5 290,-570.5"/>
+<polygon fill="white" stroke="black" points="290,-570.5 290,-589.5 366,-589.5 366,-570.5 290,-570.5"/>
 <text text-anchor="middle" x="328" y="-577.5" font-family="Helvetica,sans-Serif" font-size="10.00">GlgTurboGui</text>
 </a>
 </g>
@@ -201,7 +202,7 @@
 <g id="node13" class="node">
 <title>Node12</title>
 <g id="a_node13"><a xlink:href="classGlgValveGui.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="289.5,-532.5 289.5,-551.5 366.5,-551.5 366.5,-532.5 289.5,-532.5"/>
+<polygon fill="white" stroke="black" points="289.5,-532.5 289.5,-551.5 366.5,-551.5 366.5,-532.5 289.5,-532.5"/>
 <text text-anchor="middle" x="328" y="-539.5" font-family="Helvetica,sans-Serif" font-size="10.00">GlgValveGui</text>
 </a>
 </g>
@@ -216,7 +217,7 @@
 <g id="node14" class="node">
 <title>Node13</title>
 <g id="a_node14"><a xlink:href="classGlgXGSGaugeGui.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="277.5,-494.5 277.5,-513.5 378.5,-513.5 378.5,-494.5 277.5,-494.5"/>
+<polygon fill="white" stroke="black" points="277.5,-494.5 277.5,-513.5 378.5,-513.5 378.5,-494.5 277.5,-494.5"/>
 <text text-anchor="middle" x="328" y="-501.5" font-family="Helvetica,sans-Serif" font-size="10.00">GlgXGSGaugeGui</text>
 </a>
 </g>
@@ -231,7 +232,7 @@
 <g id="node16" class="node">
 <title>Node19</title>
 <g id="a_node16"><a xlink:href="interfaceDataTypes.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="3,-171.5 3,-190.5 71,-190.5 71,-171.5 3,-171.5"/>
+<polygon fill="white" stroke="black" points="3,-171.5 3,-190.5 71,-190.5 71,-171.5 3,-171.5"/>
 <text text-anchor="middle" x="37" y="-178.5" font-family="Helvetica,sans-Serif" font-size="10.00">DataTypes</text>
 </a>
 </g>
@@ -240,7 +241,7 @@
 <g id="node17" class="node">
 <title>Node20</title>
 <g id="a_node17"><a xlink:href="classDataElement.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="128,-152.5 128,-171.5 208,-171.5 208,-152.5 128,-152.5"/>
+<polygon fill="white" stroke="black" points="128,-152.5 128,-171.5 208,-171.5 208,-152.5 128,-152.5"/>
 <text text-anchor="middle" x="168" y="-159.5" font-family="Helvetica,sans-Serif" font-size="10.00">DataElement</text>
 </a>
 </g>
@@ -255,7 +256,7 @@
 <g id="node18" class="node">
 <title>Node21</title>
 <g id="a_node18"><a xlink:href="classDataManager.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="126.5,-114.5 126.5,-133.5 209.5,-133.5 209.5,-114.5 126.5,-114.5"/>
+<polygon fill="white" stroke="black" points="126.5,-114.5 126.5,-133.5 209.5,-133.5 209.5,-114.5 126.5,-114.5"/>
 <text text-anchor="middle" x="168" y="-121.5" font-family="Helvetica,sans-Serif" font-size="10.00">DataManager</text>
 </a>
 </g>
@@ -270,7 +271,7 @@
 <g id="node19" class="node">
 <title>Node22</title>
 <g id="a_node19"><a xlink:href="classDevice.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="303,-114.5 303,-133.5 353,-133.5 353,-114.5 303,-114.5"/>
+<polygon fill="white" stroke="black" points="303,-114.5 303,-133.5 353,-133.5 353,-114.5 303,-114.5"/>
 <text text-anchor="middle" x="328" y="-121.5" font-family="Helvetica,sans-Serif" font-size="10.00">Device</text>
 </a>
 </g>
@@ -285,7 +286,7 @@
 <g id="node27" class="node">
 <title>Node30</title>
 <g id="a_node27"><a xlink:href="classModbusSlaveThread.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="110,-247.5 110,-266.5 226,-266.5 226,-247.5 110,-247.5"/>
+<polygon fill="white" stroke="black" points="110,-247.5 110,-266.5 226,-266.5 226,-247.5 110,-247.5"/>
 <text text-anchor="middle" x="168" y="-254.5" font-family="Helvetica,sans-Serif" font-size="10.00">ModbusSlaveThread</text>
 </a>
 </g>
@@ -306,7 +307,7 @@
 <g id="node20" class="node">
 <title>Node23</title>
 <g id="a_node20"><a xlink:href="classControllino__1.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="439.5,-228.5 439.5,-247.5 520.5,-247.5 520.5,-228.5 439.5,-228.5"/>
+<polygon fill="white" stroke="black" points="439.5,-228.5 439.5,-247.5 520.5,-247.5 520.5,-228.5 439.5,-228.5"/>
 <text text-anchor="middle" x="480" y="-235.5" font-family="Helvetica,sans-Serif" font-size="10.00">Controllino_1</text>
 </a>
 </g>
@@ -321,7 +322,7 @@
 <g id="node21" class="node">
 <title>Node24</title>
 <g id="a_node21"><a xlink:href="classControllino__2.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="439.5,-190.5 439.5,-209.5 520.5,-209.5 520.5,-190.5 439.5,-190.5"/>
+<polygon fill="white" stroke="black" points="439.5,-190.5 439.5,-209.5 520.5,-209.5 520.5,-190.5 439.5,-190.5"/>
 <text text-anchor="middle" x="480" y="-197.5" font-family="Helvetica,sans-Serif" font-size="10.00">Controllino_2</text>
 </a>
 </g>
@@ -336,7 +337,7 @@
 <g id="node22" class="node">
 <title>Node25</title>
 <g id="a_node22"><a xlink:href="classControllino__3.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="439.5,-152.5 439.5,-171.5 520.5,-171.5 520.5,-152.5 439.5,-152.5"/>
+<polygon fill="white" stroke="black" points="439.5,-152.5 439.5,-171.5 520.5,-171.5 520.5,-152.5 439.5,-152.5"/>
 <text text-anchor="middle" x="480" y="-159.5" font-family="Helvetica,sans-Serif" font-size="10.00">Controllino_3</text>
 </a>
 </g>
@@ -351,7 +352,7 @@
 <g id="node23" class="node">
 <title>Node26</title>
 <g id="a_node23"><a xlink:href="classMaxiGauge.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="444,-114.5 444,-133.5 516,-133.5 516,-114.5 444,-114.5"/>
+<polygon fill="white" stroke="black" points="444,-114.5 444,-133.5 516,-133.5 516,-114.5 444,-114.5"/>
 <text text-anchor="middle" x="480" y="-121.5" font-family="Helvetica,sans-Serif" font-size="10.00">MaxiGauge</text>
 </a>
 </g>
@@ -366,7 +367,7 @@
 <g id="node24" class="node">
 <title>Node27</title>
 <g id="a_node24"><a xlink:href="classTCMuxShield.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="440,-76.5 440,-95.5 520,-95.5 520,-76.5 440,-76.5"/>
+<polygon fill="white" stroke="black" points="440,-76.5 440,-95.5 520,-95.5 520,-76.5 440,-76.5"/>
 <text text-anchor="middle" x="480" y="-83.5" font-family="Helvetica,sans-Serif" font-size="10.00">TCMuxShield</text>
 </a>
 </g>
@@ -381,7 +382,7 @@
 <g id="node25" class="node">
 <title>Node28</title>
 <g id="a_node25"><a xlink:href="classTurboPfeifferDCU.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="430,-38.5 430,-57.5 530,-57.5 530,-38.5 430,-38.5"/>
+<polygon fill="white" stroke="black" points="430,-38.5 430,-57.5 530,-57.5 530,-38.5 430,-38.5"/>
 <text text-anchor="middle" x="480" y="-45.5" font-family="Helvetica,sans-Serif" font-size="10.00">TurboPfeifferDCU</text>
 </a>
 </g>
@@ -396,7 +397,7 @@
 <g id="node26" class="node">
 <title>Node29</title>
 <g id="a_node26"><a xlink:href="classVacuum.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="452,-0.5 452,-19.5 508,-19.5 508,-0.5 452,-0.5"/>
+<polygon fill="white" stroke="black" points="452,-0.5 452,-19.5 508,-19.5 508,-0.5 452,-0.5"/>
 <text text-anchor="middle" x="480" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">Vacuum</text>
 </a>
 </g>
@@ -411,7 +412,7 @@
 <g id="node28" class="node">
 <title>Node49</title>
 <g id="a_node28"><a xlink:title=" ">
-<polygon fill="none" stroke="#bfbfbf" points="6,-294.5 6,-313.5 68,-313.5 68,-294.5 6,-294.5"/>
+<polygon fill="white" stroke="#bfbfbf" points="6,-294.5 6,-313.5 68,-313.5 68,-294.5 6,-294.5"/>
 <text text-anchor="middle" x="37" y="-301.5" font-family="Helvetica,sans-Serif" font-size="10.00">Runnable</text>
 </a>
 </g>
@@ -444,7 +445,7 @@
 <g id="node29" class="node">
 <title>Node58</title>
 <g id="a_node29"><a xlink:title=" ">
-<polygon fill="none" stroke="#bfbfbf" points="12,-332.5 12,-351.5 62,-351.5 62,-332.5 12,-332.5"/>
+<polygon fill="white" stroke="#bfbfbf" points="12,-332.5 12,-351.5 62,-351.5 62,-332.5 12,-332.5"/>
 <text text-anchor="middle" x="37" y="-339.5" font-family="Helvetica,sans-Serif" font-size="10.00">JFrame</text>
 </a>
 </g>
