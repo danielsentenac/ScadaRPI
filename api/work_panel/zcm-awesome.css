@@ -1,85 +1,62 @@
-/* zCommon visual layer on top of doxygen-awesome. */
-:root {
-  --zcommon-accent: #0d6f62;
-  --zcommon-accent-2: #1f7fbe;
-  --zcommon-bg-top: #effaf8;
-  --zcommon-bg-mid: #f3f8ff;
-  --zcommon-bg-bottom: #ffffff;
-  --zcommon-card-border: #d4e6ee;
+/* Force dark docs theme regardless of system color scheme. */
+html {
+    color-scheme: dark;
+
+    --primary-color: #1982d2;
+    --primary-dark-color: #86a9c4;
+    --primary-light-color: #4779ac;
+
+    --box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.30);
+    --odd-color: rgba(100, 100, 100, 0.06);
+    --menu-selected-background: rgba(0, 0, 0, 0.40);
+
+    --page-background-color: #1c1d1f;
+    --page-foreground-color: #d2dbde;
+    --page-secondary-foreground-color: #859399;
+    --separator-color: #38393b;
+    --side-nav-background: #252628;
+
+    --code-background: #2a2c2f;
+    --tablehead-background: #2a2c2f;
+
+    --blockquote-background: #222325;
+    --blockquote-foreground: #7e8c92;
+
+    --warning-color: #3b2e04;
+    --warning-color-dark: #f1b602;
+    --warning-color-darker: #ceb670;
+    --note-color: #163750;
+    --note-color-dark: #1982d2;
+    --note-color-darker: #dcf0fa;
+    --todo-color: #2a2536;
+    --todo-color-dark: #7661b3;
+    --todo-color-darker: #ae9ed6;
+    --deprecated-color: #2e323b;
+    --deprecated-color-dark: #738396;
+    --deprecated-color-darker: #abb0bd;
+    --bug-color: #2e1917;
+    --bug-color-dark: #ad2617;
+    --bug-color-darker: #f5b1aa;
+    --invariant-color: #303a35;
+    --invariant-color-dark: #76ce96;
+    --invariant-color-darker: #cceed5;
+
+    --fragment-background: #282c34;
+    --fragment-foreground: #dbe4eb;
+    --fragment-keyword: #cc99cd;
+    --fragment-keywordtype: #ab99cd;
+    --fragment-keywordflow: #e08000;
+    --fragment-token: #7ec699;
+    --fragment-comment: #999999;
+    --fragment-link: #98c0e3;
+    --fragment-preprocessor: #65cabe;
+    --fragment-linenumber-color: #cccccc;
+    --fragment-linenumber-background: #35393c;
+    --fragment-linenumber-border: #1f1f1f;
 }
 
 html,
 body {
-  background:
-    radial-gradient(1100px 420px at 5% -10%, rgba(13, 111, 98, 0.12), transparent 72%),
-    radial-gradient(1100px 420px at 92% -12%, rgba(31, 127, 190, 0.10), transparent 70%),
-    linear-gradient(180deg, var(--zcommon-bg-top), var(--zcommon-bg-mid) 52%, var(--zcommon-bg-bottom));
-}
-
-#titlearea {
-  border-bottom: 1px solid var(--zcommon-card-border);
-  background: linear-gradient(90deg, rgba(13, 111, 98, 0.10), rgba(31, 127, 190, 0.10));
-}
-
-#projectname {
-  font-weight: 760;
-  letter-spacing: 0.2px;
-}
-
-#projectnumber {
-  color: #2d5d7e;
-  font-weight: 600;
-}
-
-.contents {
-  border: 1px solid var(--zcommon-card-border);
-  border-radius: 12px;
-  padding: 1.1rem 1.2rem;
-  box-shadow: 0 8px 30px rgba(30, 58, 81, 0.06);
-  background: #ffffffd1;
-  backdrop-filter: blur(1px);
-}
-
-h1 {
-  color: #0b4761;
-}
-
-h2 {
-  border-left: 4px solid var(--zcommon-accent);
-  padding-left: 0.55rem;
-}
-
-a:hover {
-  color: var(--zcommon-accent);
-}
-
-.memtitle,
-.fieldtable th {
-  border-radius: 8px;
-}
-
-.fragment {
-  border-radius: 10px;
-  border: 1px solid #d7e8ef;
-  background: #f7fcff;
-}
-
-table.markdownTable {
-  border: 1px solid #d5e3ea;
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-table.markdownTable th {
-  background: linear-gradient(90deg, rgba(13, 111, 98, 0.12), rgba(31, 127, 190, 0.10));
-}
-
-table.markdownTable td,
-table.markdownTable th {
-  border-color: #d7e5ec;
-}
-
-#nav-tree .selected,
-#nav-tree .selected a {
-  background: linear-gradient(90deg, rgba(13, 111, 98, 0.16), rgba(31, 127, 190, 0.15));
+    background-color: var(--page-background-color);
+    color: var(--page-foreground-color);
 }
