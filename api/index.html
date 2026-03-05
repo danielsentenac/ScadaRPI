@@ -98,17 +98,6 @@ Architecture Schema</h1>
 GUI Example</h1>
 <p><img src="docs/Illustration.png" alt="Tube 1500W Station SCADA/HMI screen" class="inline"/></p>
 <h1><a class="anchor" id="autotoc_md3"></a>
-API Documentation</h1>
-<ul>
-<li>Published docs (GitHub Pages): <a href="https://danielsentenac.github.io/ScadaRPI/api/">SCADARPI API</a></li>
-<li>The <code>api/</code> page is a single Doxygen two-panel view with shared SCADARPI sections shown once.</li>
-<li>A dedicated <code>Module API Sections</code> page links to per-module <code>Classes</code> and <code>Files</code> views (<code>api/work_*</code>).</li>
-<li>Local generation (all modules): <code>./tools/generate_api_docs.sh</code></li>
-<li>Local generation (single module): <code>DOC_MODULES=work_pcounter ./tools/generate_api_docs.sh</code></li>
-<li>Publish to <code>gh-pages</code>: <code>./tools/publish_api_docs.sh</code></li>
-<li>Styling/theme: <a href="https://github.com/jothepro/doxygen-awesome-css">Doxygen Awesome CSS</a></li>
-</ul>
-<h1><a class="anchor" id="autotoc_md4"></a>
 Project layout</h1>
 <ul>
 <li><code>scadarpi</code>: main CLI used to list targets, compile, run, and clean.</li>
@@ -117,7 +106,7 @@ Project layout</h1>
 <li><code>work_*</code>: application modules (for example <code>work_panel</code>, <code>work_rga</code>, <code>work_venting</code>, <code>work_mainpanel</code>).</li>
 <li><code>*.g</code> files in <code>work_*</code>: GLG drawing files (built/edited with GlgBuilder) used by the GUI classes.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md5"></a>
+<h1><a class="anchor" id="autotoc_md4"></a>
 Runtime model (high level)</h1>
 <p>Most modules follow this startup pattern:</p><ul>
 <li><code>Main</code> builds a <code>DeviceManager</code>, creates one or more <code>Device</code> instances, starts their threads, starts a <code>ModbusSlaveThread</code>, then opens a <code>GlgGui</code>.</li>
@@ -125,7 +114,7 @@ Runtime model (high level)</h1>
 <li>The Modbus server interface exposed to remote clients is implemented with <a href="https://github.com/kochedykov/jlibmodbus">jlibmodbus</a>.</li>
 <li>Some modules include non-ARM safeguards and can skip hardware startup automatically unless forced.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md6"></a>
+<h1><a class="anchor" id="autotoc_md5"></a>
 Requirements</h1>
 <ul>
 <li>Linux environment.</li>
@@ -139,7 +128,7 @@ Requirements</h1>
 <li><code>java version "1.8.0_202"</code></li>
 <li><code>javac 1.8.0_202</code></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md7"></a>
+<h1><a class="anchor" id="autotoc_md6"></a>
 Build and run (recommended)</h1>
 <p>List available modules:</p>
 <div class="fragment"><div class="line">./scadarpi list</div>
@@ -165,7 +154,7 @@ Build and run (recommended)</h1>
 <div class="fragment"><div class="line">./scadarpi clean work_panel</div>
 <div class="line"># or clean everything:</div>
 <div class="line">./scadarpi clean all</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md8"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md7"></a>
 Makefile shortcuts</h1>
 <ul>
 <li><code>make list</code></li>
@@ -174,12 +163,12 @@ Makefile shortcuts</h1>
 <li><code>make run WORK=work_panel RUN_ARGS="--demo"</code></li>
 <li><code>make clean WORK=work_panel</code></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md9"></a>
+<h1><a class="anchor" id="autotoc_md8"></a>
 Current build status</h1>
 <p>As of March 3, 2026 in this repository state:</p><ul>
 <li>Use <code>./scadarpi compile all</code> to validate the full build in your current environment.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md10"></a>
+<h1><a class="anchor" id="autotoc_md9"></a>
 Notes for local testing</h1>
 <ul>
 <li>Some modules perform live network/hardware calls inside device threads; on restricted environments they may start but log communication errors.</li>
