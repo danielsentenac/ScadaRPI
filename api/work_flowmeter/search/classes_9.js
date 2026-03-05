@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['supervisorclient_288',['SupervisorClient',['../classSupervisorClient.html',1,'']]]
+  ['supervisorclient_286',['SupervisorClient',['../classSupervisorClient.html',1,'']]]
 ];

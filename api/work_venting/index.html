@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>SCADARPI API (work_venting): SCADARPI</title>
+<title>SCADARPI API (work_venting): Main Page</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -84,107 +84,11 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 </iframe>
 </div>
 
-<div class="PageDoc"><div class="header">
+<div class="header">
   <div class="headertitle">
-<div class="title">SCADARPI </div>  </div>
+<div class="title">SCADARPI API (work_venting) Documentation</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="md_README"></a> SCADARPI is a multi-application Java 8 project for SCADA/HMI stations, designed primarily for <a href="https://www.raspberrypi.com/">Raspberry Pi</a> embedded systems. <br  />
- It has been designed for the Virgo vacuum subsystem and works in association with <a href="https://www.controllino.com/">Controllino PLC</a>, communicating with the main Raspberry Pi CPU through I2C. This work relies on the <a href="https://www.genlogic.com/">GenLogic</a> GLG Toolkit for Java to build SCADA/HMI interfaces. Use GenLogic <b>GlgBuilder</b> to create and maintain the <code>.g</code> graphics files. Each <code>work_*</code> directory is a standalone application (own <code><a class="el" href="Main_8java.html">Main.java</a></code>, device logic, GUI drawings, and logs), while top-level tooling (<code>scadarpi</code>, <code>Makefile</code>) gives one uniform way to compile and run them. Live API docs: <a href="https://danielsentenac.github.io/ScadaRPI/api/">https://danielsentenac.github.io/ScadaRPI/api/</a></p>
-<h1><a class="anchor" id="autotoc_md1"></a>
-Architecture Schema</h1>
-<p><img src="docs/architecture_schema.png" alt="Generic SCADARPI architecture: Raspberry Pi + Controllino + instruments" class="inline"/></p>
-<h1><a class="anchor" id="autotoc_md2"></a>
-GUI Example</h1>
-<p><img src="docs/Illustration.png" alt="Tube 1500W Station SCADA/HMI screen" class="inline"/></p>
-<h1><a class="anchor" id="autotoc_md3"></a>
-API Documentation</h1>
-<ul>
-<li>Published docs (GitHub Pages): <a href="https://danielsentenac.github.io/ScadaRPI/api/">SCADARPI API</a></li>
-<li>The <code>api/</code> page is a landing page listing one API set per application module (<code>api/work_*</code>).</li>
-<li>Local generation (all modules): <code>./tools/generate_api_docs.sh</code></li>
-<li>Local generation (single module): <code>DOC_MODULES=work_pcounter ./tools/generate_api_docs.sh</code></li>
-<li>Publish to <code>gh-pages</code>: <code>./tools/publish_api_docs.sh</code></li>
-<li>Styling/theme: <a href="https://github.com/jothepro/doxygen-awesome-css">Doxygen Awesome CSS</a></li>
-</ul>
-<h1><a class="anchor" id="autotoc_md4"></a>
-Project layout</h1>
-<ul>
-<li><code>scadarpi</code>: main CLI used to list targets, compile, run, and clean.</li>
-<li><code>Makefile</code>: thin wrapper around <code>./scadarpi</code>.</li>
-<li><code>lib/</code>: all third-party JARs used by the applications (Pi4J, jlibmodbus, GLG, serial libs, sqlite, etc.).</li>
-<li><code>work_*</code>: application modules (for example <code>work_panel</code>, <code>work_rga</code>, <code>work_venting</code>, <code>work_mainpanel</code>).</li>
-<li><code>*.g</code> files in <code>work_*</code>: GLG drawing files (built/edited with GlgBuilder) used by the GUI classes.</li>
-</ul>
-<h1><a class="anchor" id="autotoc_md5"></a>
-Runtime model (high level)</h1>
-<p>Most modules follow this startup pattern:</p><ul>
-<li><code><a class="el" href="classMain.html">Main</a></code> builds a <code><a class="el" href="classDeviceManager.html">DeviceManager</a></code>, creates one or more <code><a class="el" href="classDevice.html">Device</a></code> instances, starts their threads, starts a <code><a class="el" href="classModbusSlaveThread.html">ModbusSlaveThread</a></code>, then opens a <code><a class="el" href="classGlgGui.html">GlgGui</a></code>.</li>
-<li><code><a class="el" href="classDevice.html">Device</a></code> subclasses encapsulate hardware/network integration (I2C, serial, Modbus TCP, HTTP clients, etc.).</li>
-<li>The Modbus server interface exposed to remote clients is implemented with <a href="https://github.com/kochedykov/jlibmodbus">jlibmodbus</a>.</li>
-<li>Some modules include non-ARM safeguards and can skip hardware startup automatically unless forced.</li>
-</ul>
-<h1><a class="anchor" id="autotoc_md6"></a>
-Requirements</h1>
-<ul>
-<li>Linux environment.</li>
-<li>Java 8 JDK available (<code>java</code> and <code>javac</code> on PATH), or set <code>JAVA_HOME</code> / <code>JAVA_BIN</code> / <code>JAVAC_BIN</code>.</li>
-<li>For hardware-backed modules on Raspberry Pi, access to required serial devices (<code>/dev/serial/...</code>), I2C, GPIO, and reachable instrument/network endpoints.</li>
-<li>Hardware access is based on <a href="https://pi4j.com/">Pi4J</a> <b>version <code>&lt; 2</code></b> (v1.x APIs), which relies on <a href="https://github.com/WiringPi/WiringPi">WiringPi</a>.</li>
-<li>Modbus communication with remote clients relies on <a href="https://github.com/kochedykov/jlibmodbus">jlibmodbus</a>.</li>
-<li>GUI execution requires an active X display.</li>
-</ul>
-<p>Verified in this workspace on March 3, 2026:</p><ul>
-<li><code>java version "1.8.0_202"</code></li>
-<li><code>javac 1.8.0_202</code></li>
-</ul>
-<h1><a class="anchor" id="autotoc_md7"></a>
-Build and run (recommended)</h1>
-<p>List available modules:</p>
-<div class="fragment"><div class="line">./scadarpi list</div>
-</div><!-- fragment --><p>Compile one module:</p>
-<div class="fragment"><div class="line">./scadarpi compile work_panel</div>
-<div class="line"># or short name:</div>
-<div class="line">./scadarpi compile panel</div>
-</div><!-- fragment --><p>Compile multiple modules:</p>
-<div class="fragment"><div class="line">./scadarpi compile mainpanel flowmeter rga</div>
-</div><!-- fragment --><p>Compile all modules:</p>
-<div class="fragment"><div class="line">./scadarpi compile all</div>
-</div><!-- fragment --><p>Run one module:</p>
-<div class="fragment"><div class="line">./scadarpi run work_panel</div>
-<div class="line"># or:</div>
-<div class="line">./scadarpi run panel</div>
-</div><!-- fragment --><p>Run in headless mode (no GUI):</p>
-<div class="fragment"><div class="line">SCADARPI_HEADLESS=1 ./scadarpi run rga</div>
-</div><!-- fragment --><p>Force GUI attempt:</p>
-<div class="fragment"><div class="line">SCADARPI_GUI=1 ./scadarpi run panel</div>
-</div><!-- fragment --><p>Force hardware startup on non-ARM hosts:</p>
-<div class="fragment"><div class="line">SCADARPI_FORCE_HARDWARE=1 ./scadarpi run rga</div>
-</div><!-- fragment --><p>Clean generated artifacts:</p>
-<div class="fragment"><div class="line">./scadarpi clean work_panel</div>
-<div class="line"># or clean everything:</div>
-<div class="line">./scadarpi clean all</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md8"></a>
-Makefile shortcuts</h1>
-<ul>
-<li><code>make list</code></li>
-<li><code>make compile WORK=work_panel</code></li>
-<li><code>make run WORK=work_panel</code></li>
-<li><code>make run WORK=work_panel RUN_ARGS="--demo"</code></li>
-<li><code>make clean WORK=work_panel</code></li>
-</ul>
-<h1><a class="anchor" id="autotoc_md9"></a>
-Current build status</h1>
-<p>As of March 3, 2026 in this repository state:</p><ul>
-<li>Use <code>./scadarpi compile all</code> to validate the full build in your current environment.</li>
-</ul>
-<h1><a class="anchor" id="autotoc_md10"></a>
-Notes for local testing</h1>
-<ul>
-<li>Some modules perform live network/hardware calls inside device threads; on restricted environments they may start but log communication errors.</li>
-<li>Log files are created inside each <code>work_*</code> directory, usually named like <code>*_YYYY-MM-DD.log</code>. </li>
-</ul>
-</div></div><!-- PageDoc -->
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

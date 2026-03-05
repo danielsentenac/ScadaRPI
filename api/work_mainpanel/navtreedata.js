@@ -25,18 +25,6 @@
 var NAVTREE =
 [
   [ "SCADARPI API (work_mainpanel)", "index.html", [
-    [ "SCADARPI", "index.html", [
-      [ "Architecture Schema", "index.html#autotoc_md1", null ],
-      [ "GUI Example", "index.html#autotoc_md2", null ],
-      [ "API Documentation", "index.html#autotoc_md3", null ],
-      [ "Project layout", "index.html#autotoc_md4", null ],
-      [ "Runtime model (high level)", "index.html#autotoc_md5", null ],
-      [ "Requirements", "index.html#autotoc_md6", null ],
-      [ "Build and run (recommended)", "index.html#autotoc_md7", null ],
-      [ "Makefile shortcuts", "index.html#autotoc_md8", null ],
-      [ "Current build status", "index.html#autotoc_md9", null ],
-      [ "Notes for local testing", "index.html#autotoc_md10", null ]
-    ] ],
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],
       [ "Class Index", "classes.html", null ],
@@ -56,7 +44,7 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "ChannelList_8java.html",
-"interfaceChannelList.html#a1829d5d8e24df7c072bca4cb136f1136"
+"interfaceChannelList.html#a457e1bd6a6ddf251b3a866950f294c86"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

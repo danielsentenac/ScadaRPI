@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['hasoffon_283',['hasOffOn',['../classDS2438.html#ad2e581f629abe9958b7d793420c561e8',1,'DS2438']]],
-  ['holdingregisters_284',['holdingRegisters',['../classDataManager.html#af94a005e5e0f83f00ea9699e556f338e',1,'DataManager.holdingRegisters()'],['../classIntesisBox.html#a0b764e30c100d279d7c0c2e7365ccb07',1,'IntesisBox.holdingRegisters()']]],
-  ['humdelta_285',['humDelta',['../classOperation.html#a532479f4e07de42430b670bf5fcc126e',1,'Operation']]],
-  ['humpoint_286',['humPoint',['../classOperation.html#a30765a644301fb8a5c442bcd4b384b66',1,'Operation']]]
+  ['hasoffon_280',['hasOffOn',['../classDS2438.html#ad2e581f629abe9958b7d793420c561e8',1,'DS2438']]],
+  ['holdingregisters_281',['holdingRegisters',['../classDataManager.html#af94a005e5e0f83f00ea9699e556f338e',1,'DataManager.holdingRegisters()'],['../classIntesisBox.html#a0b764e30c100d279d7c0c2e7365ccb07',1,'IntesisBox.holdingRegisters()']]],
+  ['humdelta_282',['humDelta',['../classOperation.html#a532479f4e07de42430b670bf5fcc126e',1,'Operation']]],
+  ['humpoint_283',['humPoint',['../classOperation.html#a30765a644301fb8a5c442bcd4b384b66',1,'Operation']]]
 ];

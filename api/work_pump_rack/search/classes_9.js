@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['xgsgauge_337',['XGSGauge',['../classXGSGauge.html',1,'']]]
+  ['xgsgauge_335',['XGSGauge',['../classXGSGauge.html',1,'']]]
 ];

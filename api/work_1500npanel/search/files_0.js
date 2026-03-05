@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['channellist_2ejava_219',['ChannelList.java',['../ChannelList_8java.html',1,'']]]
+  ['channellist_2ejava_217',['ChannelList.java',['../ChannelList_8java.html',1,'']]]
 ];

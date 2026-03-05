@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['serial_5fcomm_2ejava_382',['Serial_Comm.java',['../Serial__Comm_8java.html',1,'']]]
+  ['tcmuxshield_2ejava_380',['TCMuxShield.java',['../TCMuxShield_8java.html',1,'']]],
+  ['turbovarianv81ag_2ejava_381',['TurboVarianV81AG.java',['../TurboVarianV81AG_8java.html',1,'']]]
 ];

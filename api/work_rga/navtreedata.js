@@ -25,18 +25,6 @@
 var NAVTREE =
 [
   [ "SCADARPI API (work_rga)", "index.html", [
-    [ "SCADARPI", "index.html", [
-      [ "Architecture Schema", "index.html#autotoc_md1", null ],
-      [ "GUI Example", "index.html#autotoc_md2", null ],
-      [ "API Documentation", "index.html#autotoc_md3", null ],
-      [ "Project layout", "index.html#autotoc_md4", null ],
-      [ "Runtime model (high level)", "index.html#autotoc_md5", null ],
-      [ "Requirements", "index.html#autotoc_md6", null ],
-      [ "Build and run (recommended)", "index.html#autotoc_md7", null ],
-      [ "Makefile shortcuts", "index.html#autotoc_md8", null ],
-      [ "Current build status", "index.html#autotoc_md9", null ],
-      [ "Notes for local testing", "index.html#autotoc_md10", null ]
-    ] ],
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],
       [ "Class Index", "classes.html", null ],
