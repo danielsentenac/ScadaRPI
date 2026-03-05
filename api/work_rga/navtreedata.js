@@ -24,7 +24,7 @@
 */
 var NAVTREE =
 [
-  [ "SCADARPI API (work_rga)", "index.html", [
+  [ "work_rga module", "index.html", [
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],
       [ "Class Index", "classes.html", null ],

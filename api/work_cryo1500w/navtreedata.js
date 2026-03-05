@@ -24,7 +24,7 @@
 */
 var NAVTREE =
 [
-  [ "SCADARPI API (work_cryo1500w)", "index.html", [
+  [ "work_cryo1500w module", "index.html", [
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],
       [ "Class Index", "classes.html", null ],
