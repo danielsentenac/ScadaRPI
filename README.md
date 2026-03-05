@@ -15,15 +15,6 @@ Live API docs: [https://danielsentenac.github.io/ScadaRPI/api/](https://danielse
 
 ![Tube 1500W Station SCADA/HMI screen](docs/Illustration.png)
 
-## API Documentation
-
-- Published docs (GitHub Pages): [SCADARPI API](https://danielsentenac.github.io/ScadaRPI/api/)
-- The `api/` page is a landing page listing one API set per application module (`api/work_*`).
-- Local generation (all modules): `./tools/generate_api_docs.sh`
-- Local generation (single module): `DOC_MODULES=work_pcounter ./tools/generate_api_docs.sh`
-- Publish to `gh-pages`: `./tools/publish_api_docs.sh`
-- Styling/theme: [Doxygen Awesome CSS](https://github.com/jothepro/doxygen-awesome-css)
-
 ## Project layout
 
 - `scadarpi`: main CLI used to list targets, compile, run, and clean.
