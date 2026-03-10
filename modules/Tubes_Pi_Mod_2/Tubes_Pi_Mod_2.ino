@@ -531,7 +531,7 @@ void UpdateI2CFromIO()
      I2CsetBit(VENT_CLOSE_STATUS_BIT,0x00);  // UPDATE CLOSE VALVE BIT
   }
   else if (digitalRead(VENT_CLOSE_STATUS) == HIGH && digitalRead(VENT_OPEN_STATUS) == LOW) { // CLOSE VALVE STATUS
-     if (VENT_OPEN_STATUS_BIT == 0x01 && VENT_CLOSE_STATUS_BIT == 0x00) { // IF OPEN VALVE STATUS BIT
+     if (bitRead(i2c_buffer,VENT_OPEN_STATUS_BIT) == 0x01 && bitRead(i2c_buffer,VENT_CLOSE_STATUS_BIT) == 0x00) { // IF OPEN VALVE STATUS BIT
         // reset close command
         digitalWrite(VENT_CLOSE_CMD,LOW);  // CLOSE VALVE
         VENTtime = millis();
@@ -585,7 +585,7 @@ void UpdateI2CFromIO()
      I2CsetBit(VP_CLOSE_STATUS_BIT,0x00);  // UPDATE CLOSE VALVE BIT
   }
   else if (digitalRead(VP_CLOSE_STATUS) == HIGH && digitalRead(VP_OPEN_STATUS) == LOW) { // CLOSE VALVE STATUS
-     if (VP_OPEN_STATUS_BIT == 0x01 && VP_CLOSE_STATUS_BIT == 0x00) { // IF OPEN VALVE STATUS BIT
+     if (bitRead(i2c_buffer,VP_OPEN_STATUS_BIT) == 0x01 && bitRead(i2c_buffer,VP_CLOSE_STATUS_BIT) == 0x00) { // IF OPEN VALVE STATUS BIT
         // reset close command
         digitalWrite(VP_CLOSE_CMD,LOW);  // CLOSE VALVE
         VPtime = millis();
@@ -607,7 +607,7 @@ void UpdateI2CFromIO()
      I2CsetBit(BYPASS_OFF_STATUS_BIT,0x00);  // UPDATE BYPASS OFF BIT
   }
   else if (digitalRead(BYPASS_OFF_STATUS) == HIGH && digitalRead(BYPASS_ON_STATUS) == LOW) { // BYPASS OFF STATUS
-     if (BYPASS_ON_STATUS_BIT == 0x01 && BYPASS_OFF_STATUS_BIT == 0x00) { // IF BYPASS ON STATUS BIT
+     if (bitRead(i2c_buffer,BYPASS_ON_STATUS_BIT) == 0x01 && bitRead(i2c_buffer,BYPASS_OFF_STATUS_BIT) == 0x00) { // IF BYPASS ON STATUS BIT
         // reset BYPASS OFF command
         digitalWrite(BYPASS_OFF_CMD,LOW);  // SET BYPASS OFF VALVE
         BYPASStime = millis();

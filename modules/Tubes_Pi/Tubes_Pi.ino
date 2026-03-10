@@ -470,7 +470,7 @@ void UpdateI2CFromIO()
      I2CsetBit(V21_CLOSE_STATUS_BIT,0x00);  // UPDATE CLOSE VALVE BIT
   }
   else if (digitalRead(V21_CLOSE_STATUS) == HIGH && digitalRead(V21_OPEN_STATUS) == LOW) { // CLOSE VALVE STATUS
-     if (V21_OPEN_STATUS_BIT == 0x01 && V21_CLOSE_STATUS_BIT == 0x00) { // IF OPEN VALVE STATUS BIT
+     if (bitRead(i2c_buffer,V21_OPEN_STATUS_BIT) == 0x01 && bitRead(i2c_buffer,V21_CLOSE_STATUS_BIT) == 0x00) { // IF OPEN VALVE STATUS BIT
         // reset close command
         digitalWrite(V21_CLOSE_CMD,LOW);  // CLOSE VALVE
         V21time = millis();
@@ -492,7 +492,7 @@ void UpdateI2CFromIO()
      I2CsetBit(V22_CLOSE_STATUS_BIT,0x00);  // UPDATE CLOSE VALVE BIT
   }
   else if (digitalRead(V22_CLOSE_STATUS) == HIGH && digitalRead(V22_OPEN_STATUS) == LOW) { // CLOSE VALVE STATUS
-     if (V22_OPEN_STATUS_BIT == 0x01 && V22_CLOSE_STATUS_BIT == 0x00) { // IF OPEN VALVE STATUS BIT
+     if (bitRead(i2c_buffer,V22_OPEN_STATUS_BIT) == 0x01 && bitRead(i2c_buffer,V22_CLOSE_STATUS_BIT) == 0x00) { // IF OPEN VALVE STATUS BIT
         // reset close command
         digitalWrite(V22_CLOSE_CMD,LOW);  // CLOSE VALVE
         V22time = millis();
@@ -562,7 +562,7 @@ void UpdateI2CFromIO()
      I2CsetBit(V31_CLOSE_STATUS_BIT,0x00);  // UPDATE CLOSE VALVE BIT
   }
   else if (digitalRead(V31_CLOSE_STATUS) == HIGH && digitalRead(V31_OPEN_STATUS) == LOW) { // CLOSE VALVE STATUS
-     if (V31_OPEN_STATUS_BIT == 0x01 && V31_CLOSE_STATUS_BIT == 0x00) { // IF OPEN VALVE STATUS BIT
+     if (bitRead(i2c_buffer,V31_OPEN_STATUS_BIT) == 0x01 && bitRead(i2c_buffer,V31_CLOSE_STATUS_BIT) == 0x00) { // IF OPEN VALVE STATUS BIT
         // reset close command
         digitalWrite(V31_CLOSE_CMD,LOW);  // CLOSE VALVE
         V31time = millis();
@@ -605,4 +605,3 @@ void UpdateI2CFromIO()
   }
 
 }
-

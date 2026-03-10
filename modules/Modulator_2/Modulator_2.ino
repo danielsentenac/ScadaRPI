@@ -501,7 +501,7 @@ void UpdateI2CFromIO()
      I2CsetBit(MAIN_OFF_STATUS_BIT,0x00);    // UPDATE MAIN OFF STATUS BIT
   }
   else if (digitalRead(MAIN_OFF_STATUS) == HIGH && digitalRead(MAIN_ON_STATUS) == LOW) { // MAIN OFF STATUS
-     if (MAIN_ON_STATUS_BIT == 0x01 && MAIN_OFF_STATUS_BIT == 0x00) { // IF MAIN ON STATUS BIT
+     if (bitRead(i2c_buffer,MAIN_ON_STATUS_BIT) == 0x01 && bitRead(i2c_buffer,MAIN_OFF_STATUS_BIT) == 0x00) { // IF MAIN ON STATUS BIT
         // MAIN OFF command
         digitalWrite(MAIN_OFF_CMD,LOW);  // MAIN OFF COMMAND
         MAINtime = millis();
