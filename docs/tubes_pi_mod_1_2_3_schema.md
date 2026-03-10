@@ -19,9 +19,9 @@ The diagrams below describe the code as implemented, not a reconstructed plant P
 flowchart LR
     PI["Raspberry Pi / SCADA"]
 
-    PI <-->|I2C addr 0x08\n4-byte buffer + CRC32| M1["Tubes_Pi_Mod_1\nValve/Pump bank"]
-    PI <-->|I2C addr 0x09\n4-byte buffer + CRC32| M2["Tubes_Pi_Mod_2\nVenting/Bypass bank"]
-    PI <-->|I2C addr 0x10\ncommand buffer + CRC32\nreply = temperature + buffer + CRC32| M3["Tubes_Pi_Mod_3\nFan + thermocouple"]
+    PI <-->|I2C addr 0x08<br/>4-byte buffer + CRC32| M1["Tubes_Pi_Mod_1<br/>Valve/Pump bank"]
+    PI <-->|I2C addr 0x09<br/>4-byte buffer + CRC32| M2["Tubes_Pi_Mod_2<br/>Venting/Bypass bank"]
+    PI <-->|I2C addr 0x10<br/>command buffer + CRC32<br/>reply = temperature + buffer + CRC32| M3["Tubes_Pi_Mod_3<br/>Fan + thermocouple"]
 
     subgraph M1I["Module 1 field side"]
       M1 --> M1A["V21 / V22 / V1 valves"]
@@ -41,7 +41,7 @@ flowchart LR
     end
 
     subgraph M3I["Module 3 field side"]
-      M3 --> M3A["Fan speed relays\nNormal / Low noise"]
+      M3 --> M3A["Fan speed relays<br/>Normal / Low noise"]
       M3 --> M3B["Fan start/stop relays"]
       M3 --> M3C["Fan run/stop feedback"]
       M3 --> M3D["Thermocouple via MCP9600"]
@@ -62,12 +62,12 @@ Runtime flow:
 
 ```mermaid
 flowchart TD
-    A["I2C receiveEvent()\nvalidate CRC32"] --> B["Store new i2c_buffer\nset update flag"]
+    A["I2C receiveEvent()<br/>validate CRC32"] --> B["Store new i2c_buffer<br/>set update flag"]
     B --> C["loop() every 100 ms"]
-    C --> D["UpdateIOFromI2C()\napply command pulse"]
-    C --> E["UpdateI2CFromIO()\nread limit switches / status"]
-    C --> F["ResetAndCheck()\nreset outputs after timeout\nrun delayed checks"]
-    E --> G["I2C requestEvent()\nreturn current i2c_buffer + CRC32"]
+    C --> D["UpdateIOFromI2C()<br/>apply command pulse"]
+    C --> E["UpdateI2CFromIO()<br/>read limit switches / status"]
+    C --> F["ResetAndCheck()<br/>reset outputs after timeout<br/>run delayed checks"]
+    E --> G["I2C requestEvent()<br/>return current i2c_buffer + CRC32"]
 ```
 
 Command encoding pattern for valves and on/off devices:
@@ -294,7 +294,7 @@ SCADA-side interpretation in the Java wrapper:
 
 ```mermaid
 flowchart LR
-    PI["Pi / SCADA"] <-->|addr 0x10\nwrite 8 B / read 12 B| M3["Mod_3 controller"]
+    PI["Pi / SCADA"] <-->|addr 0x10<br/>write 8 B / read 12 B| M3["Mod_3 controller"]
 
     subgraph FAN["Fan control"]
       F1["D0/D2 normal-speed relays"]
