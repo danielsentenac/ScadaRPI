@@ -113,10 +113,18 @@ public class VentingOperations implements Runnable {
     
     @Override
     public void run() {
-	    logger.info("VentingOperations: starting sequence with " + steps.size() + " steps.");
+        if (steps.isEmpty()) {
+            logger.warning("VentingOperations: no steps available, nothing to execute.");
+            setOperationStep(0);
+            return;
+        }
+
+	    int startIndex = determineStartIndexByPressure();
+	    logger.info("VentingOperations: starting sequence with " + steps.size() + " steps from index "
+	            + startIndex + " (step " + steps.get(startIndex).step + ").");
             setOperationStep(0);
 
-	    for (int i = 0; i < steps.size(); i++) {
+	    for (int i = startIndex; i < steps.size(); i++) {
 		// global stop check at top of loop
 		if (stopRequested || Thread.currentThread().isInterrupted()) {
 		    logger.info("VentingOperations: stop requested before step " + i + ", aborting sequence.");
@@ -169,6 +177,36 @@ public class VentingOperations implements Runnable {
             clearFeedbackCell();
             setOperationStep(0);
 	    logger.info("VentingOperations: sequence finished.");
+    }
+
+    private int determineStartIndexByPressure() {
+        if (steps.isEmpty()) {
+            return 0;
+        }
+
+        DataElement g2 = getG2DataElement();
+        if (g2 == null) {
+            logger.warning("VentingOperations: G2 not available, starting from step 1.");
+            return 0;
+        }
+
+        double currentG2 = g2.value;
+        int bestIndex = 0;
+        double bestTarget = Double.NEGATIVE_INFINITY;
+
+        for (int i = 0; i < steps.size(); i++) {
+            Step step = steps.get(i);
+            if (step.g2Target <= currentG2 && step.g2Target >= bestTarget) {
+                bestIndex = i;
+                bestTarget = step.g2Target;
+            }
+        }
+
+        Step bestStep = steps.get(bestIndex);
+        logger.info("VentingOperations: current G2=" + currentG2
+                + ", resuming from step " + bestStep.step
+                + " with G2 target " + bestStep.g2Target);
+        return bestIndex;
     }
 
     private void highlightRow(int rowIndex) {
