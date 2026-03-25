@@ -12,8 +12,11 @@ import java.awt.*;
  */
 public final class VentingLookAndFeel {
 
-    private static final Color HIGHLIGHT_COLOR = new Color(255, 150, 0); // orange
+    private static final Color ACTIVE_ROW_COLOR = new Color(255, 222, 173);
+    private static final Color ACTIVE_CELL_COLOR = new Color(255, 150, 0);
     private static final String ACTIVE_ROW_PROPERTY = "activeStepRow";
+    private static final String ACTIVE_CELL_ROW_PROPERTY = "activeStepCellRow";
+    private static final String ACTIVE_CELL_COLUMN_PROPERTY = "activeStepCellColumn";
     public static final Color TABLE_BACKGROUND = new Color(140, 198, 198);
     public static final Color RUNNING_ORANGE_STRONG = new Color(255, 150, 0);
     public static final Color RUNNING_ORANGE_SOFT   = new Color(255, 200, 120);
@@ -81,21 +84,22 @@ public final class VentingLookAndFeel {
         // 0: STEP
         // 1: P1 (ON/OFF)
         // 2: V1
-        // 3: VSOFT
-        // 4: VMAIN
-        // 5: VDRYER
-        // 6: VRP
-        // 7: MKS2000 (numeric, handled elsewhere)
-        // 8: MKS50000
-        // 9: G2
+        // 3: VBYPASS
+        // 4: VSOFT
+        // 5: VMAIN
+        // 6: VDRYER
+        // 7: VRP
+        // 8: MKS2000 (numeric, handled elsewhere)
+        // 9: MKS50000
+        // 10: G2
 
         // P1: ON/OFF
         table.getColumnModel().getColumn(1)
                 .setCellEditor(new TouchComboEditor(new String[]{"ON", "OFF"}));
 
-        // Valves: OPEN/CLOSE (V1, VSOFT, VMAIN, VDRYER, VRP)
+        // Valves: OPEN/CLOSE (V1, VBYPASS, VSOFT, VMAIN, VDRYER, VRP)
         String[] valveItems = {"OPEN", "CLOSE"};
-        int[] valveCols = {2, 3, 4, 5, 6};
+        int[] valveCols = {2, 3, 4, 5, 6, 7};
         for (int col : valveCols) {
             table.getColumnModel().getColumn(col)
                     .setCellEditor(new TouchComboEditor(valveItems));
@@ -165,9 +169,25 @@ public final class VentingLookAndFeel {
         table.repaint();
     }
 
+    public static void setActiveCell(JTable table, int rowIndex, int columnIndex) {
+        if (table == null) return;
+        table.putClientProperty(ACTIVE_ROW_PROPERTY, rowIndex);
+        table.putClientProperty(ACTIVE_CELL_ROW_PROPERTY, rowIndex);
+        table.putClientProperty(ACTIVE_CELL_COLUMN_PROPERTY, columnIndex);
+        table.repaint();
+    }
+
+    public static void clearActiveCell(JTable table) {
+        if (table == null) return;
+        table.putClientProperty(ACTIVE_CELL_ROW_PROPERTY, -1);
+        table.putClientProperty(ACTIVE_CELL_COLUMN_PROPERTY, -1);
+        table.repaint();
+    }
+
     public static void clearActiveRow(JTable table) {
         if (table == null) return;
         table.putClientProperty(ACTIVE_ROW_PROPERTY, -1);
+        clearActiveCell(table);
         table.clearSelection();
         table.repaint();
     }
@@ -187,15 +207,29 @@ public final class VentingLookAndFeel {
             Component c = super.getTableCellRendererComponent(
                     table, value, false, false, row, column);
 
-            Object prop = table.getClientProperty(ACTIVE_ROW_PROPERTY);
-            int activeRow = (prop instanceof Integer) ? (Integer) prop : -1;
+            Object rowProp = table.getClientProperty(ACTIVE_ROW_PROPERTY);
+            Object activeCellRowProp = table.getClientProperty(ACTIVE_CELL_ROW_PROPERTY);
+            Object activeCellColumnProp = table.getClientProperty(ACTIVE_CELL_COLUMN_PROPERTY);
+            int activeRow = (rowProp instanceof Integer) ? (Integer) rowProp : -1;
+            int activeCellRow = (activeCellRowProp instanceof Integer) ? (Integer) activeCellRowProp : -1;
+            int activeCellColumn = (activeCellColumnProp instanceof Integer) ? (Integer) activeCellColumnProp : -1;
+            boolean isActiveCell = row == activeCellRow && column == activeCellColumn;
 
-            if (row == activeRow) {
-                c.setBackground(HIGHLIGHT_COLOR);
+            if (isActiveCell) {
+                c.setBackground(ACTIVE_CELL_COLOR);
                 c.setForeground(Color.BLACK);
+                setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(Color.BLACK, 2),
+                        BorderFactory.createEmptyBorder(3, 8, 3, 8)
+                ));
+            } else if (row == activeRow) {
+                c.setBackground(ACTIVE_ROW_COLOR);
+                c.setForeground(Color.BLACK);
+                setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
             } else {
                 c.setBackground(TABLE_BACKGROUND);
                 c.setForeground(Color.BLACK);
+                setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
             }
             return c;
         }

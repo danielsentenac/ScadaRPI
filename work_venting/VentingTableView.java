@@ -24,6 +24,18 @@ public class VentingTableView {
 
     private static final Logger logger = Logger.getLogger("Main");
 
+    private static final int STEP_COLUMN = 0;
+    private static final int P1_COLUMN = 1;
+    private static final int V1_COLUMN = 2;
+    private static final int VBYPASS_COLUMN = 3;
+    private static final int VSOFT_COLUMN = 4;
+    private static final int VMAIN_COLUMN = 5;
+    private static final int VDRYER_COLUMN = 6;
+    private static final int VRP_COLUMN = 7;
+    private static final int MKS2000_COLUMN = 8;
+    private static final int MKS50000_COLUMN = 9;
+    private static final int G2_COLUMN = 10;
+
     private final DeviceManager deviceManager;
     private final Hashtable<String,String> cmdMap;      // VENTINGCMD
     private final Hashtable<String,String> viewStatusMap;   // VENTINGVIEWSTATUS (non-GLG channels)
@@ -45,6 +57,7 @@ public class VentingTableView {
     private final JButton loadDbButton;
     private final JButton executeButton;
     private final JButton stopButton;
+    private final JLabel dbNameLabel;
 
     private volatile boolean ventingRunning = false;
     private VentingOperations currentVentingOp;
@@ -133,9 +146,17 @@ public class VentingTableView {
         JLabel titleLabel = VentingLookAndFeel.createTitleLabel("VENTING SEQUENCE");
         titleLabel.setOpaque(true);
         titleLabel.setBackground(VentingLookAndFeel.TABLE_BACKGROUND);
+
+        dbNameLabel = createDbNameLabel();
+        updateDbNameLabel();
+
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setBackground(VentingLookAndFeel.TABLE_BACKGROUND);
+        headerPanel.add(titleLabel, BorderLayout.NORTH);
+        headerPanel.add(dbNameLabel, BorderLayout.SOUTH);
         
         JPanel leftPanel = new JPanel(new BorderLayout());
-        leftPanel.add(titleLabel, BorderLayout.NORTH);
+        leftPanel.add(headerPanel, BorderLayout.NORTH);
         leftPanel.add(tableFrame, BorderLayout.CENTER);
         leftPanel.add(buttonPanel, BorderLayout.SOUTH);
         leftPanel.setBackground(VentingLookAndFeel.TABLE_BACKGROUND);
@@ -157,10 +178,39 @@ public class VentingTableView {
     }
 
     private void applyScientificRendererToG2() {
-	    // Column 9 is G2
 	    operationsTable.getColumnModel()
-		           .getColumn(9)
+		           .getColumn(G2_COLUMN)
 		           .setCellRenderer(new VentingLookAndFeel.ScientificRenderer());
+    }
+
+    private JLabel createDbNameLabel() {
+        JLabel label = new JLabel("", SwingConstants.CENTER);
+        label.setFont(new Font("SansSerif", Font.BOLD, 12));
+        label.setForeground(new Color(50, 50, 50));
+        label.setOpaque(true);
+        label.setBackground(VentingLookAndFeel.TABLE_BACKGROUND);
+        label.setBorder(BorderFactory.createEmptyBorder(4, 8, 8, 8));
+        return label;
+    }
+
+    private void updateDbNameLabel() {
+        if (dbNameLabel == null) {
+            return;
+        }
+
+        String displayName = formatDbDisplayName();
+        dbNameLabel.setText("DB: " + displayName);
+        dbNameLabel.setToolTipText(dbUrl);
+    }
+
+    private String formatDbDisplayName() {
+        if (dbUrl == null || dbUrl.trim().isEmpty()) {
+            return "(not set)";
+        }
+
+        String path = dbUrl.replaceFirst("^jdbc:sqlite:", "");
+        String fileName = new File(path).getName();
+        return fileName.isEmpty() ? path : fileName;
     }
 
     /* ===================== PUBLIC API ===================== */
@@ -184,6 +234,7 @@ public class VentingTableView {
         cols.add("STEP");
         cols.add("P1");
         cols.add("V1");
+        cols.add("VBYPASS");
         cols.add("VSOFT");
         cols.add("VMAIN");
         cols.add("VDRYER");
@@ -194,7 +245,7 @@ public class VentingTableView {
         return new DefaultTableModel(cols, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column != 0; // STEP not editable
+                return column != STEP_COLUMN; // STEP not editable
             }
         };
     }
@@ -204,6 +255,7 @@ public class VentingTableView {
                 step,       // STEP
                 "ON",       // P1
                 "OPEN",     // V1
+                "OPEN",     // VBYPASS
                 "OPEN",     // VSOFT
                 "CLOSE",    // VMAIN
                 "CLOSE",    // VDRYER
@@ -255,8 +307,8 @@ public class VentingTableView {
                 int col = operationsTable.columnAtPoint(e.getPoint());
                 if (row < 0) return;
 
-                // Column indices: 7=MKS2000, 8=MKS50000, 9=G2
-                if (col == 7 || col == 8 || col == 9) {
+                // Column indices: 8=MKS2000, 9=MKS50000, 10=G2
+                if (col == MKS2000_COLUMN || col == MKS50000_COLUMN || col == G2_COLUMN) {
                     editNumericCellWithKeypad(row, col);
                 }
             }
@@ -317,6 +369,7 @@ public class VentingTableView {
                 + " STEP INTEGER PRIMARY KEY,"
                 + " P1 TEXT NOT NULL,"
                 + " V1 TEXT NOT NULL,"
+                + " VBYPASS TEXT NOT NULL DEFAULT 'CLOSE',"
                 + " VSOFT TEXT NOT NULL,"
                 + " VMAIN TEXT NOT NULL,"
                 + " VDRYER TEXT NOT NULL,"
@@ -329,9 +382,31 @@ public class VentingTableView {
         try (Connection conn = DriverManager.getConnection(dbUrl);
              Statement stmt = conn.createStatement()) {
             stmt.execute(sql);
+            ensureOperationsSchema(conn);
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "createDbIfNeeded> " + e.getMessage(), e);
         }
+    }
+
+    private void ensureOperationsSchema(Connection conn) throws SQLException {
+        if (!hasColumn(conn, "operations", "VBYPASS")) {
+            try (Statement stmt = conn.createStatement()) {
+                stmt.execute("ALTER TABLE operations ADD COLUMN VBYPASS TEXT NOT NULL DEFAULT 'CLOSE'");
+                stmt.executeUpdate("UPDATE operations SET VBYPASS='OPEN' WHERE VSOFT='OPEN' OR VMAIN='OPEN'");
+            }
+        }
+    }
+
+    private boolean hasColumn(Connection conn, String tableName, String columnName) throws SQLException {
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("PRAGMA table_info(" + tableName + ")")) {
+            while (rs.next()) {
+                if (columnName.equalsIgnoreCase(rs.getString("name"))) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private void insertDefaultRowIfNeeded() {
@@ -339,8 +414,8 @@ public class VentingTableView {
             return;
         }
 
-        String sql = "INSERT INTO operations (STEP,P1,V1,VSOFT,VMAIN,VDRYER,VRP,MKS2000,MKS50000,G2) "
-                + "VALUES (?,?,?,?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO operations (STEP,P1,V1,VBYPASS,VSOFT,VMAIN,VDRYER,VRP,MKS2000,MKS50000,G2) "
+                + "VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 
         try (Connection conn = DriverManager.getConnection(dbUrl);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -349,12 +424,13 @@ public class VentingTableView {
             pstmt.setString(2, "ON");
             pstmt.setString(3, "OPEN");
             pstmt.setString(4, "OPEN");
-            pstmt.setString(5, "CLOSE");
+            pstmt.setString(5, "OPEN");
             pstmt.setString(6, "CLOSE");
             pstmt.setString(7, "CLOSE");
-            pstmt.setInt(8, 0);
+            pstmt.setString(8, "CLOSE");
             pstmt.setInt(9, 0);
-            pstmt.setDouble(10, 0.0);
+            pstmt.setInt(10, 0);
+            pstmt.setDouble(11, 0.0);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             // likely "constraint failed" after first run; not fatal
@@ -368,7 +444,7 @@ public class VentingTableView {
         }
 
         DefaultTableModel model = null;
-        String sql = "SELECT * FROM operations ORDER BY STEP";
+        String sql = "SELECT STEP,P1,V1,VBYPASS,VSOFT,VMAIN,VDRYER,VRP,MKS2000,MKS50000,G2 FROM operations ORDER BY STEP";
 
         try (Connection conn = DriverManager.getConnection(dbUrl);
              Statement stmt = conn.createStatement();
@@ -415,22 +491,23 @@ public class VentingTableView {
             return;
         }
 
-        String sql = "INSERT INTO operations (STEP,P1,V1,VSOFT,VMAIN,VDRYER,VRP,MKS2000,MKS50000,G2) "
-                + "VALUES (?,?,?,?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO operations (STEP,P1,V1,VBYPASS,VSOFT,VMAIN,VDRYER,VRP,MKS2000,MKS50000,G2) "
+                + "VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 
         try (Connection conn = DriverManager.getConnection(dbUrl);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setInt(1, ((Number) row[0]).intValue());
-            pstmt.setString(2, (String) row[1]);
-            pstmt.setString(3, (String) row[2]);
-            pstmt.setString(4, (String) row[3]);
-            pstmt.setString(5, (String) row[4]);
-            pstmt.setString(6, (String) row[5]);
-            pstmt.setString(7, (String) row[6]);
-            pstmt.setInt(8, ((Number) row[7]).intValue());
-            pstmt.setInt(9, ((Number) row[8]).intValue());
-            pstmt.setDouble(10, ((Number) row[9]).doubleValue());
+            pstmt.setInt(1, ((Number) row[STEP_COLUMN]).intValue());
+            pstmt.setString(2, (String) row[P1_COLUMN]);
+            pstmt.setString(3, (String) row[V1_COLUMN]);
+            pstmt.setString(4, (String) row[VBYPASS_COLUMN]);
+            pstmt.setString(5, (String) row[VSOFT_COLUMN]);
+            pstmt.setString(6, (String) row[VMAIN_COLUMN]);
+            pstmt.setString(7, (String) row[VDRYER_COLUMN]);
+            pstmt.setString(8, (String) row[VRP_COLUMN]);
+            pstmt.setInt(9, ((Number) row[MKS2000_COLUMN]).intValue());
+            pstmt.setInt(10, ((Number) row[MKS50000_COLUMN]).intValue());
+            pstmt.setDouble(11, ((Number) row[G2_COLUMN]).doubleValue());
 
             pstmt.executeUpdate();
         } catch (SQLException e) {
@@ -454,16 +531,16 @@ public class VentingTableView {
 	    int step = ((Number) stepObj).intValue();
 
 	    String sql = "UPDATE operations SET "
-		    + "P1=?, V1=?, VSOFT=?, VMAIN=?, VDRYER=?, VRP=?, "
+		    + "P1=?, V1=?, VBYPASS=?, VSOFT=?, VMAIN=?, VDRYER=?, VRP=?, "
 		    + "MKS2000=?, MKS50000=?, G2=? "
 		    + "WHERE STEP=?";
 
 	    suppressModelEvents = true;
 	    try {
 		// These may adjust the values in the model (setValueAt)
-		int mks2000  = getValidatedInt(rowIndex, 7, 0, 2000,  "MKS2000");
-		int mks50000 = getValidatedInt(rowIndex, 8, 0, 50000, "MKS50000");
-		double g2    = getValidatedDouble(rowIndex, 9, "G2");
+		int mks2000  = getValidatedInt(rowIndex, MKS2000_COLUMN, 0, 2000,  "MKS2000");
+		int mks50000 = getValidatedInt(rowIndex, MKS50000_COLUMN, 0, 50000, "MKS50000");
+		double g2    = getValidatedDouble(rowIndex, G2_COLUMN, "G2");
 
                 if (!hasDbDriver()) {
                     return;
@@ -472,18 +549,19 @@ public class VentingTableView {
 		try (Connection conn = DriverManager.getConnection(dbUrl);
 		     PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-		    pstmt.setString(1, (String) operationsModel.getValueAt(rowIndex, 1));
-		    pstmt.setString(2, (String) operationsModel.getValueAt(rowIndex, 2));
-		    pstmt.setString(3, (String) operationsModel.getValueAt(rowIndex, 3));
-		    pstmt.setString(4, (String) operationsModel.getValueAt(rowIndex, 4));
-		    pstmt.setString(5, (String) operationsModel.getValueAt(rowIndex, 5));
-		    pstmt.setString(6, (String) operationsModel.getValueAt(rowIndex, 6));
+		    pstmt.setString(1, (String) operationsModel.getValueAt(rowIndex, P1_COLUMN));
+		    pstmt.setString(2, (String) operationsModel.getValueAt(rowIndex, V1_COLUMN));
+		    pstmt.setString(3, (String) operationsModel.getValueAt(rowIndex, VBYPASS_COLUMN));
+		    pstmt.setString(4, (String) operationsModel.getValueAt(rowIndex, VSOFT_COLUMN));
+		    pstmt.setString(5, (String) operationsModel.getValueAt(rowIndex, VMAIN_COLUMN));
+		    pstmt.setString(6, (String) operationsModel.getValueAt(rowIndex, VDRYER_COLUMN));
+		    pstmt.setString(7, (String) operationsModel.getValueAt(rowIndex, VRP_COLUMN));
 
-		    pstmt.setInt(7, mks2000);
-		    pstmt.setInt(8, mks50000);
-		    pstmt.setDouble(9, g2);
+		    pstmt.setInt(8, mks2000);
+		    pstmt.setInt(9, mks50000);
+		    pstmt.setDouble(10, g2);
 
-		    pstmt.setInt(10, step);
+		    pstmt.setInt(11, step);
 
 		    pstmt.executeUpdate();
 		}
@@ -598,6 +676,7 @@ public class VentingTableView {
                 nextStep,   // STEP
                 "OFF",      // P1
                 "CLOSE",    // V1
+                "CLOSE",    // VBYPASS
                 "CLOSE",    // VSOFT
                 "CLOSE",    // VMAIN
                 "CLOSE",    // VDRYER
@@ -695,6 +774,7 @@ public class VentingTableView {
             String path = chooser.getSelectedFile().getAbsolutePath();
             dbUrl = "jdbc:sqlite:" + path;
             logger.info("Using DB: " + dbUrl);
+            updateDbNameLabel();
 
             if (!hasDbDriver()) {
                 JOptionPane.showMessageDialog(
@@ -706,6 +786,8 @@ public class VentingTableView {
                 return;
             }
 
+            createDbIfNeeded();
+            insertDefaultRowIfNeeded();
             DefaultTableModel newModel = loadOperationsFromDb();
             if (newModel != null) {
                 operationsModel = newModel;
@@ -757,17 +839,17 @@ public class VentingTableView {
 
         double newVal = dlg.getResultValue();
 
-        if (col == 7) {         // MKS2000: 0..2000, integer
+        if (col == MKS2000_COLUMN) {         // MKS2000: 0..2000, integer
             int intVal = (int) Math.round(newVal);
             operationsModel.setValueAt(intVal, row, col);
-            getValidatedInt(row, 7, 0, 2000, "MKS2000");
-        } else if (col == 8) {  // MKS50000: 0..50000, integer
+            getValidatedInt(row, MKS2000_COLUMN, 0, 2000, "MKS2000");
+        } else if (col == MKS50000_COLUMN) {  // MKS50000: 0..50000, integer
             int intVal = (int) Math.round(newVal);
             operationsModel.setValueAt(intVal, row, col);
-            getValidatedInt(row, 8, 0, 50000, "MKS50000");
-        } else if (col == 9) {  // G2: double, numeric (supports 3e-4)
+            getValidatedInt(row, MKS50000_COLUMN, 0, 50000, "MKS50000");
+        } else if (col == G2_COLUMN) {  // G2: double, numeric (supports 3e-4)
             operationsModel.setValueAt(newVal, row, col);
-            getValidatedDouble(row, 9, "G2");
+            getValidatedDouble(row, G2_COLUMN, "G2");
         }
 
         updateRowInDb(row);

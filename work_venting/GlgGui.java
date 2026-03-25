@@ -102,8 +102,8 @@ public class GlgGui extends JFrame implements ChannelList, DataTypes, Runnable  
 			VENTINGVIEWSTATUS,
 			dbUrl,
 			"MG_PR2",               // G2 status key
-			"MKS2000_FLOW_SETP",    // MKS2000 flow
-			"MKS50000_FLOW_SETP"    // MKS50000 flow
+			"MKS2000_FLOW",         // MKS2000 effective flow feedback
+			"MKS50000_FLOW"         // MKS50000 effective flow feedback
 		);
 		JPanel leftPanel = ventingTableView.getPanel();
 		leftPanel.setMinimumSize(new Dimension(420, 320));
