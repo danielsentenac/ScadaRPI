@@ -3,6 +3,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableModel;
 import java.awt.*;
 import java.io.File;
@@ -107,6 +108,7 @@ public class VentingTableView {
         VentingLookAndFeel.installEditors(operationsTable);
         VentingLookAndFeel.applyTableBackground(operationsTable); 
         applyScientificRendererToG2();
+        installCellNavigation();
         
         attachModelListener();
         installNumericEditorHook();
@@ -297,6 +299,72 @@ public class VentingTableView {
         DefaultTableModel model = createEmptyModel();
         model.addRow(defaultRow(1));
         return model;
+    }
+
+    private void installCellNavigation() {
+        operationsTable.setCellSelectionEnabled(true);
+        operationsTable.setRowSelectionAllowed(true);
+        operationsTable.setColumnSelectionAllowed(true);
+        operationsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        operationsTable.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+
+        InputMap inputMap = operationsTable.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        ActionMap actionMap = operationsTable.getActionMap();
+
+        inputMap.put(KeyStroke.getKeyStroke("TAB"), "venting-next-cell");
+        inputMap.put(KeyStroke.getKeyStroke("ENTER"), "venting-next-cell");
+        inputMap.put(KeyStroke.getKeyStroke("shift TAB"), "venting-previous-cell");
+        inputMap.put(KeyStroke.getKeyStroke("shift ENTER"), "venting-previous-cell");
+
+        actionMap.put("venting-next-cell", new AbstractAction() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                moveSelectionByOffset(1);
+            }
+        });
+
+        actionMap.put("venting-previous-cell", new AbstractAction() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                moveSelectionByOffset(-1);
+            }
+        });
+    }
+
+    private void moveSelectionByOffset(int direction) {
+        int row = operationsTable.isEditing() ? operationsTable.getEditingRow() : operationsTable.getSelectedRow();
+        int col = operationsTable.isEditing() ? operationsTable.getEditingColumn() : operationsTable.getSelectedColumn();
+        if (row < 0 || col < 0) {
+            if (operationsTable.getRowCount() > 0 && operationsTable.getColumnCount() > 0) {
+                operationsTable.changeSelection(0, 0, false, false);
+            }
+            return;
+        }
+
+        if (operationsTable.isEditing()) {
+            TableCellEditor editor = operationsTable.getCellEditor();
+            if (editor != null && !editor.stopCellEditing()) {
+                return;
+            }
+        }
+
+        int targetRow = row;
+        int targetCol = col + direction;
+        int lastColumn = operationsTable.getColumnCount() - 1;
+
+        if (targetCol > lastColumn) {
+            targetCol = 0;
+            if (row < operationsTable.getRowCount() - 1) {
+                targetRow = row + 1;
+            }
+        } else if (targetCol < 0) {
+            targetCol = lastColumn;
+            if (row > 0) {
+                targetRow = row - 1;
+            }
+        }
+
+        operationsTable.changeSelection(targetRow, targetCol, false, false);
     }
 
     private void installNumericEditorHook() {

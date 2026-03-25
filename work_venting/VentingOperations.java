@@ -14,7 +14,7 @@ import java.awt.Rectangle;
  * For each step (in increasing STEP order):
  *   1) Send each valve / pump command to the PLC
  *   2) Read PLC feedback and wait until the requested state is reported
- *   3) Set MKS2000 / MKS50000 after VRP and wait for effective FLOW feedback
+ *   3) Set MKS2000 / MKS50000 after VRP and wait for MKS setpoint feedback
  *   4) Wait until G2 (chamber pressure) reaches target from that row
  */
 public class VentingOperations implements Runnable {
@@ -32,14 +32,13 @@ public class VentingOperations implements Runnable {
     private static final int MKS2000_COLUMN_INDEX = 8;
     private static final int MKS50000_COLUMN_INDEX = 9;
     private static final int G2_COLUMN_INDEX = 10;
-    private static final double MKS_FLOW_ABSOLUTE_TOLERANCE_SCCM = 1.0;
-    private static final double MKS_FLOW_RELATIVE_TOLERANCE = 0.01;
+    private static final double MKS_SETPOINT_TOLERANCE = 1.0e-3;
 
     private final DeviceManager deviceManager;
     private final List<Step> steps;
     private final String g2StatusKey;                  // e.g. "G2Val"
-    private final String mks2000StatusKey;   // e.g. "MKS2000_FLOW"
-    private final String mks50000StatusKey;  // e.g. "MKS50000_FLOW"
+    private final String mks2000StatusKey;   // e.g. "MKS2000_FLOW_SETP"
+    private final String mks50000StatusKey;  // e.g. "MKS50000_FLOW_SETP"
     private final String stepStatusKey;      // e.g. "OP_STEP"
     private final JTable table;
     private volatile boolean stopRequested = false;
@@ -149,7 +148,7 @@ public class VentingOperations implements Runnable {
 		if (!stopped) stopped = executeIssuedCommand(step.step, step.rowIndex, queueValveCommand("M1_VRPCMD", step.vrp));
 
 		// 3) Send MKS setpoints only after the PLC path is in place, then wait
-		//    for the effective flow readback before continuing.
+		//    for the MKS setpoint readback before continuing.
 		if (!stopped) stopped = executeMksCommands(step);
 
 		// 4) If the step requests P1 OFF, stop it only after the valves and MKS
@@ -708,7 +707,7 @@ public class VentingOperations implements Runnable {
         if (waitForCommandExecution(stepNumber, issuedCommand)) {
             return true;
         }
-        return waitForMksFlow(stepNumber, rowIndex, flowKey, requestedFlow, tableColumnIndex);
+        return waitForMksSetpoint(stepNumber, rowIndex, flowKey, requestedFlow, tableColumnIndex);
     }
 
     private IssuedCommand queueMksFlowCommand(String flowKey, double requestedFlow, int tableColumnIndex) {
@@ -752,42 +751,40 @@ public class VentingOperations implements Runnable {
         );
     }
 
-    private boolean waitForMksFlow(int stepNumber,
+    private boolean waitForMksSetpoint(int stepNumber,
                                    int rowIndex,
                                    String flowKey,
                                    double requestedFlow,
                                    int tableColumnIndex) {
-        DataElement flowElement = getDataElementByKey(flowKey);
-        if (flowElement == null) {
-            logger.warning("VentingOperations: missing MKS effective flow feedback for '" + flowKey + "'");
+        DataElement setpointElement = getDataElementByKey(flowKey);
+        if (setpointElement == null) {
+            logger.warning("VentingOperations: missing MKS setpoint feedback for '" + flowKey + "'");
             return false;
         }
 
-        double tolerance = getMksFlowTolerance(requestedFlow);
         long nextLogAt = System.currentTimeMillis() + WAIT_LOG_INTERVAL_MS;
 
         highlightFeedbackCell(rowIndex, tableColumnIndex);
-        logger.info("VentingOperations: step " + stepNumber + " waiting for effective flow "
-                + flowKey + " -> " + requestedFlow + " sccm"
-                + " (tolerance +/- " + tolerance + ")");
+        logger.info("VentingOperations: step " + stepNumber + " waiting for MKS setpoint "
+                + flowKey + " -> " + requestedFlow + " sccm");
 
         while (true) {
             if (isStopRequested()) {
                 return true;
             }
 
-            double currentFlow = flowElement.value;
-            if (Math.abs(currentFlow - requestedFlow) <= tolerance) {
-                logger.info("VentingOperations: effective flow " + flowKey + " reached "
-                        + currentFlow + " sccm for target " + requestedFlow);
+            double currentSetpoint = setpointElement.value;
+            if (Math.abs(currentSetpoint - requestedFlow) <= MKS_SETPOINT_TOLERANCE) {
+                logger.info("VentingOperations: MKS setpoint " + flowKey + " reached "
+                        + currentSetpoint + " sccm for target " + requestedFlow);
                 return false;
             }
 
             long now = System.currentTimeMillis();
             if (now >= nextLogAt) {
-                logger.info("VentingOperations: still waiting for effective flow "
+                logger.info("VentingOperations: still waiting for MKS setpoint "
                         + flowKey + " -> " + requestedFlow
-                        + " sccm (current=" + currentFlow + ")");
+                        + " sccm (current=" + currentSetpoint + ")");
                 nextLogAt = now + WAIT_LOG_INTERVAL_MS;
             }
 
@@ -795,11 +792,6 @@ public class VentingOperations implements Runnable {
                 return true;
             }
         }
-    }
-
-    private double getMksFlowTolerance(double requestedFlow) {
-        return Math.max(MKS_FLOW_ABSOLUTE_TOLERANCE_SCCM,
-                        Math.abs(requestedFlow) * MKS_FLOW_RELATIVE_TOLERANCE);
     }
 
     /* ===================== PRESSURE WAIT LOGIC ===================== */
