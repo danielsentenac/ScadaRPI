@@ -133,10 +133,10 @@ public class VentingOperations implements Runnable {
 		logger.info("VentingOperations: executing step " + step.step +
 		            (isLastStep ? " (last step)" : ""));
 
-		// 1) Hardware interlock: if P1 must be ON for this step, start it
-		//    and wait for PLC feedback before opening V1.
+		// 1) Execute P1 first so the step follows table order. This still
+		//    guarantees the ON interlock before any valve opening.
 		boolean stopped = false;
-		if ("ON".equalsIgnoreCase(step.p1)) {
+		if ("ON".equalsIgnoreCase(step.p1) || "OFF".equalsIgnoreCase(step.p1)) {
 		    stopped = executeIssuedCommand(step.step, step.rowIndex, queuePumpCommand("M1_P1ONOFF", step.p1));
 		}
 
@@ -151,11 +151,6 @@ public class VentingOperations implements Runnable {
 		//    for the MKS setpoint readback before continuing.
 		if (!stopped) stopped = executeMksCommands(step);
 
-		// 4) If the step requests P1 OFF, stop it only after the valves and MKS
-		//    commands are in their requested states.
-		if (!stopped && "OFF".equalsIgnoreCase(step.p1)) {
-		    stopped = executeIssuedCommand(step.step, step.rowIndex, queuePumpCommand("M1_P1ONOFF", step.p1));
-		}
 		if (stopped) {
 		    logger.info("VentingOperations: stopped while waiting for PLC feedback.");
 		    break;

@@ -348,6 +348,14 @@ public class VentingTableView {
             }
         }
 
+        moveSelectionFrom(row, col, direction);
+    }
+
+    private void moveSelectionFrom(int row, int col, int direction) {
+        if (row < 0 || col < 0) {
+            return;
+        }
+
         int targetRow = row;
         int targetCol = col + direction;
         int lastColumn = operationsTable.getColumnCount() - 1;
@@ -921,6 +929,7 @@ public class VentingTableView {
         }
 
         updateRowInDb(row);
+        SwingUtilities.invokeLater(() -> moveSelectionFrom(row, col, 1));
     }
 
     private int getValidatedInt(int row, int col, int min, int max, String name) {
