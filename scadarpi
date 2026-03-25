@@ -15,13 +15,14 @@ Usage:
 Examples:
   ./scadarpi list
   ./scadarpi compile all
-  ./scadarpi compile mainpanel flowmeter
-  ./scadarpi run pcounter
+  ./scadarpi compile mainpanel flowmeter hidenbench
+  ./scadarpi run hidenbench
   ./scadarpi run work_rga -- --demo
   ./scadarpi clean work_sqz
 
 Notes:
   - work_name can be either full (work_mainpanel) or short (mainpanel).
+  - newly added work_* directories such as work_hidenbench are discovered automatically.
   - compile/clean default to all work_* directories when omitted.
   - run executes Main with classpath ".:classes:../lib/*" from the selected work dir.
   - JAVA_HOME, JAVA_BIN, and JAVAC_BIN can be used to override java/javac.
