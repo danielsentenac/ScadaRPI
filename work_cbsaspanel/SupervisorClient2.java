@@ -34,8 +34,8 @@ public class SupervisorClient2 extends Device {
      name = _name; // Device name
      mbRegisterStart = _mbRegisterStart;  // Starting Modbus register offset
 
-     logger.finer("SupervisorClient:SupervisorClient> " + name + " Modbus registers starts at offset " + mbRegisterStart);
-
+     logger.fine("SupervisorClient:SupervisorClient> " + name + " Modbus registers starts at offset " + mbRegisterStart);
+     
      mbRegisterEnd = mbRegisterStart-2;
 
      // PCOUNTER FLAGS CHANNELS
@@ -72,7 +72,7 @@ public class SupervisorClient2 extends Device {
 
      mbRegisterEnd+=1;
 
-     logger.finer("SupervisorClient:SupervisorClient> " + name + " Modbus registers ends at offset " + mbRegisterEnd);
+     logger.fine("SupervisorClient:SupervisorClient> " + name + " Modbus registers ends at offset " + mbRegisterEnd);
          // }
    //    });
      
@@ -133,7 +133,7 @@ public class SupervisorClient2 extends Device {
         popCommand();  // Execute commands in the loop is more reactive
    
         // Get data from (tomcat) supervisor server
-        HttpURLConnection con = getServerConnection("http://example-host:8081/jchv/jchv");
+        HttpURLConnection con = getServerConnection("http://olserver134.virgo.infn.it:8081/jchv/jchv");
         
         OutputStream outstream = con.getOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(outstream);
@@ -141,7 +141,7 @@ public class SupervisorClient2 extends Device {
         oos.flush();
         oos.close();
 
-        logger.finer("SupervisorClient:updateDeviceData> request supervisor: " + svrNameList);
+        logger.fine("SupervisorClient:updateDeviceData> request supervisor: " + svrNameList);
 
         // receive result from servlet
         InputStream instr = con.getInputStream();
@@ -151,7 +151,7 @@ public class SupervisorClient2 extends Device {
         instr.close();
         con.disconnect();
         
-        logger.finer("SupervisorClient:updateDeviceData> receive from supervisor: " + svrValueList);
+        logger.fine("SupervisorClient:updateDeviceData> receive from supervisor: " + svrValueList);
         
         
         // Fill svrNameList vector

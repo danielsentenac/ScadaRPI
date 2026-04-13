@@ -10,6 +10,7 @@ import java.net.MalformedURLException;
 
 import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.lang.reflect.Method;
 
 import java.awt.Color;
 import javax.swing.*;
@@ -21,29 +22,14 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import javax.swing.BoxLayout;
 import java.awt.Insets;
-import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import static javafx.concurrent.Worker.State.FAILED;
-import javafx.embed.swing.JFXPanel;
-import javafx.event.EventHandler;
-import javafx.scene.Scene;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebEvent;
-import javafx.scene.web.WebView;
-import javafx.concurrent.Worker.State;
-import javafx.scene.Node;
-import javafx.collections.*;
-import javafx.collections.ListChangeListener.*;
+import java.awt.Toolkit;
+import java.awt.GraphicsEnvironment;
 
 import java.lang.Runtime;
 import java.lang.System;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.SwingUtilities;
-
-import com.gluonapplication.ViewData;
-import com.gluonapplication.ViewGlobal;
 
 public class GlgGui extends JFrame implements ChannelList, Runnable  {
 
@@ -55,11 +41,11 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
     private static final Logger logger = Logger.getLogger("Main");
     private Container content;
     private JPanel panel;
-    private JFXPanel jfxPanel1;
-    private JFXPanel jfxPanel2;
-    private JFXPanel jfxPanel3;
-    private WebEngine engine1;
-    private WebEngine engine2;
+    private JComponent jfxPanel1;
+    private JComponent jfxPanel2;
+    private JComponent jfxPanel3;
+    private Object engine1;
+    private Object engine2;
     private JPanel panelweb = new JPanel();
     private JPanel panelvac = new JPanel();
     private GlgJLWBean glg_bean1;
@@ -69,6 +55,7 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
     private long pageTime = 100000;
     private long lastTime = 0;
     private boolean isVimLoaded = true;
+    private boolean javaFxEnabled = detectJavaFxAvailability();
     // O2 variables
     private SimpleDateFormat formatter = new SimpleDateFormat("EEE, dd-MMM-yyyy HH:mm:ss");
     
@@ -92,11 +79,106 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
       thread.start();
     }
 
-    public void doStop() {
+   public void doStop() {
         if (thread != null) thread.interrupt();
         // Change the states of variable
         thread = null;
    }
+
+    private boolean detectJavaFxAvailability() {
+       try {
+          Class.forName("javafx.application.Platform");
+          Class.forName("javafx.embed.swing.JFXPanel");
+          Class.forName("javafx.scene.Scene");
+          Class.forName("javafx.scene.web.WebView");
+          return true;
+       }
+       catch (ClassNotFoundException ex) {
+          logger.warning("GlgGui: JavaFX runtime unavailable, embedded views disabled.");
+          return false;
+       }
+    }
+
+    private JComponent createEmbeddedPanel(String fallbackMessage) {
+       if (!javaFxEnabled) {
+          return createFallbackPanel(fallbackMessage);
+       }
+       try {
+          return (JComponent) Class.forName("javafx.embed.swing.JFXPanel")
+                  .getDeclaredConstructor().newInstance();
+       }
+       catch (ReflectiveOperationException | LinkageError ex) {
+          javaFxEnabled = false;
+          logger.log(Level.WARNING, "GlgGui:createEmbeddedPanel> Falling back to Swing panel", ex);
+          return createFallbackPanel(fallbackMessage);
+       }
+    }
+
+    private JComponent createFallbackPanel(String message) {
+       JPanel placeholder = new JPanel(new GridBagLayout());
+       placeholder.setBackground(Color.black);
+       JLabel label = new JLabel(message);
+       label.setForeground(Color.lightGray);
+       placeholder.add(label);
+       return placeholder;
+    }
+
+    private void runOnFxThread(Runnable task) {
+       if (!javaFxEnabled) {
+          return;
+       }
+       try {
+          Class<?> platformClass = Class.forName("javafx.application.Platform");
+          Method runLater = platformClass.getMethod("runLater", Runnable.class);
+          runLater.invoke(null, task);
+       }
+       catch (ReflectiveOperationException | LinkageError ex) {
+          javaFxEnabled = false;
+          logger.log(Level.WARNING, "GlgGui:runOnFxThread> Disabling JavaFX integration", ex);
+       }
+    }
+
+    private Object createFxScene(Object root) throws ReflectiveOperationException {
+       Class<?> parentClass = Class.forName("javafx.scene.Parent");
+       Class<?> sceneClass = Class.forName("javafx.scene.Scene");
+       return sceneClass.getConstructor(parentClass).newInstance(root);
+    }
+
+    private void setFxScene(JComponent panel, Object scene) throws ReflectiveOperationException {
+       if (!javaFxEnabled || panel == null) {
+          return;
+       }
+       Class<?> sceneClass = Class.forName("javafx.scene.Scene");
+       panel.getClass().getMethod("setScene", sceneClass).invoke(panel, scene);
+    }
+
+    private Object createWebEngine(JComponent panel) throws ReflectiveOperationException {
+       Object view = Class.forName("javafx.scene.web.WebView").getDeclaredConstructor().newInstance();
+       Method setZoom = view.getClass().getMethod("setZoom", double.class);
+       setZoom.invoke(view, 0.10d);
+       Method setFontScale = view.getClass().getMethod("setFontScale", double.class);
+       setFontScale.invoke(view, 7.0d);
+       Object engine = view.getClass().getMethod("getEngine").invoke(view);
+       setFxScene(panel, createFxScene(view));
+       return engine;
+    }
+
+    private void loadUrl(final Object engine, final String url) {
+       if (!javaFxEnabled || engine == null) {
+          return;
+       }
+       runOnFxThread(new Runnable() {
+          @Override
+          public void run() {
+             try {
+                engine.getClass().getMethod("load", String.class).invoke(engine, url);
+             }
+             catch (ReflectiveOperationException | LinkageError ex) {
+                logger.log(Level.WARNING, "GlgGui:loadUrl> Unable to load " + url, ex);
+             }
+          }
+       });
+    }
 
     private void createAndShowGui () {
        
@@ -110,8 +192,13 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
           panelweb.setBackground(Color.darkGray);
           panelvac.setBackground(Color.darkGray);
           this.getContentPane().add(panel);
-          this.setExtendedState(JFrame.MAXIMIZED_BOTH);
           this.setUndecorated(true);
+          // Belt-and-suspenders fullscreen: explicitly size to screen in case
+          // the window manager (e.g. Wayfire/labwc on RPi) ignores setExtendedState.
+          Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+          this.setSize(screenSize);
+          this.setLocation(0, 0);
+          this.setExtendedState(JFrame.MAXIMIZED_BOTH);
           this.setVisible(true);
           // Attach Beans to Frame
           glg_bean1 = new GlgJLWBean();
@@ -169,8 +256,8 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
        }
     }
     private void initWebComponents() {
-        jfxPanel1 = new JFXPanel();
-        jfxPanel2 = new JFXPanel();
+        jfxPanel1 = createEmbeddedPanel("DMS view unavailable (JavaFX missing)");
+        jfxPanel2 = createEmbeddedPanel("VIM view unavailable (JavaFX missing)");
         createWebScene();
         panelweb.add(jfxPanel1, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0
 						     , GridBagConstraints.CENTER, GridBagConstraints.BOTH,
@@ -181,110 +268,57 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
     }
     
     private void initVacComponents() {
-        jfxPanel3 = new JFXPanel();
+        jfxPanel3 = createEmbeddedPanel("Vacuum supervisor unavailable (JavaFX missing)");
         createVacScene();
       
     }
     private void createVacScene() {
-
-        Platform.runLater(new Runnable() {
-            @Override public void run() {
-                ViewData global = new ViewGlobal("GLOBAL", "GLOBAL");
-                new Thread(global).start();
-                Scene sceneVac = new Scene(global);
-                jfxPanel3.setScene(sceneVac);
-                }
-          });
+        if (!javaFxEnabled) {
+           return;
+        }
+        runOnFxThread(new Runnable() {
+           @Override
+           public void run() {
+              try {
+                 Object global = Class.forName("com.gluonapplication.ViewGlobal")
+                         .getDeclaredConstructor(String.class, String.class)
+                         .newInstance("GLOBAL", "GLOBAL");
+                 if (global instanceof Runnable) {
+                    new Thread((Runnable) global).start();
+                 }
+                 setFxScene(jfxPanel3, createFxScene(global));
+              }
+              catch (ReflectiveOperationException | LinkageError ex) {
+                 logger.log(Level.WARNING, "GlgGui:createVacScene> Unable to start vacuum supervisor view", ex);
+              }
+           }
+        });
     }
     private void createWebScene() {
-
-        Platform.runLater(new Runnable() {
-            @Override public void run() {
-                WebView view1 = new WebView();
-                engine1 = view1.getEngine();
-               
-                view1.setZoom(0.10);
-                view1.setFontScale(7);
-                
-                // hide webview scrollbars whenever they appear.
-                view1.getChildrenUnmodifiable().addListener(new ListChangeListener<Node>() {
-                  @Override public void onChanged(Change<? extends Node> change) {
-                                Set<Node> deadSeaScrolls = view1.lookupAll(".scroll-bar");
-                                for (Node scroll : deadSeaScrolls) {
-                                    scroll.setVisible(false);
-                                }
-                            }
-                });
-
-                engine1.getLoadWorker().exceptionProperty().addListener(new ChangeListener<Throwable>() {
-                            public void changed(ObservableValue<? extends Throwable> o, Throwable old, final Throwable value) {
-                                if (engine1.getLoadWorker().getState() == FAILED) {
-                                    SwingUtilities.invokeLater(new Runnable() {
-                                        @Override public void run() {
-                                            JOptionPane.showMessageDialog(
-                                                    panel,
-                                                    (value != null) ?
-                                                    engine1.getLocation() + "\n" + value.getMessage() :
-                                                    engine1.getLocation() + "\nUnexpected error.",
-                                                    "Loading error...",
-                                                    JOptionPane.ERROR_MESSAGE);
-                                        }
-                                    });
-                                }
-                            }
-                        });
-                jfxPanel1.setScene(new Scene(view1));
-                
-                WebView view2 = new WebView();
-                engine2 = view2.getEngine();
-               
-                view2.setZoom(0.10);
-                view2.setFontScale(7);
-                
-                // hide webview scrollbars whenever they appear.
-                view2.getChildrenUnmodifiable().addListener(new ListChangeListener<Node>() {
-                  @Override public void onChanged(Change<? extends Node> change) {
-                                Set<Node> deadSeaScrolls = view2.lookupAll(".scroll-bar");
-                                for (Node scroll : deadSeaScrolls) {
-                                    scroll.setVisible(false);
-                                }
-                            }
-                });
-                engine2.getLoadWorker().exceptionProperty().addListener(new ChangeListener<Throwable>() {
-                            public void changed(ObservableValue<? extends Throwable> o, Throwable old, final Throwable value) {
-                                if (engine2.getLoadWorker().getState() == FAILED) {
-                                    SwingUtilities.invokeLater(new Runnable() {
-                                        @Override public void run() {
-                                            JOptionPane.showMessageDialog(
-                                                    panel,
-                                                    (value != null) ?
-                                                    engine2.getLocation() + "\n" + value.getMessage() :
-                                                    engine2.getLocation() + "\nUnexpected error.",
-                                                    "Loading error...",
-                                                    JOptionPane.ERROR_MESSAGE);
-                                        }
-                                    });
-                                }
-                            }
-                        });
-                jfxPanel2.setScene(new Scene(view2));
-            }
+        if (!javaFxEnabled) {
+           return;
+        }
+        runOnFxThread(new Runnable() {
+           @Override
+           public void run() {
+              try {
+                 engine1 = createWebEngine(jfxPanel1);
+                 engine2 = createWebEngine(jfxPanel2);
+              }
+              catch (ReflectiveOperationException | LinkageError ex) {
+                 engine1 = null;
+                 engine2 = null;
+                 logger.log(Level.WARNING, "GlgGui:createWebScene> Unable to start embedded web views", ex);
+              }
+           }
         });
     }
     public void loadURL1() {
-        Platform.runLater(new Runnable() {
-            @Override public void run() {
-                engine1.load("https://dms.virgo-gw.eu/");
-            }
-        });
+        loadUrl(engine1, "https://dms.virgo-gw.eu/");
     }
     
     public void loadURL2() {
-        Platform.runLater(new Runnable() {
-            @Override public void run() {
-                engine2.load("https://vim.virgo-gw.eu/");
-            }
-        });
+        loadUrl(engine2, "https://vim.virgo-gw.eu/");
     }
 
     public void exitProgram() {

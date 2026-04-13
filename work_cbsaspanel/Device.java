@@ -77,7 +77,7 @@ public abstract class Device extends DataManager implements Runnable, DataTypes 
                   // Update modbus register
                   holdingRegisters.setInt16At(dataElement.mbRegisterOffset,(int)dataElement.value);
                }
-               logger.fine("Device:popCommand> Device " + this.name + ": Execute command/Write value " 
+               logger.finer("Device:popCommand> Device " + this.name + ": Execute command/Write value " 
                            + dataElement.name + " value " + dataElement.setvalue);
                executeCommand(dataElement);
             }
@@ -97,7 +97,7 @@ public abstract class Device extends DataManager implements Runnable, DataTypes 
           try {
              dataElement.setvalue = holdingRegisters.getInt16At(dataElement.mbRegisterOffset);
              if ( dataElement.setvalue != 0 ) {// Command has been triggered by Modbus Master --> add it
-                logger.fine("Device:addModbusCommand>TRIGGER: Pushing Modbus command for " 
+                logger.finer("Device:addModbusCommand>TRIGGER: Pushing Modbus command for " 
                             + dataElement.name + " with value " + dataElement.setvalue);
                 commandSetQueue.add(dataElement);
              }
@@ -127,7 +127,7 @@ public abstract class Device extends DataManager implements Runnable, DataTypes 
                   break;
              }
              if (dataElement.value != dataElement.setvalue) {
-                logger.fine("Device:addModbusCommand>READ_AND_WRITE_VALUE: Pushing Modbus command for " 
+                logger.finer("Device:addModbusCommand>READ_AND_WRITE_VALUE: Pushing Modbus command for " 
                             + dataElement.name + " with value " + dataElement.setvalue );
                    commandSetQueue.add(dataElement);
              }

@@ -79,7 +79,7 @@ public class Main {
         DeviceManager deviceManager = new DeviceManager();
         /**********************************************************************************************/
         // Create FlowMeterModbusMaster device
-        Device fm1 = new FlowMeterModbusMaster("FM1","192.168.100.100",502,0); // Modbus start offset
+        Device fm1 = new FlowMeterModbusMaster("FM1","192.168.2.155",502,0); // Modbus start offset
         
         // Add fm1 to DeviceManager
         deviceManager.addDevice(fm1);

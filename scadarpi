@@ -25,7 +25,11 @@ Notes:
   - newly added work_* directories such as work_hidenbench are discovered automatically.
   - compile/clean default to all work_* directories when omitted.
   - run executes Main with classpath ".:classes:../lib/*" from the selected work dir.
+  - OpenJFX is auto-detected from common install paths for compile/run when present.
+  - If OpenJFX modules are absent, a Java 8 JDK/JRE with bundled JavaFX is auto-detected.
   - JAVA_HOME, JAVA_BIN, and JAVAC_BIN can be used to override java/javac.
+  - SCADARPI_JAVAFX_LIB can point to an OpenJFX lib directory (contains javafx.base.jar).
+  - SCADARPI_JAVAFX_JAVA_HOME can point to a Java 8 home with bundled JavaFX (contains jfxrt.jar).
   - set SCADARPI_FORCE_HARDWARE=1 to force hardware startup on non-ARM hosts.
 EOF
 }
@@ -88,7 +92,7 @@ targets_from_args() {
   done
 }
 
-java_bin() {
+base_java_bin() {
   if [[ -n "${JAVA_BIN:-}" ]]; then
     printf '%s\n' "$JAVA_BIN"
     return 0
@@ -100,7 +104,7 @@ java_bin() {
   printf 'java\n'
 }
 
-javac_bin() {
+base_javac_bin() {
   if [[ -n "${JAVAC_BIN:-}" ]]; then
     printf '%s\n' "$JAVAC_BIN"
     return 0
@@ -112,17 +116,172 @@ javac_bin() {
   printf 'javac\n'
 }
 
+java_major_version() {
+  local java_cmd="$1"
+  local version_line
+
+  version_line="$("$java_cmd" -version 2>&1 | head -n 1)"
+
+  if [[ "$version_line" =~ \"1\.([0-9]+)\.[0-9_]+\" ]]; then
+    printf '%s\n' "${BASH_REMATCH[1]}"
+    return 0
+  fi
+
+  if [[ "$version_line" =~ \"([0-9]+)(\.[0-9._]+)?\" ]]; then
+    printf '%s\n' "${BASH_REMATCH[1]}"
+    return 0
+  fi
+
+  printf '0\n'
+}
+
+javafx_modules() {
+  printf '%s\n' "javafx.base,javafx.controls,javafx.fxml,javafx.graphics,javafx.media,javafx.swing,javafx.web"
+}
+
+is_javafx_lib_dir() {
+  local dir="${1:-}"
+  [[ -n "$dir" && -d "$dir" && -f "$dir/javafx.base.jar" ]]
+}
+
+find_javafx_lib_dir() {
+  local candidate
+  local -a candidates=(
+    "/usr/share/openjfx/lib"
+    "/usr/lib/openjfx/lib"
+    "/usr/lib64/openjfx/lib"
+    "/opt/openjfx/lib"
+    "/opt/javafx/lib"
+    "/opt/javafx-sdk/lib"
+  )
+
+  if [[ -n "${SCADARPI_JAVAFX_LIB:-}" ]]; then
+    is_javafx_lib_dir "$SCADARPI_JAVAFX_LIB" || die "SCADARPI_JAVAFX_LIB is not an OpenJFX lib directory: $SCADARPI_JAVAFX_LIB"
+    printf '%s\n' "$SCADARPI_JAVAFX_LIB"
+    return 0
+  fi
+
+  for candidate in "${candidates[@]}"; do
+    if is_javafx_lib_dir "$candidate"; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+is_legacy_javafx_home() {
+  local home="${1:-}"
+
+  [[ -n "$home" && -d "$home" && -x "$home/bin/java" ]] || return 1
+  [[ -f "$home/jre/lib/ext/jfxrt.jar" || -f "$home/lib/ext/jfxrt.jar" ]]
+}
+
+find_legacy_javafx_java_home() {
+  local candidate
+  local -a candidates=(
+    "/usr/java/jdk1.8.0_202-amd64"
+    "/usr/java/jdk1.8.0_191-amd64"
+    "/usr/java/jre1.8.0_291-amd64"
+    "/usr/lib/jvm/java-8-openjdk-amd64"
+    "/usr/lib/jvm/jre-8-openjdk-amd64"
+    "/opt/vibe/jre"
+  )
+
+  if [[ -n "${SCADARPI_JAVAFX_JAVA_HOME:-}" ]]; then
+    is_legacy_javafx_home "$SCADARPI_JAVAFX_JAVA_HOME" || die "SCADARPI_JAVAFX_JAVA_HOME is not a JavaFX-capable Java home: $SCADARPI_JAVAFX_JAVA_HOME"
+    printf '%s\n' "$SCADARPI_JAVAFX_JAVA_HOME"
+    return 0
+  fi
+
+  for candidate in "${candidates[@]}"; do
+    if is_legacy_javafx_home "$candidate"; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+java_bin() {
+  local candidate
+  local base_cmd
+  local java_major
+
+  base_cmd="$(base_java_bin)"
+  if [[ -n "${JAVA_BIN:-}" ]]; then
+    printf '%s\n' "$base_cmd"
+    return 0
+  fi
+
+  if find_javafx_lib_dir >/dev/null 2>&1; then
+    printf '%s\n' "$base_cmd"
+    return 0
+  fi
+
+  java_major="$(java_major_version "$base_cmd")"
+  if ((java_major > 8)) && candidate="$(find_legacy_javafx_java_home)"; then
+    printf '%s\n' "$candidate/bin/java"
+    return 0
+  fi
+
+  printf '%s\n' "$base_cmd"
+}
+
+javac_bin() {
+  local candidate
+  local base_cmd
+  local java_major
+
+  base_cmd="$(base_javac_bin)"
+  if [[ -n "${JAVAC_BIN:-}" ]]; then
+    printf '%s\n' "$base_cmd"
+    return 0
+  fi
+
+  if find_javafx_lib_dir >/dev/null 2>&1; then
+    printf '%s\n' "$base_cmd"
+    return 0
+  fi
+
+  java_major="$(java_major_version "$(base_java_bin)")"
+  if ((java_major > 8)) && candidate="$(find_legacy_javafx_java_home)" && [[ -x "$candidate/bin/javac" ]]; then
+    printf '%s\n' "$candidate/bin/javac"
+    return 0
+  fi
+
+  printf '%s\n' "$base_cmd"
+}
+
+append_javafx_opts() {
+  local -n opts_ref="$1"
+  local javafx_lib_dir
+
+  if javafx_lib_dir="$(find_javafx_lib_dir)"; then
+    opts_ref+=("--module-path" "$javafx_lib_dir" "--add-modules" "$(javafx_modules)")
+  fi
+}
+
 compile_work() {
   local work="$1"
   local work_dir="$ROOT_DIR/$work"
   local javac_cmd
+  local -a javac_opts=(
+    -Xlint
+    -Xlint:-serial
+    -Xlint:-path
+    -XDignore.symbol.file
+  )
 
   javac_cmd="$(javac_bin)"
+  append_javafx_opts javac_opts
   printf '[compile] %s\n' "$work"
   (
     cd "$work_dir"
-    rm -f -- *.class
-    "$javac_cmd" -Xlint -Xlint:-serial -Xlint:-path -XDignore.symbol.file -classpath ".:../lib/*" -d . *.java
+    find . -type f -name '*.class' -delete
+    "$javac_cmd" "${javac_opts[@]}" -classpath ".:../lib/*" -d . *.java
   )
 }
 
@@ -140,6 +299,7 @@ run_work() {
   local x_socket
 
   java_cmd="$(java_bin)"
+  append_javafx_opts java_opts
 
   if [[ "$force_gui" == "1" ]]; then
     headless=0
