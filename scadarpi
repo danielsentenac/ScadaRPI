@@ -301,6 +301,11 @@ run_work() {
   java_cmd="$(java_bin)"
   append_javafx_opts java_opts
 
+  local javafx_lib_dir
+  if javafx_lib_dir="$(find_javafx_lib_dir 2>/dev/null)"; then
+    java_opts+=("-Djava.library.path=$javafx_lib_dir")
+  fi
+
   if [[ "$force_gui" == "1" ]]; then
     headless=0
   elif [[ "$force_headless" == "1" ]]; then
@@ -330,6 +335,10 @@ run_work() {
   printf '[run] %s\n' "$work"
   (
     cd "$work_dir"
+    local stdcxx
+    if stdcxx="$(ldconfig -p 2>/dev/null | awk '/libstdc\+\+\.so\.6 /{print $NF; exit}')"; [[ -n "$stdcxx" ]]; then
+      export LD_PRELOAD="${LD_PRELOAD:+$LD_PRELOAD:}$stdcxx"
+    fi
     "$java_cmd" "${java_opts[@]}" -classpath ".:classes:../lib/*" Main "$@"
   )
 }
