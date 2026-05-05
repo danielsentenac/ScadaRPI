@@ -89,21 +89,26 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
                   new Thread(o2).start();
 
                   // Title bar matching vacuum panel style
-                  Label o2Title = new Label("O2 SENSOR MONITORING");
-                  o2Title.setStyle("-fx-text-fill: #00e5ff; -fx-font-size: 20; -fx-font-weight: bold;");
+                  Label o2Title = new Label("O2 SENSORS");
+                  o2Title.setMaxWidth(Double.MAX_VALUE);
+                  o2Title.setPrefHeight(64);
+                  o2Title.setAlignment(javafx.geometry.Pos.CENTER);
+                  o2Title.setTranslateY(3);
+                  o2Title.setStyle("-fx-text-fill: AQUA; -fx-font-size: 38; -fx-border-width: 1; -fx-border-radius: 5; -fx-background-color: #303E4F; -fx-background-radius: 5;");
                   StackPane titleBar = new StackPane(o2Title);
-                  titleBar.setStyle("-fx-background-color: #21304F; -fx-padding: 14 0 14 0;");
+                  titleBar.setStyle("-fx-background-color: #21304F; -fx-padding: 3 4 0 8;");
 
                   // Content with cyan border, aligned top-left
                   StackPane contentArea = new StackPane(o2.pane);
                   contentArea.setAlignment(javafx.geometry.Pos.TOP_LEFT);
-                  contentArea.setStyle("-fx-border-color: #00e5ff; -fx-border-width: 2; -fx-padding: 4;");
+                  contentArea.setStyle("-fx-border-color: #00e5ff; -fx-border-width: 2; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 4;");
 
                   // Assembled decorated panel
                   BorderPane o2Decorated = new BorderPane();
                   o2Decorated.setStyle("-fx-background-color: #21304F;");
                   o2Decorated.setTop(titleBar);
                   o2Decorated.setCenter(contentArea);
+                  BorderPane.setMargin(contentArea, new javafx.geometry.Insets(24, 0, 0, 0));
 
                   // Scale from top-left corner (pivot 0,0) to avoid center-offset shift
                   javafx.scene.transform.Scale o2Scale = new javafx.scene.transform.Scale(1, 1, 0, 0);
@@ -118,7 +123,7 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
                   final boolean[] bgOverrideDone = {false};
                   o2Decorated.layoutBoundsProperty().addListener((obs, oldB, newB) -> {
                       if (newB.getWidth() > 0 && newB.getHeight() > 0) {
-                          double scaleX = (screenW * 0.20) / newB.getWidth();
+                          double scaleX = (screenW * 0.23) / newB.getWidth();
                           double scaleY = (double) screenH / newB.getHeight();
                           double scale = Math.min(scaleX, scaleY);
                           o2Scale.setX(scale);
@@ -174,6 +179,28 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
 
                   Scene scene = new Scene(root, screenW, screenH);
                   jfxPanel.setScene(scene);
+                  Platform.runLater(() -> {
+                      Label vacTitle = (Label) global.lookup("#LevelLN2NE1");
+                      if (vacTitle != null) {
+                          vacTitle.setText("VACUUM");
+                      }
+                      for (javafx.scene.Node node : global.lookupAll(".label")) {
+                          if (!(node instanceof Label)) {
+                              continue;
+                          }
+                          Label label = (Label) node;
+                          String id = label.getId();
+                          String style = label.getStyle();
+                          if (id == null || style == null) {
+                              continue;
+                          }
+                          if ((id.startsWith("Pressure") || id.startsWith("Level")) &&
+                              !id.equals("LevelLN2NE1") &&
+                              style.contains("-fx-border-color")) {
+                              label.setStyle(style + "; -fx-font-size: 9;");
+                          }
+                      }
+                  });
               }
           });
 
