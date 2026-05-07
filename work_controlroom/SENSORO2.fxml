@@ -18,43 +18,53 @@
                </font>
             </Label>
 
-            <VBox spacing="8.0" style="-fx-background-color: #17233d; -fx-border-color: #00e5ff44; -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10 8 12 8;">
+            <HBox spacing="8.0">
                <children>
-                  <Label fx:id="ViewName111" style="-fx-text-fill: #d7e6ff; -fx-font-size: 14; -fx-font-weight: bold;" text="Controller Status">
+            <VBox spacing="8.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-background-color: #17233d; -fx-border-color: #00e5ff44; -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10 8 12 8;">
+               <children>
+                  <Label fx:id="ViewName111" style="-fx-text-fill: #d7e6ff; -fx-font-size: 18; -fx-font-weight: bold;" text="Controller Status">
                      <font>
-                        <Font name="System" size="14.0" />
+                        <Font name="System" size="18.0" />
                      </font>
                   </Label>
                   <HBox alignment="CENTER_LEFT" spacing="6.0">
                      <children>
-                        <Label prefWidth="22.0" style="-fx-text-fill: #d7e6ff;" text="CB">
+                        <Label prefWidth="40.0" style="-fx-text-fill: #d7e6ff;" text="CB">
                            <font>
-                              <Font size="12.0" />
+                              <Font size="22.0" />
                            </font>
                         </Label>
-                        <Label fx:id="ControllerCB" alignment="CENTER" prefWidth="68.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;">
+                        <Label fx:id="ControllerCB" alignment="CENTER" prefWidth="100.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 2 6 2 6;">
                            <font>
-                              <Font size="12.0" />
+                              <Font size="22.0" />
                            </font>
                         </Label>
-                        <Label prefWidth="22.0" style="-fx-text-fill: #d7e6ff;" text="NE">
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" spacing="6.0">
+                     <children>
+                        <Label prefWidth="40.0" style="-fx-text-fill: #d7e6ff;" text="NE">
                            <font>
-                              <Font size="12.0" />
+                              <Font size="22.0" />
                            </font>
                         </Label>
-                        <Label fx:id="ControllerNE" alignment="CENTER" prefWidth="68.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;">
+                        <Label fx:id="ControllerNE" alignment="CENTER" prefWidth="100.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 2 6 2 6;">
                            <font>
-                              <Font size="12.0" />
+                              <Font size="22.0" />
                            </font>
                         </Label>
-                        <Label prefWidth="22.0" style="-fx-text-fill: #d7e6ff;" text="WE">
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" spacing="6.0">
+                     <children>
+                        <Label prefWidth="40.0" style="-fx-text-fill: #d7e6ff;" text="WE">
                            <font>
-                              <Font size="12.0" />
+                              <Font size="22.0" />
                            </font>
                         </Label>
-                        <Label fx:id="ControllerWE" alignment="CENTER" prefWidth="68.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;">
+                        <Label fx:id="ControllerWE" alignment="CENTER" prefWidth="100.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 2 6 2 6;">
                            <font>
-                              <Font size="12.0" />
+                              <Font size="22.0" />
                            </font>
                         </Label>
                      </children>
@@ -62,176 +72,186 @@
                </children>
             </VBox>
 
-            <VBox spacing="8.0" style="-fx-background-color: #17233d; -fx-border-color: #00e5ff44; -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10 8 12 8;">
+            <VBox spacing="8.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-background-color: #17233d; -fx-border-color: #00e5ff44; -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10 8 12 8;">
                <children>
-                  <Label fx:id="ViewName11" style="-fx-text-fill: #d7e6ff; -fx-font-size: 14; -fx-font-weight: bold;" text="Alarms">
+                  <Label fx:id="ViewName11" style="-fx-text-fill: #d7e6ff; -fx-font-size: 18; -fx-font-weight: bold;" text="Alarms">
                      <font>
-                        <Font name="System" size="14.0" />
+                        <Font name="System" size="18.0" />
                      </font>
                   </Label>
                   <HBox alignment="CENTER_LEFT" spacing="6.0">
                      <children>
-                        <Label prefWidth="22.0" style="-fx-text-fill: #d7e6ff;" text="CB">
+                        <Label prefWidth="40.0" style="-fx-text-fill: #d7e6ff;" text="CB">
                            <font>
-                              <Font size="12.0" />
+                              <Font size="22.0" />
                            </font>
                         </Label>
-                        <Label fx:id="AlarmCB" alignment="CENTER" prefWidth="68.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;">
+                        <Label fx:id="AlarmCB" alignment="CENTER" prefWidth="100.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 2 6 2 6;">
                            <font>
-                              <Font size="12.0" />
+                              <Font size="22.0" />
                            </font>
                         </Label>
-                        <Label prefWidth="22.0" style="-fx-text-fill: #d7e6ff;" text="NE">
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" spacing="6.0">
+                     <children>
+                        <Label prefWidth="40.0" style="-fx-text-fill: #d7e6ff;" text="NE">
                            <font>
-                              <Font size="12.0" />
+                              <Font size="22.0" />
                            </font>
                         </Label>
-                        <Label fx:id="AlarmNE" alignment="CENTER" prefWidth="68.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;">
+                        <Label fx:id="AlarmNE" alignment="CENTER" prefWidth="100.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 2 6 2 6;">
                            <font>
-                              <Font size="12.0" />
+                              <Font size="22.0" />
                            </font>
                         </Label>
-                        <Label prefWidth="22.0" style="-fx-text-fill: #d7e6ff;" text="WE">
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" spacing="6.0">
+                     <children>
+                        <Label prefWidth="40.0" style="-fx-text-fill: #d7e6ff;" text="WE">
                            <font>
-                              <Font size="12.0" />
+                              <Font size="22.0" />
                            </font>
                         </Label>
-                        <Label fx:id="AlarmWE" alignment="CENTER" prefWidth="68.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;">
+                        <Label fx:id="AlarmWE" alignment="CENTER" prefWidth="100.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 2 6 2 6;">
                            <font>
-                              <Font size="12.0" />
+                              <Font size="22.0" />
                            </font>
                         </Label>
                      </children>
                   </HBox>
                </children>
             </VBox>
+               </children>
+            </HBox>
 
             <Region VBox.vgrow="ALWAYS" />
 
             <VBox spacing="10.0" style="-fx-background-color: #17233d; -fx-border-color: #00e5ff44; -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10 8 12 8;">
                <children>
-                  <Label fx:id="ViewName1" alignment="CENTER" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #00e5ff; -fx-font-size: 15; -fx-font-weight: bold;" text="CB">
+                  <Label fx:id="ViewName1" alignment="CENTER" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #00e5ff; -fx-font-size: 22; -fx-font-weight: bold;" text="CB">
                      <font>
-                        <Font name="System" size="15.0" />
+                        <Font name="System" size="22.0" />
                      </font>
                   </Label>
                   <HBox spacing="10.0">
                      <children>
-                        <VBox prefWidth="168.0" spacing="8.0">
+                        <VBox prefWidth="168.0" spacing="8.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
                            <children>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Zone A 60"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="CBZoneA60" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Zone A 60"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="CBZoneA60" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="CBZoneA60Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Zone A 120"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="CBZoneA120" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Zone A 120"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="CBZoneA120" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="CBZoneA120Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Zone B 120"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="CBZoneB120" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Zone B 120"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="CBZoneB120" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="CBZoneB120Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Zone B 170"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="CBZoneB170" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Zone B 170"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="CBZoneB170" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="CBZoneB170Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Zone C 60"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="CBZoneC60" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Zone C 60"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="CBZoneC60" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="CBZoneC60Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Zone C 120"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="CBZoneC120" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Zone C 120"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="CBZoneC120" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="CBZoneC120Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Zone D 120"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="CBZoneD120" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Zone D 120"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="CBZoneD120" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="CBZoneD120Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Zone D 170"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="CBZoneD170" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Zone D 170"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="CBZoneD170" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="CBZoneD170Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                            </children>
                         </VBox>
-                        <VBox prefWidth="168.0" spacing="8.0">
+                        <VBox prefWidth="168.0" spacing="8.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
                            <children>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Zone E 60"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="CBZoneE60" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Zone E 60"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="CBZoneE60" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="CBZoneE60Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Zone E 120"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="CBZoneE120" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Zone E 120"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="CBZoneE120" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="CBZoneE120Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Zone F 60"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="CBZoneF60" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Zone F 60"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="CBZoneF60" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="CBZoneF60Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Zone F 120"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="CBZoneF120" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Zone F 120"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="CBZoneF120" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="CBZoneF120Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Zone G 60"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="CBZoneG60" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Zone G 60"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="CBZoneG60" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="CBZoneG60Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Zone G 120"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="CBZoneG120" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Zone G 120"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="CBZoneG120" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="CBZoneG120Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Clean Rm 60"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="CBCleanRoom60" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Clean Rm 60"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="CBCleanRoom60" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="CBCleanRoom60Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Clean Rm 120"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="CBCleanRoom120" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Clean Rm 120"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="CBCleanRoom120" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="CBCleanRoom120Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
@@ -246,100 +266,100 @@
 
             <VBox spacing="10.0" style="-fx-background-color: #17233d; -fx-border-color: #00e5ff44; -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10 8 12 8;">
                <children>
-                  <Label fx:id="ViewName12" alignment="CENTER" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #00e5ff; -fx-font-size: 15; -fx-font-weight: bold;" text="NE">
+                  <Label fx:id="ViewName12" alignment="CENTER" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #00e5ff; -fx-font-size: 22; -fx-font-weight: bold;" text="NE">
                      <font>
-                        <Font name="System" size="15.0" />
+                        <Font name="System" size="22.0" />
                      </font>
                   </Label>
                   <HBox spacing="10.0">
                      <children>
-                        <VBox prefWidth="168.0" spacing="8.0">
+                        <VBox prefWidth="168.0" spacing="8.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
                            <children>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Tower DX 60"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="NETowerDx60" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Tower DX 60"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="NETowerDx60" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="NETowerDx60Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Tower DX120"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="NETowerDx120" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Tower DX120"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="NETowerDx120" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="NETowerDx120Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Base Rm 60"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="NEBaseRoom60" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Base Rm 60"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="NEBaseRoom60" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="NEBaseRoom60Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Base Rm 120"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="NEBaseRoom120" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Base Rm 120"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="NEBaseRoom120" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="NEBaseRoom120Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Clean Rm 60"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="NECleanRoom60" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Clean Rm 60"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="NECleanRoom60" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="NECleanRoom60Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Clean Rm 120"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="NECleanRoom120" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Clean Rm 120"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="NECleanRoom120" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="NECleanRoom120Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                            </children>
                         </VBox>
-                        <VBox prefWidth="168.0" spacing="8.0">
+                        <VBox prefWidth="168.0" spacing="8.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
                            <children>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Tower SX 60"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="NETowerSx60" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Tower SX 60"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="NETowerSx60" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="NETowerSx60Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Tower SX120"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="NETowerSx120" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Tower SX120"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="NETowerSx120" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="NETowerSx120Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Tunnel 60"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="NETunnel60" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Tunnel 60"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="NETunnel60" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="NETunnel60Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Tunnel 120"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="NETunnel120" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Tunnel 120"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="NETunnel120" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="NETunnel120Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Tunnel Dr 60"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="NETunnelDoor60" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Tunnel Dr 60"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="NETunnelDoor60" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="NETunnelDoor60Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Tunnel Dr120"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="NETunnelDoor120" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Tunnel Dr120"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="NETunnelDoor120" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="NETunnelDoor120Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
@@ -354,100 +374,100 @@
 
             <VBox spacing="10.0" style="-fx-background-color: #17233d; -fx-border-color: #00e5ff44; -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10 8 12 8;">
                <children>
-                  <Label fx:id="ViewName121" alignment="CENTER" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #00e5ff; -fx-font-size: 15; -fx-font-weight: bold;" text="WE">
+                  <Label fx:id="ViewName121" alignment="CENTER" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #00e5ff; -fx-font-size: 22; -fx-font-weight: bold;" text="WE">
                      <font>
-                        <Font name="System" size="15.0" />
+                        <Font name="System" size="22.0" />
                      </font>
                   </Label>
                   <HBox spacing="10.0">
                      <children>
-                        <VBox prefWidth="168.0" spacing="8.0">
+                        <VBox prefWidth="168.0" spacing="8.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
                            <children>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Tower DX 60"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="WETowerDx60" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Tower DX 60"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="WETowerDx60" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="WETowerDx60Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Tower DX120"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="WETowerDx120" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Tower DX120"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="WETowerDx120" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="WETowerDx120Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Base Rm 60"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="WEBaseRoom60" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Base Rm 60"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="WEBaseRoom60" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="WEBaseRoom60Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Base Rm 120"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="WEBaseRoom120" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Base Rm 120"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="WEBaseRoom120" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="WEBaseRoom120Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Clean Rm 60"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="WECleanRoom60" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Clean Rm 60"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="WECleanRoom60" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="WECleanRoom60Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Clean Rm 120"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="WECleanRoom120" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Clean Rm 120"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="WECleanRoom120" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="WECleanRoom120Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                            </children>
                         </VBox>
-                        <VBox prefWidth="168.0" spacing="8.0">
+                        <VBox prefWidth="168.0" spacing="8.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
                            <children>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Tower SX 60"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="WETowerSx60" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Tower SX 60"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="WETowerSx60" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="WETowerSx60Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Tower SX120"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="WETowerSx120" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Tower SX120"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="WETowerSx120" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="WETowerSx120Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Tunnel 60"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="WETunnel60" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Tunnel 60"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="WETunnel60" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="WETunnel60Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Tunnel 120"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="WETunnel120" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Tunnel 120"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="WETunnel120" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="WETunnel120Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Tunnel Dr 60"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="WETunnelDoor60" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Tunnel Dr 60"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="WETunnelDoor60" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="WETunnelDoor60Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="4.0">
                                  <children>
-                                    <Label prefWidth="88.0" style="-fx-text-fill: #d7e6ff;" text="Tunnel Dr120"><font><Font size="12.0" /></font></Label>
-                                    <Label fx:id="WETunnelDoor120" alignment="CENTER" prefWidth="72.0" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff;"><font><Font size="12.0" /></font></Label>
+                                    <Label prefWidth="120.0" style="-fx-text-fill: #d7e6ff;" text="Tunnel Dr120"><font><Font size="16.0" /></font></Label>
+                                    <Label fx:id="WETunnelDoor120" alignment="CENTER" prefWidth="72.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-border-color: #cfcfcf; -fx-border-width: 1; -fx-border-radius: 5; -fx-text-fill: #f3f6ff; -fx-padding: 0 4 0 4;"><font><Font size="16.0" /></font></Label>
                                     <Circle fx:id="WETunnelDoor120Status" fill="#d1d1e0" radius="4.5" stroke="#d1d1de00" strokeType="INSIDE"><effect><InnerShadow /></effect></Circle>
                                  </children>
                               </HBox>

@@ -30,6 +30,8 @@ Notes:
   - JAVA_HOME, JAVA_BIN, and JAVAC_BIN can be used to override java/javac.
   - SCADARPI_JAVAFX_LIB can point to an OpenJFX lib directory (contains javafx.base.jar).
   - SCADARPI_JAVAFX_JAVA_HOME can point to a Java 8 home with bundled JavaFX (contains jfxrt.jar).
+  - SCADARPI_TRUSTSTORE / SCADARPI_TRUSTSTORE_PASSWORD override the JVM truststore used for HTTPS;
+    by default /etc/pki/java/cacerts (or /etc/ssl/certs/java/cacerts) is used so WebView trusts modern roots.
   - set SCADARPI_FORCE_HARDWARE=1 to force hardware startup on non-ARM hosts.
 EOF
 }
@@ -160,6 +162,13 @@ find_javafx_lib_dir() {
     printf '%s\n' "$SCADARPI_JAVAFX_LIB"
     return 0
   fi
+
+  shopt -s nullglob
+  if [[ -n "${HOME:-}" ]]; then
+    candidates+=("$HOME"/Downloads/javafx-sdk-*/lib "$HOME"/javafx-sdk-*/lib)
+  fi
+  candidates+=(/opt/javafx-sdk-*/lib)
+  shopt -u nullglob
 
   for candidate in "${candidates[@]}"; do
     if is_javafx_lib_dir "$candidate"; then
@@ -304,6 +313,19 @@ run_work() {
   local javafx_lib_dir
   if javafx_lib_dir="$(find_javafx_lib_dir 2>/dev/null)"; then
     java_opts+=("-Djava.library.path=$javafx_lib_dir")
+  fi
+
+  local truststore="${SCADARPI_TRUSTSTORE:-}"
+  if [[ -z "$truststore" ]]; then
+    for candidate in /etc/pki/java/cacerts /etc/ssl/certs/java/cacerts; do
+      if [[ -r "$candidate" ]]; then
+        truststore="$candidate"
+        break
+      fi
+    done
+  fi
+  if [[ -n "$truststore" && -r "$truststore" ]]; then
+    java_opts+=("-Djavax.net.ssl.trustStore=$truststore" "-Djavax.net.ssl.trustStorePassword=${SCADARPI_TRUSTSTORE_PASSWORD:-changeit}")
   fi
 
   if [[ "$force_gui" == "1" ]]; then

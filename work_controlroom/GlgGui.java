@@ -123,17 +123,33 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
                   final boolean[] bgOverrideDone = {false};
                   o2Decorated.layoutBoundsProperty().addListener((obs, oldB, newB) -> {
                       if (newB.getWidth() > 0 && newB.getHeight() > 0) {
-                          double scaleX = (screenW * 0.23) / newB.getWidth();
+                          double scaleX = (screenW * 0.30) / newB.getWidth();
                           double scaleY = (double) screenH / newB.getHeight();
-                          double scale = Math.min(scaleX, scaleY);
-                          o2Scale.setX(scale);
-                          o2Scale.setY(scale);
-                          double scaledW = newB.getWidth() * scale;
+                          o2Scale.setX(scaleX);
+                          o2Scale.setY(scaleY);
+                          double scaledW = screenW * 0.30;
                           o2Pane.setMinWidth(scaledW);
                           o2Pane.setPrefWidth(scaledW);
                           o2Pane.setMaxWidth(scaledW);
                           if (!bgOverrideDone[0] && o2.pane != null) {
                               o2.pane.setStyle("-fx-background-color: #21304F;");
+                              String[] statusIds = {"ControllerCB", "ControllerNE", "ControllerWE",
+                                                    "AlarmCB", "AlarmNE", "AlarmWE"};
+                              for (String id : statusIds) {
+                                  javafx.scene.Node n = o2.pane.lookup("#" + id);
+                                  if (n instanceof Label) {
+                                      Label l = (Label) n;
+                                      boolean[] guard = {false};
+                                      l.styleProperty().addListener((sObs, sOld, sNew) -> {
+                                          if (guard[0] || sNew == null) return;
+                                          if (sNew.contains("-fx-font-size: 11")) {
+                                              guard[0] = true;
+                                              l.setStyle(sNew.replace("-fx-font-size: 11", "-fx-font-size: 22"));
+                                              guard[0] = false;
+                                          }
+                                      });
+                                  }
+                              }
                               bgOverrideDone[0] = true;
                           }
                       }
