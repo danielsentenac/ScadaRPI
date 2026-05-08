@@ -35,6 +35,10 @@ import javafx.concurrent.Worker.State;
 import javafx.scene.Node;
 import javafx.collections.*;
 import javafx.collections.ListChangeListener.*;
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
+import javafx.event.ActionEvent;
+import javafx.util.Duration;
 
 import java.lang.Runtime;
 import java.lang.System;
@@ -53,6 +57,15 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
     private String title;
     private Thread thread;
     private static final Logger logger = Logger.getLogger("Main");
+    private static final String DMS_URL = "https://dms.virgo-gw.eu/";
+    private static final String VIM_URL = "https://vim.virgo-gw.eu/";
+    // Dark navy frame around the VIM resource image, matching the bottom panels.
+    private static final String VIM_BG_COLOR = "#1a2438";
+    private static final int VIM_MARGIN_PX = 16;
+    // Background for the DMS pane: match the surrounding Swing chrome
+    // (panel.setBackground(Color.darkGray) -> #404040) so the empty WebView area
+    // blends in instead of forming visible "black squares" at top/bottom.
+    private static final String DMS_BG_COLOR = "#404040";
     private Container content;
     private JPanel panel;
     private JFXPanel jfxPanel1;
@@ -217,12 +230,109 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
                 }
           });
     }
+    private void loadEngine(final WebEngine engine, final String url, final String name) {
+        if (engine == null) {
+            logger.warning("GlgGui:" + name + "> Web engine is not initialized yet.");
+            return;
+        }
+        logger.info("GlgGui:" + name + "> Loading " + url);
+        engine.load(url);
+    }
+    
+    private void addLoadStateLogging(final WebEngine engine, final String name) {
+        engine.getLoadWorker().stateProperty().addListener(new ChangeListener<State>() {
+            public void changed(ObservableValue<? extends State> o, State oldState, State newState) {
+                if (newState == State.SUCCEEDED) {
+                    logger.info("GlgGui:" + name + "> Loaded " + engine.getLocation());
+                }
+                else if (newState == FAILED) {
+                    logger.warning("GlgGui:" + name + "> Failed loading " + engine.getLocation());
+                }
+            }
+        });
+    }
+
+    // After a VIM page finishes loading, replace its body with just the chosen plot
+    // (matched by title; falls back to the first resource image) so the WebView
+    // shows a single, full-panel chart instead of the multi-resource summary grid.
+    private void addVimResourceFocus(final WebEngine engine, final String titleRegex) {
+        engine.getLoadWorker().stateProperty().addListener(new ChangeListener<State>() {
+            public void changed(ObservableValue<? extends State> o, State oldState, State newState) {
+                if (newState != State.SUCCEEDED) return;
+                String js =
+                    "(function(){"
+                  + "  var imgs = document.querySelectorAll('img.resource-img');"
+                  + "  if (!imgs.length) return false;"
+                  + "  var rx = new RegExp('" + titleRegex + "', 'i');"
+                  + "  var target = null;"
+                  + "  for (var i = 0; i < imgs.length; i++) {"
+                  + "    var titleId = imgs[i].id.replace('actual_resource_img_', 'div_resource_title_');"
+                  + "    var titleEl = document.getElementById(titleId);"
+                  + "    if (titleEl && rx.test(titleEl.textContent)) { target = imgs[i]; break; }"
+                  + "  }"
+                  + "  if (!target) target = imgs[0];"
+                  + "  var src = target.getAttribute('src');"
+                  + "  var style = document.createElement('style');"
+                  + "  style.textContent = 'html,body{margin:0;background:" + VIM_BG_COLOR + ";height:100%;width:100%;overflow:hidden;box-sizing:border-box}'"
+                  + "                    + 'body{padding:" + VIM_MARGIN_PX + "px}'"
+                  + "                    + 'img.scadarpi-focus{width:100%;height:100%;object-fit:fill;display:block}';"
+                  + "  document.head.appendChild(style);"
+                  + "  document.body.innerHTML = '';"
+                  + "  var img = document.createElement('img');"
+                  + "  img.className = 'scadarpi-focus';"
+                  + "  img.src = src;"
+                  + "  document.body.appendChild(img);"
+                  + "  return true;"
+                  + "})();";
+                try {
+                    Object ok = engine.executeScript(js);
+                    logger.info("GlgGui:VIM> Focus on '" + titleRegex + "': " + ok);
+                } catch (Exception ex) {
+                    logger.warning("GlgGui:VIM> Focus script failed: " + ex.getMessage());
+                }
+            }
+        });
+    }
+
+    // Tints html/body of the loaded page so empty WebView area (visible when the page
+    // is shrunk via setZoom) blends with the surrounding panel chrome.
+    private void addPageBackgroundTint(final WebEngine engine, final String cssColor) {
+        engine.getLoadWorker().stateProperty().addListener(new ChangeListener<State>() {
+            public void changed(ObservableValue<? extends State> o, State oldState, State newState) {
+                if (newState != State.SUCCEEDED) return;
+                String js =
+                    "(function(){"
+                  + "  var s = document.createElement('style');"
+                  + "  s.textContent = 'html,body{background:" + cssColor + " !important}';"
+                  + "  document.head.appendChild(s);"
+                  + "})();";
+                try { engine.executeScript(js); } catch (Exception ignore) {}
+            }
+        });
+    }
+
+    // Periodically reloads the page so the embedded resource URL (which encodes the
+    // current date) and its image both pick up fresh data. The SUCCEEDED listener
+    // re-applies the crop after each reload.
+    private void schedulePeriodicReload(final WebEngine engine, final String name, double seconds) {
+        final Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(seconds),
+            new EventHandler<ActionEvent>() {
+                @Override public void handle(ActionEvent e) {
+                    logger.fine("GlgGui:" + name + "> Periodic reload");
+                    engine.reload();
+                }
+            }));
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
+    }
+    
     private void createWebScene() {
 
         Platform.runLater(new Runnable() {
             @Override public void run() {
                 WebView view1 = new WebView();
                 engine1 = view1.getEngine();
+                addLoadStateLogging(engine1, "DMS");
                
                 view1.setZoom(0.10);
                 view1.setFontScale(7);
@@ -254,11 +364,21 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
                                 }
                             }
                         });
-                jfxPanel1.setScene(new Scene(view1));
+                addPageBackgroundTint(engine1, DMS_BG_COLOR);
+                javafx.scene.paint.Color bg1 = javafx.scene.paint.Color.web(DMS_BG_COLOR);
+                Scene scene1 = new Scene(view1, bg1);
+                view1.setStyle("-fx-background-color: " + DMS_BG_COLOR + ";");
+                jfxPanel1.setScene(scene1);
+                jfxPanel1.setBackground(new Color(
+                        Integer.parseInt(DMS_BG_COLOR.substring(1, 3), 16),
+                        Integer.parseInt(DMS_BG_COLOR.substring(3, 5), 16),
+                        Integer.parseInt(DMS_BG_COLOR.substring(5, 7), 16)));
+                loadEngine(engine1, DMS_URL, "DMS");
                 
                 WebView view2 = new WebView();
                 engine2 = view2.getEngine();
-               
+                addLoadStateLogging(engine2, "VIM");
+
                 view2.setZoom(0.10);
                 view2.setFontScale(7);
                 
@@ -289,13 +409,14 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
                             }
                         });
                 jfxPanel2.setScene(new Scene(view2));
+                loadEngine(engine2, VIM_URL, "VIM");
             }
         });
     }
     public void loadURL1() {
         Platform.runLater(new Runnable() {
             @Override public void run() {
-                engine1.load("https://dms.virgo-gw.eu/");
+                loadEngine(engine1, DMS_URL, "DMS");
             }
         });
     }
@@ -303,7 +424,7 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
     public void loadURL2() {
         Platform.runLater(new Runnable() {
             @Override public void run() {
-                engine2.load("https://vim.virgo-gw.eu/");
+                loadEngine(engine2, VIM_URL, "VIM");
             }
         });
     }

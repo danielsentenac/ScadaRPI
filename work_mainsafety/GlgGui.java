@@ -86,9 +86,6 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
 
                   // --- O2 sensor side panel (left) ---
                   SidePopupViewSensorO2 o2 = new SidePopupViewSensorO2("SENSORO2", "SENSORO2");
-                  // Embedded side-panel views do not receive popup lifecycle events.
-                  // Keep O2 active so it refreshes continuously like the Global view.
-                  o2.isSuspended = false;
                   new Thread(o2).start();
 
                   // Title bar matching vacuum panel style
