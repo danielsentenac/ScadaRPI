@@ -3,7 +3,7 @@
 
   Hardware:
   - WSEN-PDUS V2 differential pressure sensor on I2C
-  - Arduino Leonardo ETH on Ethernet
+  - Arduino Leonardo ETH on Ethernet, or Arduino Leonardo + W5x00 Ethernet module
 
   Network role:
   - One node per sensor
@@ -22,16 +22,44 @@
 // Site configuration
 // -------------------------------------------------------------------------------------------------
 
+#define ETHERNET_BOARD_LEONARDO_ETH 1
+#define ETHERNET_BOARD_W5X00_MODULE 2
+
+// Select the Ethernet hardware fitted on this node.
+// - ETHERNET_BOARD_LEONARDO_ETH: use the MAC address printed on the Arduino Leonardo ETH sticker.
+// - ETHERNET_BOARD_W5X00_MODULE: use a locally administered MAC address configured below.
+#ifndef ETHERNET_BOARD_TYPE
+#define ETHERNET_BOARD_TYPE ETHERNET_BOARD_LEONARDO_ETH
+#endif
 
 static const bool USE_DHCP = true;
 static const uint8_t DHCP_ATTEMPTS = 5;
 static const unsigned long DHCP_RETRY_DELAY_MS = 1000UL;
 
+#if ETHERNET_BOARD_TYPE == ETHERNET_BOARD_LEONARDO_ETH
 byte MAC_ADDRESS[] = { 0x90, 0xA2, 0xDA, 0x10, 0x5D, 0x5A };
+#elif ETHERNET_BOARD_TYPE == ETHERNET_BOARD_W5X00_MODULE
+byte MAC_ADDRESS[] = { 0x02, 0x56, 0x43, 0x52, 0x44, 0x01 };
+#else
+#error Unsupported ETHERNET_BOARD_TYPE
+#endif
+
 IPAddress STATIC_IP(192, 168, 224, 190);
 IPAddress DNS_SERVER(192, 168, 224, 1);
 IPAddress GATEWAY_IP(192, 168, 224, 1);
 IPAddress SUBNET_MASK(255, 255, 255, 0);
+
+#if ETHERNET_BOARD_TYPE == ETHERNET_BOARD_W5X00_MODULE
+static const uint8_t W5X00_ETH_CS_PIN = 10;
+static const uint8_t W5X00_ETH_RST_PIN = 11;
+static const uint8_t W5X00_SD_CS_PIN = 4;
+
+// Keep this disabled with the older Ethernet library used by the current ModbusTCPSlave setup.
+// Enable only if using an Ethernet/Ethernet2 library version that provides Ethernet.init().
+#ifndef W5X00_USE_ETHERNET_INIT
+#define W5X00_USE_ETHERNET_INIT 0
+#endif
+#endif
 
 static const uint16_t MODBUS_PORT = 502;
 static const uint8_t NODE_ID = 1;
@@ -277,6 +305,27 @@ void startModbusServer()
   modbus.setHoldingRegisters(holdingRegisters, NB_HOLDING_REGISTERS);
 }
 
+void initialiseEthernetHardware()
+{
+#if ETHERNET_BOARD_TYPE == ETHERNET_BOARD_W5X00_MODULE
+  pinMode(W5X00_ETH_CS_PIN, OUTPUT);
+  digitalWrite(W5X00_ETH_CS_PIN, HIGH);
+
+  pinMode(W5X00_SD_CS_PIN, OUTPUT);
+  digitalWrite(W5X00_SD_CS_PIN, HIGH);
+
+  pinMode(W5X00_ETH_RST_PIN, OUTPUT);
+  digitalWrite(W5X00_ETH_RST_PIN, LOW);
+  delay(50);
+  digitalWrite(W5X00_ETH_RST_PIN, HIGH);
+  delay(200);
+
+#if W5X00_USE_ETHERNET_INIT
+  Ethernet.init(W5X00_ETH_CS_PIN);
+#endif
+#endif
+}
+
 void initialiseRegisters()
 {
   for (uint16_t i = 0; i < NB_HOLDING_REGISTERS; ++i)
@@ -298,8 +347,6 @@ void initialiseRegisters()
 
 void setup()
 {
- 
-  
   if (SERIAL_DIAGNOSTICS)
   {
     Serial.begin(SERIAL_BAUD);
@@ -310,6 +357,7 @@ void setup()
   Wire.begin();
 
   initialiseRegisters();
+  initialiseEthernetHardware();
   startModbusServer();
 
   readLocalSensor(localSnapshot);
