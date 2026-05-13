@@ -3,7 +3,7 @@
 
   Hardware:
   - WSEN-PDUS V2 differential pressure sensor on I2C
-  - Arduino Leonardo ETH on Ethernet, or Arduino Leonardo + W5x00 Ethernet module
+  - Arduino Leonardo ETH, Arduino Ethernet, or Arduino Uno/Leonardo + W5x00 Ethernet module
 
   Network role:
   - One node per sensor
@@ -11,11 +11,12 @@
   - SCADA or supervisory software reads sensor values on demand
 
   Notes:
-  - The intended deployment is one Arduino Leonardo ETH per WSEN-PDUS sensor.
+  - The intended deployment is one Ethernet-capable Arduino per WSEN-PDUS sensor.
   - The fixed WSEN-PDUS I2C address (0x78) is not a problem in that topology.
   - Update LOCAL_SENSOR_TYPE to match the exact mounted WSEN-PDUS variant.
 */
 #include <Wire.h>
+#include <SPI.h>
 #include <ModbusTCPSlave.h>
 
 // -------------------------------------------------------------------------------------------------
@@ -24,40 +25,57 @@
 
 #define ETHERNET_BOARD_LEONARDO_ETH 1
 #define ETHERNET_BOARD_W5X00_MODULE 2
+#define ETHERNET_BOARD_ARDUINO_ETHERNET 3
+#define ETHERNET_BOARD_UNO_W5X00 4
+#define ETHERNET_BOARD_ROBOTDYN_LEONARDO_W5500 5
 
 // Select the Ethernet hardware fitted on this node.
 // - ETHERNET_BOARD_LEONARDO_ETH: use the MAC address printed on the Arduino Leonardo ETH sticker.
+// - ETHERNET_BOARD_ARDUINO_ETHERNET: old ATmega328P board with built-in W5100 and EXT PROG.
+// - ETHERNET_BOARD_UNO_W5X00: Arduino Uno with a W5100/W5500 module or shield.
 // - ETHERNET_BOARD_W5X00_MODULE: use a locally administered MAC address configured below.
-#ifndef ETHERNET_BOARD_TYPE
-#define ETHERNET_BOARD_TYPE ETHERNET_BOARD_LEONARDO_ETH
-#endif
+// - ETHERNET_BOARD_ROBOTDYN_LEONARDO_W5500: RobotDyn Leonardo+Ethernet W5500+microSD.
 
+//#define ETHERNET_BOARD_TYPE ETHERNET_BOARD_LEONARDO_ETH
+//#define ETHERNET_BOARD_TYPE ETHERNET_BOARD_W5X00_MODULE
+//#define ETHERNET_BOARD_TYPE ETHERNET_BOARD_ARDUINO_ETHERNET
+//#define ETHERNET_BOARD_TYPE ETHERNET_BOARD_UNO_W5X00
+#define ETHERNET_BOARD_TYPE ETHERNET_BOARD_ROBOTDYN_LEONARDO_W5500
 static const bool USE_DHCP = true;
 static const uint8_t DHCP_ATTEMPTS = 5;
 static const unsigned long DHCP_RETRY_DELAY_MS = 1000UL;
 
-#if ETHERNET_BOARD_TYPE == ETHERNET_BOARD_LEONARDO_ETH
-byte MAC_ADDRESS[] = { 0x90, 0xA2, 0xDA, 0x10, 0x5D, 0x5A };
-#elif ETHERNET_BOARD_TYPE == ETHERNET_BOARD_W5X00_MODULE
-byte MAC_ADDRESS[] = { 0x02, 0x56, 0x43, 0x52, 0x44, 0x01 };
-#else
-#error Unsupported ETHERNET_BOARD_TYPE
-#endif
+//byte MAC_ADDRESS[] = { 0x90, 0xA2, 0xDA, 0x10, 0x5D, 0x5A };   // DELTAP1 MAC use with ETHERNET_BOARD_LEONARDO_ETH (Arduino Leonardo ETH)
+//byte MAC_ADDRESS[] = { 0x02, 0x56, 0x43, 0x52, 0x44, 0x01 };   // DELTAP2 MAC use with ETHERNET_BOARD_W5X00_MODULE (Arduino Leonardo)
+//byte MAC_ADDRESS[] = { 0x02, 0x56, 0x43, 0x52, 0x44, 0x02 };   // DELTAP3 MAC use with ETHERNET_BOARD_W5X00_MODULE (Arduino Leonardo)
+//byte MAC_ADDRESS[] = { 0x90, 0xA2, 0xDA, 0x10, 0x2C, 0x1D };   // DELTAP4 MAC use with ETHERNET_BOARD_UNO_W5X00 (Arduino Ethernet)
+byte MAC_ADDRESS[] = { 0x02, 0x56, 0x43, 0x52, 0x44, 0x03 };   // DELTAP5 MAC use with ETHERNET_BOARD_W5X00_MODULE (Arduino Leonardo)
 
-IPAddress STATIC_IP(192, 168, 224, 190);
+IPAddress STATIC_IP(192, 168, 224, 182);
 IPAddress DNS_SERVER(192, 168, 224, 1);
 IPAddress GATEWAY_IP(192, 168, 224, 1);
 IPAddress SUBNET_MASK(255, 255, 255, 0);
 
-#if ETHERNET_BOARD_TYPE == ETHERNET_BOARD_W5X00_MODULE
+#if ETHERNET_BOARD_TYPE == ETHERNET_BOARD_W5X00_MODULE || ETHERNET_BOARD_TYPE == ETHERNET_BOARD_ARDUINO_ETHERNET || ETHERNET_BOARD_TYPE == ETHERNET_BOARD_UNO_W5X00 || ETHERNET_BOARD_TYPE == ETHERNET_BOARD_ROBOTDYN_LEONARDO_W5500
 static const uint8_t W5X00_ETH_CS_PIN = 10;
-static const uint8_t W5X00_ETH_RST_PIN = 11;
 static const uint8_t W5X00_SD_CS_PIN = 4;
 
-// Keep this disabled with the older Ethernet library used by the current ModbusTCPSlave setup.
-// Enable only if using an Ethernet/Ethernet2 library version that provides Ethernet.init().
+#if ETHERNET_BOARD_TYPE == ETHERNET_BOARD_ROBOTDYN_LEONARDO_W5500
+#define W5X00_HAS_RESET_PIN 1
+#endif
+
+#ifndef W5X00_HAS_RESET_PIN
+#define W5X00_HAS_RESET_PIN 0
+#endif
+
+#if W5X00_HAS_RESET_PIN
+static const uint8_t W5X00_ETH_RST_PIN = 11;
+#endif
+
+// Modern Ethernet library (2.x) and the bundled ModbusTCP both use <Ethernet.h> which
+// provides Ethernet.init(). Override to 0 only if linking against an older library.
 #ifndef W5X00_USE_ETHERNET_INIT
-#define W5X00_USE_ETHERNET_INIT 0
+#define W5X00_USE_ETHERNET_INIT 1
 #endif
 #endif
 
@@ -65,8 +83,10 @@ static const uint16_t MODBUS_PORT = 502;
 static const uint8_t NODE_ID = 1;
 
 static const bool SERIAL_DIAGNOSTICS = true;
-static const unsigned long SERIAL_BAUD = 115200UL;
+static const unsigned long SERIAL_BAUD = 9600UL;
 static const unsigned long LOCAL_SAMPLE_INTERVAL_MS = 500UL;
+static const unsigned long SERIAL_SNAPSHOT_INTERVAL_MS = 5000UL;
+static const uint32_t W5X00_SPI_PROBE_HZ = 1000000UL;
 
 // -------------------------------------------------------------------------------------------------
 // WSEN-PDUS sensor configuration
@@ -140,6 +160,7 @@ ModbusTCPSlave modbus(MODBUS_PORT);
 uint16_t holdingRegisters[NB_HOLDING_REGISTERS];
 SensorSnapshot localSnapshot;
 unsigned long lastLocalSampleMs = 0UL;
+unsigned long lastSnapshotLogMs = 0UL;
 
 void(*resetBoard)(void) = 0;
 
@@ -154,6 +175,152 @@ void logMessage(const __FlashStringHelper *message)
     Serial.println(message);
   }
 }
+
+void logBoardConfiguration()
+{
+  if (!SERIAL_DIAGNOSTICS)
+  {
+    return;
+  }
+
+  Serial.print(F("Ethernet board mode: "));
+#if ETHERNET_BOARD_TYPE == ETHERNET_BOARD_ARDUINO_ETHERNET
+  Serial.println(F("Arduino Ethernet"));
+#elif ETHERNET_BOARD_TYPE == ETHERNET_BOARD_LEONARDO_ETH
+  Serial.println(F("Arduino Leonardo ETH"));
+#elif ETHERNET_BOARD_TYPE == ETHERNET_BOARD_UNO_W5X00
+  Serial.println(F("Arduino Uno + W5x00 module"));
+#elif ETHERNET_BOARD_TYPE == ETHERNET_BOARD_ROBOTDYN_LEONARDO_W5500
+  Serial.println(F("RobotDyn Leonardo + W5500"));
+#elif ETHERNET_BOARD_TYPE == ETHERNET_BOARD_W5X00_MODULE
+  Serial.println(F("W5x00 Ethernet module"));
+#else
+  Serial.println(F("unknown"));
+#endif
+
+  Serial.print(F("Arduino target: "));
+#if defined(ARDUINO_AVR_ETHERNET)
+  Serial.println(F("arduino:avr:ethernet"));
+#elif defined(ARDUINO_AVR_UNO)
+  Serial.println(F("arduino:avr:uno"));
+#elif defined(ARDUINO_AVR_LEONARDO)
+  Serial.println(F("arduino:avr:leonardo"));
+#elif defined(ARDUINO_AVR_LEONARDO_ETH)
+  Serial.println(F("arduino:avr:leonardoeth"));
+#else
+  Serial.println(F("not detected"));
+#endif
+}
+
+void logEthernetStatus()
+{
+  if (!SERIAL_DIAGNOSTICS)
+  {
+    return;
+  }
+
+  Serial.print(F("Ethernet hardware: "));
+  switch (Ethernet.hardwareStatus())
+  {
+    case EthernetNoHardware: Serial.println(F("none detected (SPI/wiring?)")); break;
+    case EthernetW5100:      Serial.println(F("W5100")); break;
+    case EthernetW5200:      Serial.println(F("W5200")); break;
+    case EthernetW5500:      Serial.println(F("W5500")); break;
+    default:                 Serial.println(F("unknown")); break;
+  }
+
+  Serial.print(F("Ethernet link: "));
+  switch (Ethernet.linkStatus())
+  {
+    case LinkON:  Serial.println(F("up")); break;
+    case LinkOFF: Serial.println(F("down (cable?)")); break;
+    case Unknown:
+    default:      Serial.println(F("unknown")); break;
+  }
+}
+
+void logMacAddress()
+{
+  if (!SERIAL_DIAGNOSTICS)
+  {
+    return;
+  }
+
+  Serial.print(F("Ethernet MAC: "));
+  for (uint8_t i = 0; i < 6; ++i)
+  {
+    if (MAC_ADDRESS[i] < 0x10)
+    {
+      Serial.print(F("0"));
+    }
+    Serial.print(MAC_ADDRESS[i], HEX);
+    if (i < 5)
+    {
+      Serial.print(F(":"));
+    }
+  }
+  Serial.println();
+}
+
+void logNetworkAddress(const __FlashStringHelper *label, IPAddress address)
+{
+  if (!SERIAL_DIAGNOSTICS)
+  {
+    return;
+  }
+
+  Serial.print(label);
+  Serial.println(address);
+}
+
+#if ETHERNET_BOARD_TYPE == ETHERNET_BOARD_W5X00_MODULE || ETHERNET_BOARD_TYPE == ETHERNET_BOARD_ARDUINO_ETHERNET || ETHERNET_BOARD_TYPE == ETHERNET_BOARD_UNO_W5X00 || ETHERNET_BOARD_TYPE == ETHERNET_BOARD_ROBOTDYN_LEONARDO_W5500
+uint8_t readW5500VersionRegister(uint8_t csPin)
+{
+  SPI.beginTransaction(SPISettings(W5X00_SPI_PROBE_HZ, MSBFIRST, SPI_MODE0));
+  digitalWrite(csPin, LOW);
+  SPI.transfer(0x00);
+  SPI.transfer(0x39);
+  SPI.transfer(0x00);
+  uint8_t version = SPI.transfer(0x00);
+  digitalWrite(csPin, HIGH);
+  SPI.endTransaction();
+  return version;
+}
+
+void logW5500Probe(uint8_t csPin)
+{
+  if (!SERIAL_DIAGNOSTICS)
+  {
+    return;
+  }
+
+  pinMode(csPin, OUTPUT);
+  digitalWrite(csPin, HIGH);
+
+  Serial.print(F("W5500 VERSIONR probe CS D"));
+  Serial.print(csPin);
+  Serial.print(F(": 0x"));
+  uint8_t version = readW5500VersionRegister(csPin);
+  if (version < 0x10)
+  {
+    Serial.print(F("0"));
+  }
+  Serial.println(version, HEX);
+}
+
+void logW5500ProbeScan()
+{
+  if (!SERIAL_DIAGNOSTICS)
+  {
+    return;
+  }
+
+  logMessage(F("W5500 SPI probe: expected VERSIONR 0x04"));
+  logW5500Probe(W5X00_ETH_CS_PIN);
+  logW5500Probe(8);
+  logW5500Probe(SS);
+}
+#endif
 
 void logSnapshot(const SensorSnapshot &snapshot)
 {
@@ -275,17 +442,31 @@ void startModbusServer()
 {
   bool networkReady = false;
 
+  logMacAddress();
+#if ETHERNET_BOARD_TYPE == ETHERNET_BOARD_W5X00_MODULE || ETHERNET_BOARD_TYPE == ETHERNET_BOARD_ARDUINO_ETHERNET || ETHERNET_BOARD_TYPE == ETHERNET_BOARD_UNO_W5X00 || ETHERNET_BOARD_TYPE == ETHERNET_BOARD_ROBOTDYN_LEONARDO_W5500
+  logW5500ProbeScan();
+#endif
+
   if (USE_DHCP)
   {
     logMessage(F("Trying DHCP"));
     for (uint8_t attempt = 0; attempt < DHCP_ATTEMPTS && !networkReady; ++attempt)
     {
+      if (SERIAL_DIAGNOSTICS)
+      {
+        Serial.print(F("DHCP attempt "));
+        Serial.println(attempt + 1);
+      }
       networkReady = Ethernet.begin(MAC_ADDRESS) != 0;
       if (!networkReady)
       {
         logMessage(F("DHCP attempt failed"));
         delay(DHCP_RETRY_DELAY_MS);
       }
+    }
+    if (networkReady)
+    {
+      logMessage(F("DHCP succeeded"));
     }
     if (!networkReady)
     {
@@ -301,29 +482,49 @@ void startModbusServer()
 
   delay(1000);
 
+  logEthernetStatus();
+#if ETHERNET_BOARD_TYPE == ETHERNET_BOARD_W5X00_MODULE || ETHERNET_BOARD_TYPE == ETHERNET_BOARD_ARDUINO_ETHERNET || ETHERNET_BOARD_TYPE == ETHERNET_BOARD_UNO_W5X00 || ETHERNET_BOARD_TYPE == ETHERNET_BOARD_ROBOTDYN_LEONARDO_W5500
+  if (Ethernet.hardwareStatus() == EthernetNoHardware)
+  {
+    logW5500ProbeScan();
+  }
+#endif
+  logNetworkAddress(F("IP: "), Ethernet.localIP());
+  logNetworkAddress(F("Gateway: "), Ethernet.gatewayIP());
+  logNetworkAddress(F("Subnet: "), Ethernet.subnetMask());
+
   modbus.begin();
   modbus.setHoldingRegisters(holdingRegisters, NB_HOLDING_REGISTERS);
 }
 
 void initialiseEthernetHardware()
 {
-#if ETHERNET_BOARD_TYPE == ETHERNET_BOARD_W5X00_MODULE
+  logMessage(F("Initialising Ethernet hardware"));
+
+#if ETHERNET_BOARD_TYPE == ETHERNET_BOARD_W5X00_MODULE || ETHERNET_BOARD_TYPE == ETHERNET_BOARD_ARDUINO_ETHERNET || ETHERNET_BOARD_TYPE == ETHERNET_BOARD_UNO_W5X00 || ETHERNET_BOARD_TYPE == ETHERNET_BOARD_ROBOTDYN_LEONARDO_W5500
+  pinMode(SS, OUTPUT);
+  digitalWrite(SS, HIGH);
+
   pinMode(W5X00_ETH_CS_PIN, OUTPUT);
   digitalWrite(W5X00_ETH_CS_PIN, HIGH);
 
   pinMode(W5X00_SD_CS_PIN, OUTPUT);
   digitalWrite(W5X00_SD_CS_PIN, HIGH);
 
+#if W5X00_HAS_RESET_PIN
   pinMode(W5X00_ETH_RST_PIN, OUTPUT);
-  digitalWrite(W5X00_ETH_RST_PIN, LOW);
-  delay(50);
   digitalWrite(W5X00_ETH_RST_PIN, HIGH);
   delay(200);
+#endif
+
+  SPI.begin();
 
 #if W5X00_USE_ETHERNET_INIT
   Ethernet.init(W5X00_ETH_CS_PIN);
 #endif
 #endif
+
+  logMessage(F("Ethernet hardware ready"));
 }
 
 void initialiseRegisters()
@@ -352,14 +553,22 @@ void setup()
     Serial.begin(SERIAL_BAUD);
     delay(300);
     logMessage(F("VirgoCleanRoomDeltaP boot"));
+    logBoardConfiguration();
+    logMessage(F("Serial diagnostics ready"));
   }
 
+  logMessage(F("Starting I2C"));
   Wire.begin();
+  logMessage(F("I2C ready"));
 
   initialiseRegisters();
+  logMessage(F("Registers ready"));
   initialiseEthernetHardware();
+  logMessage(F("Starting Modbus TCP"));
   startModbusServer();
+  logMessage(F("Modbus TCP ready"));
 
+  logMessage(F("Reading local sensor"));
   readLocalSensor(localSnapshot);
   publishLocalSnapshot();
   logSnapshot(localSnapshot);
@@ -383,7 +592,11 @@ void loop()
     lastLocalSampleMs = now;
     readLocalSensor(localSnapshot);
     publishLocalSnapshot();
-    logSnapshot(localSnapshot);
+    if ((now - lastSnapshotLogMs) >= SERIAL_SNAPSHOT_INTERVAL_MS)
+    {
+      lastSnapshotLogMs = now;
+      logSnapshot(localSnapshot);
+    }
   }
 
   holdingRegisters[REG_SAMPLE_AGE_S] =

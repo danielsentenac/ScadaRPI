@@ -27,8 +27,8 @@ IPAddress ip( 192, 168, 224, 174 ); // Arduino-14 has this IP
 uint8_t mac[] = { 0x90, 0xA2, 0xDA, 0x10, 0x5C, 0xED };
 IPAddress ip( 192, 168, 224, 175 ); // Arduino-15 has this IP
 */
-uint8_t mac[] = { 0x90, 0xA2, 0xDA, 0x10, 0x60, 0x4D };
-IPAddress ip( 192, 168, 224, 177 ); // Arduino-17 has this IP
+//uint8_t mac[] = { 0x90, 0xA2, 0xDA, 0x10, 0x60, 0x4D };
+//IPAddress ip( 192, 168, 224, 177 ); // Arduino-17 has this IP
 /*
 uint8_t mac[] = { 0x90, 0xA2, 0xDA, 0x10, 0x60, 0x2C };
 IPAddress ip( 192, 168, 224, 178 ); // Arduino-18 has this IP
