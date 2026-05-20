@@ -46,10 +46,10 @@ static const uint8_t DHCP_ATTEMPTS = 5;
 static const unsigned long DHCP_RETRY_DELAY_MS = 1000UL;
 
 //byte MAC_ADDRESS[] = { 0x90, 0xA2, 0xDA, 0x10, 0x5D, 0x5A };   // DELTAP1 MAC use with ETHERNET_BOARD_LEONARDO_ETH (Arduino Leonardo ETH)
-//byte MAC_ADDRESS[] = { 0x02, 0x56, 0x43, 0x52, 0x44, 0x01 };   // DELTAP2 MAC use with ETHERNET_BOARD_W5X00_MODULE (Arduino Leonardo)
+byte MAC_ADDRESS[] = { 0x02, 0x56, 0x43, 0x52, 0x44, 0x01 };   // DELTAP2 MAC use with ETHERNET_BOARD_W5X00_MODULE (Arduino Leonardo)
 //byte MAC_ADDRESS[] = { 0x02, 0x56, 0x43, 0x52, 0x44, 0x02 };   // DELTAP3 MAC use with ETHERNET_BOARD_W5X00_MODULE (Arduino Leonardo)
 //byte MAC_ADDRESS[] = { 0x90, 0xA2, 0xDA, 0x10, 0x2C, 0x1D };   // DELTAP4 MAC use with ETHERNET_BOARD_UNO_W5X00 (Arduino Ethernet)
-byte MAC_ADDRESS[] = { 0x02, 0x56, 0x43, 0x52, 0x44, 0x03 };   // DELTAP5 MAC use with ETHERNET_BOARD_W5X00_MODULE (Arduino Leonardo)
+//byte MAC_ADDRESS[] = { 0x02, 0x56, 0x43, 0x52, 0x44, 0x03 };   // DELTAP5 MAC use with ETHERNET_BOARD_W5X00_MODULE (Arduino Leonardo)
 
 IPAddress STATIC_IP(192, 168, 224, 182);
 IPAddress DNS_SERVER(192, 168, 224, 1);
@@ -161,6 +161,8 @@ uint16_t holdingRegisters[NB_HOLDING_REGISTERS];
 SensorSnapshot localSnapshot;
 unsigned long lastLocalSampleMs = 0UL;
 unsigned long lastSnapshotLogMs = 0UL;
+uint32_t lastReportedRequestCount = 0UL;
+uint32_t lastReportedConnectionCount = 0UL;
 
 void(*resetBoard)(void) = 0;
 
@@ -438,6 +440,60 @@ void publishLocalSnapshot()
   holdingRegisters[REG_MAP_VERSION] = MAP_VERSION;
 }
 
+void logModbusActivity()
+{
+  if (!SERIAL_DIAGNOSTICS)
+  {
+    return;
+  }
+
+  uint32_t connCount = modbus.getConnectionCount();
+  if (connCount != lastReportedConnectionCount)
+  {
+    uint32_t newConnections = connCount - lastReportedConnectionCount;
+    lastReportedConnectionCount = connCount;
+
+    Serial.print(F("Modbus: TCP client accepted from "));
+    Serial.print(modbus.getLastMasterIP());
+    Serial.print(F(" (+"));
+    Serial.print(newConnections);
+    Serial.print(F(", total="));
+    Serial.print(connCount);
+    Serial.println(F(")"));
+  }
+
+  uint32_t currentCount = modbus.getRequestCount();
+  if (currentCount == lastReportedRequestCount)
+  {
+    return;
+  }
+
+  uint32_t newResponses = currentCount - lastReportedRequestCount;
+  lastReportedRequestCount = currentCount;
+
+  Serial.print(F("Modbus -> Master: served "));
+  Serial.print(newResponses);
+  Serial.print(F(" request(s), total="));
+  Serial.print(currentCount);
+  Serial.print(F(", masterIP="));
+  Serial.print(modbus.getLastMasterIP());
+  Serial.print(F(", regs[P_lo,P_hi,T_lo,T_hi,rawP,rawT,status]=["));
+  Serial.print(holdingRegisters[REG_PRESSURE_LO]);
+  Serial.print(F(","));
+  Serial.print(holdingRegisters[REG_PRESSURE_HI]);
+  Serial.print(F(","));
+  Serial.print(holdingRegisters[REG_TEMPERATURE_LO]);
+  Serial.print(F(","));
+  Serial.print(holdingRegisters[REG_TEMPERATURE_HI]);
+  Serial.print(F(","));
+  Serial.print(holdingRegisters[REG_RAW_PRESSURE]);
+  Serial.print(F(","));
+  Serial.print(holdingRegisters[REG_RAW_TEMPERATURE]);
+  Serial.print(F(",0x"));
+  Serial.print(holdingRegisters[REG_STATUS], HEX);
+  Serial.println(F("]"));
+}
+
 void startModbusServer()
 {
   bool networkReady = false;
@@ -585,6 +641,7 @@ void loop()
 {
   Ethernet.maintain();
   modbus.update();
+  logModbusActivity();
 
   unsigned long now = millis();
   if ((now - lastLocalSampleMs) >= LOCAL_SAMPLE_INTERVAL_MS)
