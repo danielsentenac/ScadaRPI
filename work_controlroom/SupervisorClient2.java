@@ -131,7 +131,6 @@ public class SupervisorClient2 extends Device implements ChannelList {
         oos.writeObject(svrNameList);
         oos.flush();
         oos.close();
-        con.disconnect();
         logger.finer("SupervisorClient2:updateDeviceData> request supervisor: " + svrNameList);
 
         // receive result from servlet
@@ -140,7 +139,7 @@ public class SupervisorClient2 extends Device implements ChannelList {
         svrValueList = (Vector <String>) inputFromServlet.readObject();
         inputFromServlet.close();
         instr.close();
-       
+        con.disconnect();
 
         logger.finer("SupervisorClient2:updateDeviceData> receive from supervisor: " + svrValueList);
         

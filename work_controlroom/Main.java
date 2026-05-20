@@ -18,6 +18,8 @@ import java.awt.GraphicsEnvironment;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
 
+import java.net.CookieManager;
+import java.net.CookieHandler;
 
 public class Main {
 
@@ -28,6 +30,10 @@ public class Main {
                         PlatformAlreadyAssignedException,
                         IOException,
                         UnsupportedBusNumberException {
+
+         // Share a single JSESSIONID across every ViewData thread spawned by GlgGui.
+         // Without this, each per-second poll creates a fresh Tomcat session.
+         CookieHandler.setDefault(new CookieManager());
 
          logger.setLevel(Level.FINE);
 
