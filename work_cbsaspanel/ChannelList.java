@@ -414,7 +414,7 @@ put(255,"-");
 Hashtable<Integer,GlgPoint> PCounterColorSTATUS = new Hashtable<Integer, GlgPoint>(){
 
 private static final long serialVersionUID = 354054054062L;
-{ 
+{
 put(0,new GlgPoint(1.,0.7,0.3));
 put(1,new  GlgPoint(1.,0.5,0.));
 put(2,new GlgPoint(1.,0.,0.));
@@ -422,6 +422,88 @@ put(3,new GlgPoint(1.,0.7,0.5));
 put(4,new GlgPoint(1.,0.7,0.));
 put(5,new GlgPoint(1.,0.7,0.2));
 put(6,new GlgPoint(0.,1.,0.));
+put(255,new GlgPoint(0.5,0.5,0.5));
+}};
+
+//
+// PCounterMOB Instrument status (Device Status, reg 5001, U16 bitmask)
+//   bit0 0x01 Flow Error
+//   bit1 0x02 Laser Error
+//   bit2 0x04 Time of day clock not running
+//   bit3 0x08 Internal Data Error
+// Highest-priority bit is reported (Data > Clock > Laser > Flow).
+//
+Hashtable<Integer, String> PCounterMOBINSTRSTATUS = new Hashtable<Integer, String>(){
+
+private static final long serialVersionUID = 354054054260L;
+{
+put(0,"OK");
+put(1,"Flow Err");
+put(2,"Laser Err");
+put(3,"Laser Err");
+put(4,"Clock Err");
+put(5,"Clock Err");
+put(6,"Clock Err");
+put(7,"Clock Err");
+put(8,"Int. Data Err");
+put(9,"Int. Data Err");
+put(10,"Int. Data Err");
+put(11,"Int. Data Err");
+put(12,"Int. Data Err");
+put(13,"Int. Data Err");
+put(14,"Int. Data Err");
+put(15,"Int. Data Err");
+put(255,"-");
+}};
+
+
+Hashtable<Integer,GlgPoint> PCounterMOBColorINSTRSTATUS = new Hashtable<Integer, GlgPoint>(){
+
+private static final long serialVersionUID = 354054054262L;
+{
+put(0,new GlgPoint(0.,1.,0.));
+put(1,new GlgPoint(1.,0.,0.));
+put(2,new GlgPoint(1.,0.,0.));
+put(3,new GlgPoint(1.,0.,0.));
+put(4,new GlgPoint(1.,0.,0.));
+put(5,new GlgPoint(1.,0.,0.));
+put(6,new GlgPoint(1.,0.,0.));
+put(7,new GlgPoint(1.,0.,0.));
+put(8,new GlgPoint(1.,0.,0.));
+put(9,new GlgPoint(1.,0.,0.));
+put(10,new GlgPoint(1.,0.,0.));
+put(11,new GlgPoint(1.,0.,0.));
+put(12,new GlgPoint(1.,0.,0.));
+put(13,new GlgPoint(1.,0.,0.));
+put(14,new GlgPoint(1.,0.,0.));
+put(15,new GlgPoint(1.,0.,0.));
+put(255,new GlgPoint(0.5,0.5,0.5));
+}};
+
+//
+// PCounterMOB sampling status (Start/Stop Sampling, reg 5000, U16 read state)
+//   0 = Stopped, 1 = Delay, 2 = Counting, 3 = Hold
+//
+Hashtable<Integer, String> PCounterMOBSTATUS = new Hashtable<Integer, String>(){
+
+private static final long serialVersionUID = 354054054360L;
+{
+put(0,"Stopped");
+put(1,"Delay");
+put(2,"Counting");
+put(3,"Hold");
+put(255,"-");
+}};
+
+
+Hashtable<Integer,GlgPoint> PCounterMOBColorSTATUS = new Hashtable<Integer, GlgPoint>(){
+
+private static final long serialVersionUID = 354054054362L;
+{
+put(0,new GlgPoint(1.,0.,0.));
+put(1,new GlgPoint(1.,0.5,0.));
+put(2,new GlgPoint(0.,1.,0.));
+put(3,new GlgPoint(1.,0.7,0.));
 put(255,new GlgPoint(0.5,0.5,0.5));
 }};
 

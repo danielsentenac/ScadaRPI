@@ -141,7 +141,7 @@ public class SupervisorClient2 extends Device {
         oos.flush();
         oos.close();
 
-        logger.fine("SupervisorClient:updateDeviceData> request supervisor: " + svrNameList);
+        logger.finer("SupervisorClient2:updateDeviceData> request supervisor: " + svrNameList);
 
         // receive result from servlet
         InputStream instr = con.getInputStream();
@@ -151,7 +151,7 @@ public class SupervisorClient2 extends Device {
         instr.close();
         con.disconnect();
         
-        logger.fine("SupervisorClient:updateDeviceData> receive from supervisor: " + svrValueList);
+        logger.finer("SupervisorClient2:updateDeviceData> receive from supervisor: " + svrValueList);
         
         
         // Fill svrNameList vector
@@ -260,14 +260,14 @@ public class SupervisorClient2 extends Device {
         
         if ( hasWarned == true ) {
            hasWarned = false;
-           logger.info("SupervisorClient:updateDeviceData> Communication with " + name + " back!");
+           logger.info("SupervisorClient2:updateDeviceData> Communication with " + name + " back!");
         }
      }
      catch (Exception ex) {
         ex.printStackTrace();
         if ( hasWarned == false ) {
-           logger.log(Level.WARNING, "SupervisorClient:updateDeviceData> Communication with " + name + " interrupted");
-           logger.log(Level.SEVERE, "SupervisorClient:updateDeviceData>" + ex.getMessage());
+           logger.log(Level.WARNING, "SupervisorClient2:updateDeviceData> Communication with " + name + " interrupted");
+           logger.log(Level.SEVERE, "SupervisorClient2:updateDeviceData>" + ex.getMessage());
         }
         setErrorComStatus();
      }

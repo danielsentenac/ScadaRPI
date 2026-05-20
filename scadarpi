@@ -289,7 +289,7 @@ compile_work() {
   printf '[compile] %s\n' "$work"
   (
     cd "$work_dir"
-    find . -type f -name '*.class' -delete
+    find . -type f -name '*.class' ! -path './com/gluonapplication/*' -delete
     "$javac_cmd" "${javac_opts[@]}" -classpath ".:../lib/*" -d . *.java
   )
 }

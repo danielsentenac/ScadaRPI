@@ -54,7 +54,7 @@ public class Main {
 
          try {
              // create an appending file handler
-             FileHandler fileHandler = new FileHandler("NEPANEL_" + LocalDate.now() + ".log");
+             FileHandler fileHandler = new FileHandler("WEPANEL_" + LocalDate.now() + ".log");
              fileHandler.setFormatter(new SimpleFormatter() {
                 private static final String format = "[%1$tF %1$tT] [%2$-7s] %3$s %n";
                 @Override

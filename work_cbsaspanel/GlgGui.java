@@ -44,17 +44,13 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
     private JComponent jfxPanel1;
     private JComponent jfxPanel2;
     private JComponent jfxPanel3;
-    private Object engine1;
-    private Object engine2;
+    private JComponent jfxPanel4;
     private JPanel panelweb = new JPanel();
     private JPanel panelvac = new JPanel();
     private GlgJLWBean glg_bean1;
     private GlgJLWBean glg_bean2;
     public Hashtable<String, GlgChildGui> subwindows;
     public boolean isSuspended = false;
-    private long pageTime = 100000;
-    private long lastTime = 0;
-    private boolean isVimLoaded = true;
     private boolean javaFxEnabled = detectJavaFxAvailability();
     // O2 variables
     private SimpleDateFormat formatter = new SimpleDateFormat("EEE, dd-MMM-yyyy HH:mm:ss");
@@ -123,6 +119,51 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
        return placeholder;
     }
 
+    private JComponent wrapWithTitle(JComponent content, String titleText) {
+       return wrapWithTitle(content, titleText, 0);
+    }
+
+    private JComponent wrapWithTitle(final JComponent content, String titleText, final int contentTopCrop) {
+       JLabel title = new JLabel(titleText, SwingConstants.CENTER);
+       title.setOpaque(true);
+       title.setBackground(new Color(0x0e, 0x17, 0x26));
+       title.setForeground(Color.CYAN);
+       title.setFont(new java.awt.Font("System", java.awt.Font.PLAIN, 24));
+       title.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
+       title.setPreferredSize(new java.awt.Dimension(0, 42));
+
+       JComponent contentArea;
+       if (contentTopCrop > 0) {
+          final JPanel cropPanel = new JPanel(null);
+          cropPanel.setOpaque(false);
+          cropPanel.add(content);
+          cropPanel.addComponentListener(new java.awt.event.ComponentAdapter() {
+             @Override
+             public void componentResized(java.awt.event.ComponentEvent e) {
+                content.setBounds(0, -contentTopCrop, cropPanel.getWidth(), cropPanel.getHeight() + contentTopCrop);
+             }
+          });
+          contentArea = cropPanel;
+       }
+       else {
+          JPanel pass = new JPanel(new java.awt.BorderLayout());
+          pass.setOpaque(false);
+          pass.add(content, java.awt.BorderLayout.CENTER);
+          contentArea = pass;
+       }
+
+       JPanel contentWrapper = new JPanel(new java.awt.BorderLayout());
+       contentWrapper.setBackground(new Color(0x0f, 0x1a, 0x30));
+       contentWrapper.setBorder(BorderFactory.createLineBorder(Color.CYAN, 2));
+       contentWrapper.add(contentArea, java.awt.BorderLayout.CENTER);
+
+       JPanel wrapper = new JPanel(new java.awt.BorderLayout(0, 0));
+       wrapper.setBackground(Color.black);
+       wrapper.add(title, java.awt.BorderLayout.NORTH);
+       wrapper.add(contentWrapper, java.awt.BorderLayout.CENTER);
+       return wrapper;
+    }
+
     private void runOnFxThread(Runnable task) {
        if (!javaFxEnabled) {
           return;
@@ -150,34 +191,6 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
        }
        Class<?> sceneClass = Class.forName("javafx.scene.Scene");
        panel.getClass().getMethod("setScene", sceneClass).invoke(panel, scene);
-    }
-
-    private Object createWebEngine(JComponent panel) throws ReflectiveOperationException {
-       Object view = Class.forName("javafx.scene.web.WebView").getDeclaredConstructor().newInstance();
-       Method setZoom = view.getClass().getMethod("setZoom", double.class);
-       setZoom.invoke(view, 0.10d);
-       Method setFontScale = view.getClass().getMethod("setFontScale", double.class);
-       setFontScale.invoke(view, 7.0d);
-       Object engine = view.getClass().getMethod("getEngine").invoke(view);
-       setFxScene(panel, createFxScene(view));
-       return engine;
-    }
-
-    private void loadUrl(final Object engine, final String url) {
-       if (!javaFxEnabled || engine == null) {
-          return;
-       }
-       runOnFxThread(new Runnable() {
-          @Override
-          public void run() {
-             try {
-                engine.getClass().getMethod("load", String.class).invoke(engine, url);
-             }
-             catch (ReflectiveOperationException | LinkageError ex) {
-                logger.log(Level.WARNING, "GlgGui:loadUrl> Unable to load " + url, ex);
-             }
-          }
-       });
     }
 
     private void createAndShowGui () {
@@ -208,29 +221,30 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
           
           
           
-          // Add DMS & VIM
+          // Vac supervisor must be initialized first because initWebComponents()
+          // places jfxPanel3 (created by initVacComponents) in the top row.
+          initVacComponents();
+
+          // Top-row JavaFX panels (O2, Safety, Vac, Legend)
           initWebComponents();
           
-          // Add Vac supervisor
-          initVacComponents();
-          
           // Add component to a frame
-          panel.add(glg_bean1, new GridBagConstraints(0, 1, 1, 1, 1.1, 1.0
+          panel.add(wrapWithTitle(glg_bean1, "PARTICLE MONITORING CEB", 30), new GridBagConstraints(0, 1, 1, 1, 1.5, 0.7
 						     , GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						     new Insets(1, 1, 1, 1), 0, 0));
-          panel.add(glg_bean2, new GridBagConstraints(1, 1, 1, 1, 0.4, 0.5
+          panel.add(wrapWithTitle(glg_bean2, "PARTICLE MONITORING MOBILE", 30), new GridBagConstraints(1, 1, 1, 1, 0.7, 0.7
 						     , GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						     new Insets(1, 1, 1, 1), 0, 0));
-	  panel.add(jfxPanel3, new GridBagConstraints(2, 1, 1, 1, 0.55, 0.5
+	  panel.add(jfxPanel4, new GridBagConstraints(2, 1, 1, 1, 0.1,0.7
 						     , GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						     new Insets(1, 1, 1, 1), 0, 0));
-          panel.add(panelweb, new GridBagConstraints(0, 0, 3, 1, 0.95, 0.95
+          panel.add(panelweb, new GridBagConstraints(0, 0, 3, 1, 1.0, 1.1
 						     , GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						     new Insets(1, 1, 1, 1), 0, 0));	
 	  			     
           
-          glg_bean1.SetSTag("title", "PARTICLE MONITORING CEB", true);
-          glg_bean2.SetSTag("title", "PARTICLE MONITORING MOBILE", true);
+          glg_bean1.SetSTag("title", "", true);
+          glg_bean2.SetSTag("title", "", true);
           
           glg_bean1.SetSTag("pcounter1", "Injection L.", true);
           glg_bean1.SetSTag("pcounter2", "Baseroom C.", true);
@@ -247,24 +261,27 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
           
           // Start thread
           this.doStart();
-          
-          // Init Time
-          lastTime = System.currentTimeMillis();
        }
        catch (Exception ex) {
-          logger.log(Level.SEVERE, "GlgGui:createAndShowGui> " + ex.getMessage());
+          logger.log(Level.SEVERE, "GlgGui:createAndShowGui> " + ex);
+          ex.printStackTrace();
        }
     }
     private void initWebComponents() {
-        jfxPanel1 = createEmbeddedPanel("DMS view unavailable (JavaFX missing)");
-        jfxPanel2 = createEmbeddedPanel("VIM view unavailable (JavaFX missing)");
-        createWebScene();
-        panelweb.add(jfxPanel1, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0
+        jfxPanel1 = createEmbeddedPanel("CB O₂ sensor panel unavailable (JavaFX missing)");
+        jfxPanel2 = createEmbeddedPanel("CB safety panel unavailable (JavaFX missing)");
+        jfxPanel4 = createEmbeddedPanel("LEGEND unavailable (JavaFX missing)");
+        createSensorO2Scene();
+        createSafetyScene();
+        panelweb.add(jfxPanel1, new GridBagConstraints(0, 0, 1, 1, 0.8, 1.0
 						     , GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						     new Insets(1, 1, 1, 1), 0, 0));	
-        panelweb.add(jfxPanel2, new GridBagConstraints(1, 0, 1, 1, 0.7, 0.7
+						     new Insets(1, 1, 1, 1), 0, 0));
+        panelweb.add(jfxPanel2, new GridBagConstraints(1, 0, 1, 1, 0.8, 1.0
 						     , GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						     new Insets(1, 1, 1, 1), 0, 0));	
+						     new Insets(1, 1, 1, 1), 0, 0));
+        panelweb.add(jfxPanel3, new GridBagConstraints(2, 0, 1, 1, 1.0, 1.0
+						     , GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						     new Insets(1, 1, 1, 1), 0, 0));
     }
     
     private void initVacComponents() {
@@ -283,10 +300,21 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
                  Object global = Class.forName("com.gluonapplication.ViewGlobal")
                          .getDeclaredConstructor(String.class, String.class)
                          .newInstance("GLOBAL", "GLOBAL");
+                 // Force the run() loop to always call updateViewData(): the
+                 // bytecode sets isStarted=false inside updateViewData, after
+                 // which the (isSuspended && isStarted) gate would skip the
+                 // refresh on every subsequent tick. Clearing isSuspended
+                 // bypasses that gate (same trick work_controlroom uses).
+                 global.getClass().getField("isSuspended").setBoolean(global, false);
                  if (global instanceof Runnable) {
                     new Thread((Runnable) global).start();
                  }
-                 setFxScene(jfxPanel3, createFxScene(global));
+                 Class<?> paneClass = Class.forName("javafx.scene.layout.Pane");
+                 Class<?> sceneClass = Class.forName("javafx.scene.Scene");
+                 Object scene = Class.forName("CbsaspanelFx")
+                         .getMethod("buildVacScene", paneClass)
+                         .invoke(null, global);
+                 jfxPanel3.getClass().getMethod("setScene", sceneClass).invoke(jfxPanel3, scene);
               }
               catch (ReflectiveOperationException | LinkageError ex) {
                  logger.log(Level.WARNING, "GlgGui:createVacScene> Unable to start vacuum supervisor view", ex);
@@ -294,7 +322,7 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
            }
         });
     }
-    private void createWebScene() {
+    private void createSensorO2Scene() {
         if (!javaFxEnabled) {
            return;
         }
@@ -302,25 +330,61 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
            @Override
            public void run() {
               try {
-                 engine1 = createWebEngine(jfxPanel1);
-                 engine2 = createWebEngine(jfxPanel2);
+                 Object o2 = Class.forName("com.gluonapplication.SidePopupViewSensorO2")
+                         .getDeclaredConstructor(String.class, String.class)
+                         .newInstance("SENSORO2", "SENSORO2");
+                 o2.getClass().getField("isSuspended").setBoolean(o2, false);
+                 if (o2 instanceof Runnable) {
+                    new Thread((Runnable) o2).start();
+                 }
+                 Object pane = o2.getClass().getField("pane").get(o2);
+                 Class<?> paneClass = Class.forName("javafx.scene.layout.Pane");
+                 Class<?> sceneClass = Class.forName("javafx.scene.Scene");
+                 Object scene = Class.forName("CbsaspanelFx")
+                         .getMethod("buildO2Scene", paneClass)
+                         .invoke(null, pane);
+                 jfxPanel1.getClass().getMethod("setScene", sceneClass).invoke(jfxPanel1, scene);
               }
               catch (ReflectiveOperationException | LinkageError ex) {
-                 engine1 = null;
-                 engine2 = null;
-                 logger.log(Level.WARNING, "GlgGui:createWebScene> Unable to start embedded web views", ex);
+                 logger.log(Level.WARNING, "GlgGui:createSensorO2Scene> Unable to start CB O2 sensor panel", ex);
               }
            }
         });
     }
-    public void loadURL1() {
-        loadUrl(engine1, "https://dms.virgo-gw.eu/");
-    }
-    
-    public void loadURL2() {
-        loadUrl(engine2, "https://vim.virgo-gw.eu/");
-    }
+    private void createSafetyScene() {
+        if (!javaFxEnabled) {
+           return;
+        }
+        runOnFxThread(new Runnable() {
+           @Override
+           public void run() {
+              try {
+                 Object safetyCB = Class.forName("com.gluonapplication.ViewSafetyFlags")
+                         .getDeclaredConstructor(String.class, String.class)
+                         .newInstance("CBSAFETYFLAGS", "SafetyFlagsCB");
+                 safetyCB.getClass().getField("isSuspended").setBoolean(safetyCB, false);
+                 if (safetyCB instanceof Runnable) {
+                    new Thread((Runnable) safetyCB).start();
+                 }
+                 Class<?> loaderClass = Class.forName("javafx.fxml.FXMLLoader");
+                 Object loader = loaderClass.getConstructor(URL.class)
+                         .newInstance(getClass().getResource("/SAFETYFLAGSLEGEND.fxml"));
+                 Object legend = loaderClass.getMethod("load").invoke(loader);
 
+                 Class<?> paneClass = Class.forName("javafx.scene.layout.Pane");
+                 Class<?> sceneClass = Class.forName("javafx.scene.Scene");
+                 Class<?> fxBuilder = Class.forName("CbsaspanelFx");
+                 Object safetyScene = fxBuilder.getMethod("buildSafetyScene", paneClass).invoke(null, safetyCB);
+                 jfxPanel2.getClass().getMethod("setScene", sceneClass).invoke(jfxPanel2, safetyScene);
+                 Object legendScene = fxBuilder.getMethod("buildLegendScene", paneClass).invoke(null, legend);
+                 jfxPanel4.getClass().getMethod("setScene", sceneClass).invoke(jfxPanel4, legendScene);
+              }
+              catch (ReflectiveOperationException | LinkageError ex) {
+                 logger.log(Level.WARNING, "GlgGui:createSafetyScene> Unable to start CB safety panel", ex);
+              }
+           }
+        });
+    }
     public void exitProgram() {
        System.exit(0);
     }
@@ -421,13 +485,13 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
                glgNameTmp = glgNameTmp.replace(pcounterName,""); // Remove device name in glgNameTmp String
                if (!glgName.contains("sub")) {
                   if ( glgName.contains("Status") && !glgName.contains("Instr") && glgName.contains("Col") )// Col is a tag for object status (short type) color property
-                     glg_bean2.SetGTag(glgName, PCounterColorSTATUS.get((int)dataElement.value), true);
+                     glg_bean2.SetGTag(glgName, PCounterMOBColorSTATUS.get((int)dataElement.value), true);
                   if ( glgName.contains("Status") && !glgName.contains("Instr") && glgName.contains("Str") )  // Str is a tag for object status (short type) string property
-                     glg_bean2.SetSTag(glgName, "Count: " + PCounterSTATUS.get((int)dataElement.value), true);     
+                     glg_bean2.SetSTag(glgName, "Count: " + PCounterMOBSTATUS.get((int)dataElement.value), true);
                   if ( glgName.contains("InstrStatus") && glgName.contains("Col") )// Col is a tag for object status (short type) color property
-                     glg_bean2.SetGTag(glgName, PCounterColorINSTRSTATUS.get((int)dataElement.value), true);
+                     glg_bean2.SetGTag(glgName, PCounterMOBColorINSTRSTATUS.get((int)dataElement.value), true);
                   if ( glgName.contains("InstrStatus") && glgName.contains("Str") )  // Str is a tag for object status (short type) string property
-                     glg_bean2.SetSTag(glgName, "Status: " + PCounterINSTRSTATUS.get((int)dataElement.value), true);
+                     glg_bean2.SetSTag(glgName, "Status: " + PCounterMOBINSTRSTATUS.get((int)dataElement.value), true);
                   if ( glgName.contains("Sampling") && glgName.contains("Str") )  // Str is a tag for object status (short type) string property
                      glg_bean2.SetSTag(glgName, glgNameTmp.replace("Sampling","Sample") + ":" + (int) dataElement.value + "s", true);
                   if ( glgName.contains("Holding") && glgName.contains("Str") )  // Str is a tag for object status (short type) string property
@@ -457,8 +521,6 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
     public void run () {
        
        try {
-          loadURL1();
-          loadURL2();
           while (true) {
 	     // Get rid of GlgLogic popup window
 	     Frame[] frames = Frame.getFrames();
@@ -479,13 +541,6 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
                       // Update Bean
                       glg_bean2.validate();
                       glg_bean2.repaint();
-                   // Reload page periodically
-                      if ( System.currentTimeMillis() > pageTime + lastTime) {
-                         lastTime = System.currentTimeMillis();
-                         // Load web page
-                         loadURL1();
-                         loadURL2();
-                      }                 
                    }
                 });
              }

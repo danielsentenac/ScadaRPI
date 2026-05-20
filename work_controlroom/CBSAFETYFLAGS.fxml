@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.effect.InnerShadow?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.shape.SVGPath?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane maxHeight="1.7976931348623157E308" prefHeight="482.0" prefWidth="540.0" style="-fx-background-color: #21304F;" stylesheets="@GLOBAL.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gluonapplication.ControllerSafetyGlobal">
+   <children>
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="27.0" layoutX="209.0" layoutY="215.0" stroke="#efff21" strokeType="INSIDE" width="41.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="27.0" layoutX="370.0" layoutY="437.0" stroke="#ff1f1f" strokeType="INSIDE" width="41.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="27.0" layoutX="220.0" layoutY="165.0" stroke="#efff21" strokeType="INSIDE" width="41.0" />
+      <Label fx:id="TUBEMC" alignment="CENTER" contentDisplay="CENTER" layoutX="178.0" layoutY="444.0" onMouseClicked="#TUBEMC_Clicked" onMousePressed="#TUBEMC_Pressed" onMouseReleased="#TUBEMC_Released" prefHeight="17.0" prefWidth="60.0" scaleX="1.5" scaleY="1.5" style="-fx-background-color: e1e4db;">
+         <font>
+            <Font name="System" size="12.0" />
+         </font>
+         <effect>
+            <InnerShadow />
+         </effect>
+      </Label>
+      <Label fx:id="TUBEW" alignment="CENTER" contentDisplay="CENTER" layoutX="45.0" layoutY="264.0" onMouseClicked="#TUBEW_Clicked" onMousePressed="#TUBEW_Pressed" onMouseReleased="#TUBEW_Released" prefHeight="20.0" prefWidth="80.0" scaleX="1.5" scaleY="1.5" style="-fx-background-color: e1e4db;" text="WEST">
+         <font>
+            <Font name="System" size="12.0" />
+         </font>
+         <effect>
+            <InnerShadow />
+         </effect>
+      </Label>
+      <Label fx:id="MC" alignment="CENTER" contentDisplay="CENTER" layoutX="121.0" layoutY="437.0" onMouseClicked="#MC_Clicked" onMousePressed="#MC_Pressed" onMouseReleased="#MC_Released" prefHeight="33.0" prefWidth="33.0" scaleX="1.5" scaleY="1.5" style="-fx-background-color: e1e4db; -fx-background-radius: 5; -fx-border-radius: 5; " text="MC" translateX="1.0" translateY="-1.0">
+         <font>
+            <Font name="System" size="12.0" />
+         </font>
+         <effect>
+            <InnerShadow />
+         </effect>
+      </Label>
+      <Label fx:id="Sqz" alignment="CENTER" contentDisplay="CENTER" layoutX="439.0" layoutY="88.0" onMouseClicked="#Sqz_Clicked" onMousePressed="#Sqz_Pressed" onMouseReleased="#Sqz_Released" prefHeight="17.0" prefWidth="60.0" rotate="90.0" scaleX="1.5" scaleY="1.5" style="-fx-background-color: e1e4db;" text="SQZ">
+         <font>
+            <Font name="System" size="12.0" />
+         </font>
+         <effect>
+            <InnerShadow />
+         </effect>
+      </Label>
+      <SVGPath fx:id="StatusValveSqz300N" content="m17,26v18l36-18v18z" fill="#e1e4db" layoutX="434.0" layoutY="7.0" rotate="90.0" scaleX="0.5" scaleY="1.5">
+         <effect>
+            <InnerShadow />
+         </effect>
+      </SVGPath>
+      <SVGPath fx:id="StatusValveSqz0N" content="m17,26v18l36-18v18z" fill="#e1e4db" layoutX="434.0" layoutY="115.0" rotate="90.0" scaleX="0.5" scaleY="1.5">
+         <effect>
+            <InnerShadow />
+         </effect>
+      </SVGPath>
+      <Label fx:id="Sqz0N" alignment="CENTER" contentDisplay="CENTER" layoutX="462.0" layoutY="161.0" prefHeight="16.0" prefWidth="13.5" rotate="90.0" scaleX="1.5" scaleY="1.5" style="-fx-background-color: e1e4db;">
+         <font>
+            <Font name="System" size="12.0" />
+         </font>
+         <effect>
+            <InnerShadow />
+         </effect>
+      </Label>
+      <SVGPath fx:id="StatusValveSqzDet2" content="m17,26v18l36-18v18z" fill="#e1e4db" layoutX="434.0" layoutY="154.0" rotate="90.0" scaleX="0.5" scaleY="1.5">
+         <effect>
+            <InnerShadow />
+         </effect>
+      </SVGPath>
+      <Label fx:id="SqzDet2" alignment="CENTER" contentDisplay="CENTER" layoutX="463.0" layoutY="198.0" prefHeight="17.0" prefWidth="12.0" rotate="90.0" scaleX="1.5" scaleY="1.5" style="-fx-background-color: e1e4db;">
+         <font>
+            <Font name="System" size="12.0" />
+         </font>
+         <effect>
+            <InnerShadow />
+         </effect>
+      </Label>
+      <SVGPath fx:id="StatusValveSqzDet1" content="m17,26v18l36-18v18z" fill="#e1e4db" layoutX="434.0" layoutY="189.0" rotate="90.0" scaleX="0.5" scaleY="1.5">
+         <effect>
+            <InnerShadow />
+         </effect>
+      </SVGPath>
+      <Label fx:id="Sqz300N" alignment="CENTER" contentDisplay="CENTER" layoutX="462.0" layoutY="16.0" prefHeight="17.0" prefWidth="14.0" rotate="90.0" scaleX="1.5" scaleY="1.5" style="-fx-background-color: e1e4db;">
+         <font>
+            <Font name="System" size="12.0" />
+         </font>
+         <effect>
+            <InnerShadow />
+         </effect>
+      </Label>
+      <SVGPath fx:id="StatusValveBigNI" content="m17,26v18l36-18v18z" fill="#e1e4db" layoutX="260.0" layoutY="103.0" rotate="90.0" scaleX="0.5" scaleY="1.5">
+         <effect>
+            <InnerShadow />
+         </effect>
+      </SVGPath>
+      <SVGPath fx:id="StatusValveBigWI" content="m17,26v18l36-18v18z" fill="#e1e4db" layoutX="119.0" layoutY="240.0" scaleX="0.5" scaleY="1.5">
+         <effect>
+            <InnerShadow />
+         </effect>
+      </SVGPath>
+      <SVGPath fx:id="StatusValveCentralLI" content="m17,26v18l36-18v18z" fill="#e1e4db" layoutX="227.0" layoutY="417.0" scaleX="0.5" scaleY="1.5">
+         <effect>
+            <InnerShadow />
+         </effect>
+      </SVGPath>
+      <SVGPath fx:id="StatusValveCryoNI" content="m17,26v18l36-18v18z" fill="#e1e4db" layoutX="260.0" layoutY="143.0" rotate="90.0" scaleX="0.5" scaleY="1.5">
+         <effect>
+            <InnerShadow />
+         </effect>
+      </SVGPath>
+      <SVGPath fx:id="StatusValveCryoWI" content="m17,26v18l36-18v18z" fill="#e1e4db" layoutX="160.0" layoutY="241.0" scaleX="0.5" scaleY="1.5">
+         <effect>
+            <InnerShadow />
+         </effect>
+      </SVGPath>
+      <Label fx:id="WI" alignment="CENTER" contentDisplay="CENTER" layoutX="212.0" layoutY="260.0" prefHeight="33.0" prefWidth="33.0" scaleX="1.5" scaleY="1.5" style="-fx-background-color: e1e4db; -fx-background-radius: 5; -fx-border-radius: 5; " text="WI">
+         <font>
+            <Font name="System" size="12.0" />
+         </font>
+         <effect>
+            <InnerShadow />
+         </effect>
+      </Label>
+      <SVGPath fx:id="StatusValveCentralNS" content="m17,26v18l36-18v18z" fill="#e1e4db" layoutX="261.0" layoutY="210.0" rotate="90.0" scaleX="0.5" scaleY="1.5">
+         <effect>
+            <InnerShadow />
+         </effect>
+      </SVGPath>
+      <SVGPath fx:id="StatusValveCentralWS" content="m17,26v18l36-18v18z" fill="#e1e4db" layoutX="227.0" layoutY="242.0" scaleX="0.5" scaleY="1.5">
+         <effect>
+            <InnerShadow />
+         </effect>
+      </SVGPath>
+      <SVGPath fx:id="StatusValveCentralPS" content="m17,26v18l36-18v18z" fill="#e1e4db" layoutX="261.0" layoutY="275.0" rotate="90.0" scaleX="0.5" scaleY="1.5">
+         <effect>
+            <InnerShadow />
+         </effect>
+      </SVGPath>
+      <SVGPath fx:id="StatusValveCentralSS" content="m17,26v18l36-18v18z" fill="#e1e4db" layoutX="294.0" layoutY="242.0" scaleX="0.5" scaleY="1.5">
+         <effect>
+            <InnerShadow />
+         </effect>
+      </SVGPath>
+      <SVGPath fx:id="StatusValveCryoLinkDETVs1" content="m17,26v18l36-18v18z" fill="#e1e4db" layoutX="362.0" layoutY="242.0" scaleX="0.5" scaleY="1.5">
+         <effect>
+            <InnerShadow />
+         </effect>
+      </SVGPath>
+      <SVGPath fx:id="StatusValveCryoLinkIBVs2" content="m17,26v18l36-18v18z" fill="#e1e4db" layoutX="261.0" layoutY="342.0" rotate="90.0" scaleX="0.5" scaleY="1.5">
+         <effect>
+            <InnerShadow />
+         </effect>
+      </SVGPath>
+      <Label fx:id="PR" alignment="CENTER" contentDisplay="CENTER" layoutX="279.0" layoutY="327.0" prefHeight="33.0" prefWidth="33.0" scaleX="1.5" scaleY="1.5" style="-fx-background-color: e1e4db; -fx-background-radius: 5; -fx-border-radius: 5; " text="PR">
+         <font>
+            <Font name="System" size="12.0" />
+         </font>
+         <effect>
+            <InnerShadow />
+         </effect>
+      </Label>
+      <Label fx:id="SR" alignment="CENTER" contentDisplay="CENTER" layoutX="347.0" layoutY="260.0" prefHeight="33.0" prefWidth="33.0" scaleX="1.5" scaleY="1.5" style="-fx-background-color: e1e4db; -fx-background-radius: 5; -fx-border-radius: 5; " text="SR">
+         <font>
+            <Font name="System" size="12.0" />
+         </font>
+         <effect>
+            <InnerShadow />
+         </effect>
+      </Label>
+      <Label fx:id="BS" alignment="CENTER" contentDisplay="CENTER" layoutX="279.0" layoutY="260.0" prefHeight="33.0" prefWidth="33.0" scaleX="1.5" scaleY="1.5" style="-fx-background-color: e1e4db; -fx-background-radius: 5; -fx-border-radius: 5; " text="BS">
+         <font>
+            <Font name="System" size="12.0" />
+         </font>
+         <effect>
+            <InnerShadow />
+         </effect>
+      </Label>
+      <Label fx:id="NI" alignment="CENTER" contentDisplay="CENTER" layoutX="279.0" layoutY="195.0" prefHeight="33.0" prefWidth="33.0" scaleX="1.5" scaleY="1.5" style="-fx-background-color: e1e4db; -fx-background-radius: 5; -fx-border-radius: 5; " text="NI">
+         <font>
+            <Font name="System" size="12.0" />
+         </font>
+         <effect>
+            <InnerShadow />
+         </effect>
+      </Label>
+      <Label fx:id="CryoNI" alignment="CENTER" contentDisplay="CENTER" layoutX="288.0" layoutY="148.0" prefHeight="20.0" prefWidth="15.0" rotate="90.0" scaleX="1.5" scaleY="1.5" style="-fx-background-color: #00bfff;" textFill="#0d70d6">
+         <font>
+            <Font name="System" size="12.0" />
+         </font>
+         <effect>
+            <InnerShadow />
+         </effect>
+      </Label>
+      <Label fx:id="CryoWI" alignment="CENTER" contentDisplay="CENTER" layoutX="167.0" layoutY="265.0" prefHeight="20.0" prefWidth="15.0" scaleX="1.5" scaleY="1.5" style="-fx-background-color: #00bfff;" textFill="#0d70d6">
+         <font>
+            <Font name="System" size="12.0" />
+         </font>
+         <effect>
+            <InnerShadow />
+         </effect>
+      </Label>
+      <Label fx:id="CryoLinkDet" alignment="CENTER" contentDisplay="CENTER" layoutX="410.0" layoutY="267.0" prefHeight="20.0" prefWidth="15.0" scaleX="1.5" scaleY="1.5" style="-fx-background-color: #00bfff;" textFill="#0d70d6">
+         <font>
+            <Font name="System" size="12.0" />
+         </font>
+         <effect>
+            <InnerShadow />
+         </effect>
+      </Label>
+      <Label fx:id="CryoLinkIB" alignment="CENTER" contentDisplay="CENTER" layoutX="289.0" layoutY="387.0" prefHeight="20.0" prefWidth="15.0" rotate="90.0" scaleX="1.5" scaleY="1.5" style="-fx-background-color: #00bfff;" textFill="#0d70d6">
+         <font>
+            <Font name="System" size="12.0" />
+         </font>
+         <effect>
+            <InnerShadow />
+         </effect>
+      </Label>
+      <SVGPath fx:id="StatusValveCryoLinkIBVs1" content="m17,26v18l36-18v18z" fill="#e1e4db" layoutX="261.0" layoutY="382.0" rotate="90.0" scaleX="0.5" scaleY="1.5">
+         <effect>
+            <InnerShadow />
+         </effect>
+      </SVGPath>
+      <Label fx:id="IB" alignment="CENTER" contentDisplay="CENTER" layoutX="279.0" layoutY="434.0" prefHeight="33.0" prefWidth="33.0" scaleX="1.5" scaleY="1.5" style="-fx-background-color: e1e4db; -fx-background-radius: 5; -fx-border-radius: 5; " text="IB">
+         <font>
+            <Font name="System" size="12.0" />
+         </font>
+         <effect>
+            <InnerShadow />
+         </effect>
+      </Label>
+      <Label fx:id="Det" alignment="CENTER" contentDisplay="CENTER" layoutX="454.0" layoutY="260.0" prefHeight="33.0" prefWidth="33.0" scaleX="1.5" scaleY="1.5" style="-fx-background-color: e1e4db; -fx-background-radius: 5; -fx-border-radius: 5; " text="DET">
+         <font>
+            <Font name="System" size="12.0" />
+         </font>
+         <effect>
+            <InnerShadow />
+         </effect>
+      </Label>
+      <SVGPath fx:id="StatusValveCryoLinkDETVs2" content="m17,26v18l36-18v18z" fill="#e1e4db" layoutX="402.0" layoutY="242.0" scaleX="0.5" scaleY="1.5">
+         <effect>
+            <InnerShadow />
+         </effect>
+      </SVGPath>
+      <Label fx:id="SqzDet1" alignment="CENTER" contentDisplay="CENTER" layoutX="463.0" layoutY="234.0" prefHeight="17.0" prefWidth="13.0" rotate="90.0" scaleX="1.5" scaleY="1.5" style="-fx-background-color: e1e4db;">
+         <font>
+            <Font name="System" size="12.0" />
+         </font>
+         <effect>
+            <InnerShadow />
+         </effect>
+      </Label>
+      <Label fx:id="TUBEN" alignment="CENTER" contentDisplay="CENTER" layoutX="256.0" layoutY="58.0" onMouseClicked="#TUBEN_Clicked" onMousePressed="#TUBEN_Pressed" onMouseReleased="#TUBEN_Released" prefHeight="21.0" prefWidth="80.0" rotate="90.0" scaleX="1.5" scaleY="1.5" style="-fx-background-color: e1e4db;" text="NORTH">
+         <font>
+            <Font name="System" size="12.0" />
+         </font>
+         <effect>
+            <InnerShadow />
+         </effect>
+      </Label>
+      <Circle fx:id="IBYag" fill="#ff1f1f" layoutX="280.0" layoutY="434.0" radius="6.0" stroke="#ff1f1f" strokeType="INSIDE" />
+      <Circle fx:id="PRYag" fill="#ff1f1f" layoutX="280.0" layoutY="327.0" radius="6.0" stroke="#ff1f1f" strokeType="INSIDE" />
+      <Circle fx:id="BSYag" fill="#ff1f1f" layoutX="280.0" layoutY="261.0" radius="6.0" stroke="#ff1f1f" strokeType="INSIDE" />
+      <Circle fx:id="NIYag" fill="#ff1f1f" layoutX="280.0" layoutY="195.0" radius="6.0" stroke="#ff1f1f" strokeType="INSIDE" />
+      <Circle fx:id="SRYag" fill="#ff1f1f" layoutX="348.0" layoutY="261.0" radius="6.0" stroke="#ff1f1f" strokeType="INSIDE" />
+      <Circle fx:id="WIYag" fill="#ff1f1f" layoutX="213.0" layoutY="260.0" radius="6.0" stroke="#ff1f1f" strokeType="INSIDE" />
+      <Circle fx:id="DETYag" fill="#ff1f1f" layoutX="455.0" layoutY="261.0" radius="6.0" stroke="#ff1f1f" strokeType="INSIDE" />
+      <Circle fx:id="MCYag" fill="#ff1f1f" layoutX="123.0" layoutY="437.0" radius="6.0" stroke="#ff1f1f" strokeType="INSIDE" />
+      <Circle fx:id="WISourceCO2" fill="#efff21" layoutX="221.0" layoutY="228.0" radius="6.0" stroke="#efff21" strokeType="INSIDE" />
+      <Circle fx:id="NISourceCO2" fill="#efff21" layoutX="232.0" layoutY="178.0" radius="6.0" stroke="#efff21" strokeType="INSIDE" />
+      <Rectangle fx:id="NILocalCtrl" arcHeight="5.0" arcWidth="5.0" fill="#ff1f1f" height="12.0" layoutX="306.0" layoutY="222.0" scaleX="0.5" scaleY="0.5" stroke="#ff1f1f" strokeType="INSIDE" width="12.0" />
+      <Rectangle fx:id="WILocalCtrl" arcHeight="5.0" arcWidth="5.0" fill="#ff1f1f" height="12.0" layoutX="240.0" layoutY="285.0" scaleX="0.5" scaleY="0.5" stroke="#ff1f1f" strokeType="INSIDE" width="12.0" />
+      <Rectangle fx:id="BSLocalCtrl" arcHeight="5.0" arcWidth="5.0" fill="#ff1f1f" height="12.0" layoutX="306.0" layoutY="285.0" scaleX="0.5" scaleY="0.5" stroke="#ff1f1f" strokeType="INSIDE" width="12.0" />
+      <Rectangle fx:id="PRLocalCtrl" arcHeight="5.0" arcWidth="5.0" fill="#ff1f1f" height="12.0" layoutX="306.0" layoutY="354.0" scaleX="0.5" scaleY="0.5" stroke="#ff1f1f" strokeType="INSIDE" width="12.0" />
+      <Rectangle fx:id="IBLocalCtrl" arcHeight="5.0" arcWidth="5.0" fill="#ff1f1f" height="12.0" layoutX="306.0" layoutY="461.0" scaleX="0.5" scaleY="0.5" stroke="#ff1f1f" strokeType="INSIDE" width="12.0" />
+      <Rectangle fx:id="MCLocalCtrl" arcHeight="5.0" arcWidth="5.0" fill="#ff1f1f" height="12.0" layoutX="149.0" layoutY="461.0" scaleX="0.5" scaleY="0.5" stroke="#ff1f1f" strokeType="INSIDE" width="12.0" />
+      <Rectangle fx:id="SRLocalCtrl" arcHeight="5.0" arcWidth="5.0" fill="#ff1f1f" height="12.0" layoutX="373.0" layoutY="285.0" scaleX="0.5" scaleY="0.5" stroke="#ff1f1f" strokeType="INSIDE" width="12.0" />
+      <Rectangle fx:id="DETLocalCtrl" arcHeight="5.0" arcWidth="5.0" fill="#ff1f1f" height="12.0" layoutX="481.0" layoutY="285.0" scaleX="0.5" scaleY="0.5" stroke="#ff1f1f" strokeType="INSIDE" width="12.0" />
+      <SVGPath fx:id="NICO2Shutter" content="M61.72.28a61.18,61.18,0,0,1,38.93,13.91L46.86,45.24V2.1A61.21,61.21,0,0,1,61.72.28ZM106,19.12a61.25,61.25,0,0,1,17.17,42.6,62,62,0,0,1-.64,8.89L69.66,40.09l36.33-21Zm15.06,58.64a61.59,61.59,0,0,1-34.91,40.36V57.6l34.91,20.16ZM79.21,120.64A61.6,61.6,0,0,1,25.05,111L79.21,79.75v40.89Zm-59.8-14.37A61.28,61.28,0,0,1,.28,61.72a62.4,62.4,0,0,1,.65-8.91L55.44,85.46l-36,20.81Zm-17-60.65A61.6,61.6,0,0,1,39.91,4.27l-.44,63.54-37-22.19Z" fill="#efff21" layoutX="186.0" layoutY="117.0" scaleX="0.11" scaleY="0.11" />
+      <SVGPath fx:id="WICO2Shutter" content="M61.72.28a61.18,61.18,0,0,1,38.93,13.91L46.86,45.24V2.1A61.21,61.21,0,0,1,61.72.28ZM106,19.12a61.25,61.25,0,0,1,17.17,42.6,62,62,0,0,1-.64,8.89L69.66,40.09l36.33-21Zm15.06,58.64a61.59,61.59,0,0,1-34.91,40.36V57.6l34.91,20.16ZM79.21,120.64A61.6,61.6,0,0,1,25.05,111L79.21,79.75v40.89Zm-59.8-14.37A61.28,61.28,0,0,1,.28,61.72a62.4,62.4,0,0,1,.65-8.91L55.44,85.46l-36,20.81Zm-17-60.65A61.6,61.6,0,0,1,39.91,4.27l-.44,63.54-37-22.19Z" fill="#efff21" layoutX="175.0" layoutY="167.0" scaleX="0.11" scaleY="0.11" />
+      <Circle fx:id="SQZDET1Yag" fill="#ff1f1f" layoutX="466.0" layoutY="242.0" radius="6.0" stroke="#ff1f1f" strokeType="INSIDE" />
+      <Circle fx:id="SQZDET2Yag" fill="#ff1f1f" layoutX="466.0" layoutY="206.0" radius="6.0" stroke="#ff1f1f" strokeType="INSIDE" />
+      <Circle fx:id="SQZ0NYag" fill="#ff1f1f" layoutX="466.0" layoutY="169.0" radius="6.0" stroke="#ff1f1f" strokeType="INSIDE" />
+      <Circle fx:id="SQZ300NYag" fill="#ff1f1f" layoutX="466.0" layoutY="23.0" radius="6.0" stroke="#ff1f1f" strokeType="INSIDE" />
+      <Circle fx:id="TUBENYag" fill="#ff1f1f" layoutX="288.0" layoutY="120.0" radius="6.0" stroke="#ff1f1f" strokeType="INSIDE" />
+      <Circle fx:id="TUBEWYag" fill="#ff1f1f" layoutX="133.0" layoutY="267.0" radius="6.0" stroke="#ff1f1f" strokeType="INSIDE" />
+      <Circle fx:id="IBGreen" fill="#21ff27" layoutX="280.0" layoutY="466.0" radius="6.0" stroke="#21ff27" strokeType="INSIDE" />
+      <Circle fx:id="PRGreen" fill="#21ff27" layoutX="279.0" layoutY="359.0" radius="6.0" stroke="#21ff27" strokeType="INSIDE" />
+      <Circle fx:id="BSGreen" fill="#21ff27" layoutX="279.0" layoutY="294.0" radius="6.0" stroke="#21ff27" strokeType="INSIDE" />
+      <Circle fx:id="NIGreen" fill="#21ff27" layoutX="279.0" layoutY="228.0" radius="6.0" stroke="#21ff27" strokeType="INSIDE" />
+      <Circle fx:id="WIGreen" fill="#21ff27" layoutX="212.0" layoutY="293.0" radius="6.0" stroke="#21ff27" strokeType="INSIDE" />
+      <Circle fx:id="TUBEWGreen" fill="#21ff27" layoutX="133.0" layoutY="282.0" radius="6.0" stroke="#21ff27" strokeType="INSIDE" />
+      <Circle fx:id="TUBENGreen" fill="#21ff27" layoutX="304.0" layoutY="120.0" radius="6.0" stroke="#21ff27" strokeType="INSIDE" />
+      <Circle fx:id="SRGreen" fill="#21ff27" layoutX="348.0" layoutY="294.0" radius="6.0" stroke="#21ff27" strokeType="INSIDE" />
+      <Circle fx:id="DETGreen" fill="#21ff27" layoutX="455.0" layoutY="293.0" radius="6.0" stroke="#21ff27" strokeType="INSIDE" />
+      <Label fx:id="DetMini" alignment="CENTER" contentDisplay="CENTER" layoutX="498.0" layoutY="260.0" prefHeight="33.0" prefWidth="33.0" style="-fx-background-color: e1e4db; -fx-background-radius: 5; -fx-border-radius: 5; ">
+         <font>
+            <Font name="System" size="12.0" />
+         </font>
+         <effect>
+            <InnerShadow />
+         </effect>
+      </Label>
+      <Label fx:id="PRMini" alignment="CENTER" contentDisplay="CENTER" layoutX="236.0" layoutY="306.0" prefHeight="33.0" prefWidth="33.0" style="-fx-background-color: e1e4db; -fx-background-radius: 5; -fx-border-radius: 5; ">
+         <font>
+            <Font name="System" size="12.0" />
+         </font>
+         <effect>
+            <InnerShadow />
+         </effect>
+      </Label>
+      <Circle fx:id="DETMiniGreen" fill="#21ff27" layoutX="508.0" layoutY="284.0" radius="6.0" stroke="#21ff27" strokeType="INSIDE" />
+      <Circle fx:id="PRMiniGreen" fill="#21ff27" layoutX="245.0" layoutY="330.0" radius="6.0" stroke="#21ff27" strokeType="INSIDE" />
+      <Label fx:id="IBMini" alignment="CENTER" contentDisplay="CENTER" layoutX="322.0" layoutY="434.0" prefHeight="33.0" prefWidth="33.0" style="-fx-background-color: e1e4db; -fx-background-radius: 5; -fx-border-radius: 5; ">
+         <font>
+            <Font name="System" size="12.0" />
+         </font>
+         <effect>
+            <InnerShadow />
+         </effect>
+      </Label>
+      <Circle fx:id="IBMiniGreen" fill="#21ff27" layoutX="332.0" layoutY="458.0" radius="6.0" stroke="#21ff27" strokeType="INSIDE" />
+      <Circle fx:id="NICO2" fill="#efff21" layoutX="310.0" layoutY="195.0" radius="6.0" stroke="#efff21" strokeType="INSIDE" />
+      <Text fill="#d1d1e0" layoutX="101.0" layoutY="184.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Source CO₂ NI" wrappingWidth="120.0">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Text>
+      <Circle fx:id="WICO2" fill="#efff21" layoutX="244.0" layoutY="260.0" radius="6.0" stroke="#efff21" strokeType="INSIDE" />
+      <Text fill="#d1d1e0" layoutX="85.0" layoutY="234.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Source CO₂ WI" wrappingWidth="120.0">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Text>
+      <Circle fx:id="SourceYag" fill="#ff1f1f" layoutX="391.0" layoutY="450.0" radius="6.0" stroke="#ff1f1f" strokeType="INSIDE" />
+      <Text fill="#d1d1e0" layoutX="418.0" layoutY="455.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Source Yag" wrappingWidth="105.0">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Text>
+      <Circle fx:id="IBMiniYag" fill="#ff1f1f" layoutX="331.0" layoutY="442.0" radius="6.0" stroke="#ff1f1f" strokeType="INSIDE" />
+      <Circle fx:id="DETMiniYag" fill="#ff1f1f" layoutX="507.0" layoutY="268.0" radius="6.0" stroke="#ff1f1f" strokeType="INSIDE" />
+      <Circle fx:id="PRMiniYag" fill="#ff1f1f" layoutX="245.0" layoutY="314.0" radius="6.0" stroke="#ff1f1f" strokeType="INSIDE" />
+   </children>
+</AnchorPane>

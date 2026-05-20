@@ -44,10 +44,26 @@ import javax.swing.SwingUtilities;
 
 import com.gluonapplication.ViewData;
 import com.gluonapplication.ViewGlobal;
+import com.gluonapplication.ViewSafetyFlags;
+import javafx.fxml.FXMLLoader;
+import javafx.geometry.Bounds;
+import javafx.geometry.Pos;
+import javafx.scene.Group;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
+import javafx.scene.transform.Scale;
 
 public class GlgGui extends JFrame implements ChannelList, Runnable  {
 
     private static final long serialVersionUID = 354054054055L;
+    private static final String PANEL_BACKGROUND = "#21304F";
+    private static final String TITLE_BACKGROUND = "#0e1726";
+    private static final String ACCENT_COLOR = "AQUA";
+    private static final double SAFETY_CONTENT_MARGIN = 14.0;
     private DeviceManager deviceManager;
     public GlgGui parent;
     private String title;
@@ -59,7 +75,6 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
     private JFXPanel jfxPanel2;
     private JFXPanel jfxPanel3;
     private WebEngine engine1;
-    private WebEngine engine2;
     private JPanel panelweb = new JPanel();
     private JPanel panelvac = new JPanel();
     private GlgJLWBean glg_bean1;
@@ -161,13 +176,13 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
           initVacComponents();
           
           // Add component to a frame
-          panel.add(glg_bean1, new GridBagConstraints(0, 1, 1, 1, 0.48, 0.5
+          panel.add(wrapWithTitle(glg_bean1, "WE BUILDING PARTICLE MONITORING", 30), new GridBagConstraints(0, 1, 1, 1, 0.1, 0.5
 						     , GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						     new Insets(1, 1, 1, 1), 0, 0));
-          panel.add(glg_bean2, new GridBagConstraints(1, 1, 1, 1, 1.0, 1.0
+          panel.add(wrapWithTitle(glg_bean2, "WE BUILDING SAFETY", 30), new GridBagConstraints(1, 1, 1, 1, 1.2, 1.0
 						     , GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						     new Insets(1, 1, 1, 1), 0, 0));
-	  panel.add(jfxPanel3, new GridBagConstraints(2, 1, 1, 1, 0.54, 0.5
+	  panel.add(jfxPanel3, new GridBagConstraints(2, 1, 1, 1, 1.0, 0.5
 						     , GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						     new Insets(1, 1, 1, 1), 0, 0));
           panel.add(panelweb, new GridBagConstraints(0, 0, 3, 1, 0.95, 0.95
@@ -196,7 +211,7 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
         panelweb.add(jfxPanel1, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0
 						     , GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						     new Insets(1, 1, 1, 1), 0, 0));	
-        panelweb.add(jfxPanel2, new GridBagConstraints(1, 0, 1, 1, 0.7, 0.7
+        panelweb.add(jfxPanel2, new GridBagConstraints(1, 0, 1, 1, 1.1, 1.0
 						     , GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						     new Insets(1, 1, 1, 1), 0, 0));	
     }
@@ -211,11 +226,73 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
         Platform.runLater(new Runnable() {
             @Override public void run() {
                 ViewData global = new ViewGlobal("GLOBAL", "GLOBAL");
+                global.isSuspended = false;
                 new Thread(global).start();
-                Scene sceneVac = new Scene(global);
+                Scene sceneVac = new Scene(buildVacWrapped(global, "VACUUM MONITORING", 48.0));
                 jfxPanel3.setScene(sceneVac);
                 }
           });
+    }
+
+    // Mirrors work_cbsaspanel CbsaspanelFx.buildVacScene: external title bar on top,
+    // top 48 px of the FXML cropped (it's empty space above the diagram), no
+    // additional cyan border since GLOBAL.fxml already paints one at y=48.
+    private BorderPane buildVacWrapped(Pane content, String title, double topCrop) {
+        Label titleLabel = createPanelTitle(title);
+
+        if (topCrop > 0) {
+            javafx.scene.shape.Rectangle clip = new javafx.scene.shape.Rectangle();
+            clip.setX(0);
+            clip.setY(topCrop);
+            clip.widthProperty().bind(content.widthProperty());
+            clip.heightProperty().bind(content.heightProperty().subtract(topCrop));
+            content.setClip(clip);
+            content.setTranslateY(-topCrop);
+        }
+
+        Group group = new Group(content);
+        Scale scale = new Scale(1, 1, 0, 0);
+        group.getTransforms().add(scale);
+
+        StackPane contentPane = new StackPane(group);
+        contentPane.setAlignment(Pos.TOP_LEFT);
+        contentPane.setStyle("-fx-background-color: " + PANEL_BACKGROUND + ";");
+
+        final double[] natural = {0, 0};
+        Runnable updateScale = () -> {
+            double naturalW = natural[0];
+            double effectiveH = natural[1] - topCrop;
+            double availW = contentPane.getWidth();
+            double availH = contentPane.getHeight();
+            if (naturalW > 0 && effectiveH > 0 && availW > 0 && availH > 0) {
+                double s = Math.min(availW / naturalW, availH / effectiveH);
+                scale.setX(s);
+                scale.setY(s);
+                group.setTranslateX(Math.max(0, (availW - naturalW * s) / 2));
+                group.setTranslateY(Math.max(0, (availH - effectiveH * s) / 2));
+            }
+        };
+        content.layoutBoundsProperty().addListener((obs, oldB, newB) -> {
+            if (newB.getWidth() > 0 && newB.getHeight() > 0) {
+                natural[0] = newB.getWidth();
+                natural[1] = newB.getHeight();
+                Platform.runLater(updateScale);
+            }
+        });
+        Bounds initial = content.getLayoutBounds();
+        if (initial.getWidth() > 0 && initial.getHeight() > 0) {
+            natural[0] = initial.getWidth();
+            natural[1] = initial.getHeight();
+            Platform.runLater(updateScale);
+        }
+        contentPane.widthProperty().addListener((obs, oldW, newW) -> Platform.runLater(updateScale));
+        contentPane.heightProperty().addListener((obs, oldH, newH) -> Platform.runLater(updateScale));
+
+        BorderPane decorated = new BorderPane();
+        decorated.setStyle("-fx-background-color: black;");
+        decorated.setTop(titleLabel);
+        decorated.setCenter(contentPane);
+        return decorated;
     }
     private void createWebScene() {
 
@@ -255,40 +332,23 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
                             }
                         });
                 jfxPanel1.setScene(new Scene(view1));
-                
-                WebView view2 = new WebView();
-                engine2 = view2.getEngine();
-               
-                view2.setZoom(0.10);
-                view2.setFontScale(7);
-                
-                // hide webview scrollbars whenever they appear.
-                view2.getChildrenUnmodifiable().addListener(new ListChangeListener<Node>() {
-                  @Override public void onChanged(Change<? extends Node> change) {
-                                Set<Node> deadSeaScrolls = view2.lookupAll(".scroll-bar");
-                                for (Node scroll : deadSeaScrolls) {
-                                    scroll.setVisible(false);
-                                }
-                            }
-                });
-                engine2.getLoadWorker().exceptionProperty().addListener(new ChangeListener<Throwable>() {
-                            public void changed(ObservableValue<? extends Throwable> o, Throwable old, final Throwable value) {
-                                if (engine2.getLoadWorker().getState() == FAILED) {
-                                    SwingUtilities.invokeLater(new Runnable() {
-                                        @Override public void run() {
-                                            JOptionPane.showMessageDialog(
-                                                    panel,
-                                                    (value != null) ?
-                                                    engine2.getLocation() + "\n" + value.getMessage() :
-                                                    engine2.getLocation() + "\nUnexpected error.",
-                                                    "Loading error...",
-                                                    JOptionPane.ERROR_MESSAGE);
-                                        }
-                                    });
-                                }
-                            }
-                        });
-                jfxPanel2.setScene(new Scene(view2));
+
+                // Safety WE + LEGEND scene (replaces former VIM webview)
+                ViewData safetyFlagsWE = new ViewSafetyFlags("WESAFETYFLAGS", "SafetyFlagsWE");
+                safetyFlagsWE.isSuspended = false;
+                new Thread(safetyFlagsWE).start();
+
+                StackPane safetyWEPane = createScaledNodePanel(safetyFlagsWE, "LASER BEAMS - WE", SAFETY_CONTENT_MARGIN);
+                StackPane legendPane = createLegendPanel();
+
+                HBox safetyRoot = new HBox(8, safetyWEPane, legendPane);
+                safetyRoot.setStyle("-fx-background-color: black; -fx-padding: 8;");
+                HBox.setHgrow(safetyWEPane, Priority.ALWAYS);
+                HBox.setHgrow(legendPane, Priority.ALWAYS);
+                safetyWEPane.prefWidthProperty().bind(safetyRoot.widthProperty().multiply(0.5));
+                legendPane.prefWidthProperty().bind(safetyRoot.widthProperty().multiply(0.5));
+
+                jfxPanel2.setScene(new Scene(safetyRoot));
             }
         });
     }
@@ -299,13 +359,125 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
             }
         });
     }
-    
-    public void loadURL2() {
-        Platform.runLater(new Runnable() {
-            @Override public void run() {
-                engine2.load("https://vim.virgo-gw.eu/");
-            }
-        });
+
+    private Label createPanelTitle(String text) {
+       Label titleLabel = new Label(text);
+       titleLabel.setMaxWidth(Double.MAX_VALUE);
+       titleLabel.setPrefHeight(42);
+       titleLabel.setAlignment(Pos.CENTER);
+       titleLabel.setStyle("-fx-text-fill: " + ACCENT_COLOR + "; -fx-font-size: 24; -fx-border-width: 1; -fx-border-radius: 5; -fx-background-color: " + TITLE_BACKGROUND + "; -fx-background-radius: 5;");
+       return titleLabel;
+    }
+
+    private StackPane createLegendPanel() {
+       try {
+          FXMLLoader loader = new FXMLLoader(getClass().getResource("/SAFETYFLAGSLEGEND.fxml"));
+          Pane legend = loader.load();
+          return createScaledNodePanel(legend, "LEGEND", SAFETY_CONTENT_MARGIN);
+       }
+       catch (java.io.IOException ex) {
+          logger.log(Level.SEVERE, "GlgGui:createLegendPanel> " + ex.getMessage());
+          return createScaledNodePanel(new Pane(), "LEGEND", SAFETY_CONTENT_MARGIN);
+       }
+    }
+
+    private StackPane createScaledNodePanel(Node content, String panelTitle, double contentMargin) {
+       Label titleLabel = createPanelTitle(panelTitle);
+       if (content instanceof javafx.scene.Parent) {
+          ((javafx.scene.Parent) content).setStyle("-fx-background-color: " + PANEL_BACKGROUND + ";");
+       }
+
+       Group group = new Group(content);
+       Scale scale = new Scale(1, 1, 0, 0);
+       group.getTransforms().add(scale);
+
+       StackPane contentPane = new StackPane(group);
+       contentPane.setAlignment(Pos.TOP_LEFT);
+       contentPane.setStyle("-fx-background-color: " + PANEL_BACKGROUND + "; -fx-border-color: " + ACCENT_COLOR + "; -fx-border-width: 2; -fx-border-radius: 5; -fx-background-radius: 5;");
+
+       final double[] naturalSize = {0, 0};
+       Runnable updateScale = () -> {
+          double naturalWidth = naturalSize[0];
+          double naturalHeight = naturalSize[1];
+          double availableWidth = contentPane.getWidth() - 2 * contentMargin;
+          double availableHeight = contentPane.getHeight() - 2 * contentMargin;
+          if (naturalWidth > 0 && naturalHeight > 0 && availableWidth > 0 && availableHeight > 0) {
+             double newScale = Math.min(availableWidth / naturalWidth, availableHeight / naturalHeight);
+             scale.setX(newScale);
+             scale.setY(newScale);
+             group.setTranslateX(contentMargin + Math.max(0, (availableWidth - naturalWidth * newScale) / 2));
+             group.setTranslateY(contentMargin + Math.max(0, (availableHeight - naturalHeight * newScale) / 2));
+          }
+       };
+       content.layoutBoundsProperty().addListener((obs, oldB, newB) -> {
+          if (newB.getWidth() > 0 && newB.getHeight() > 0) {
+             naturalSize[0] = newB.getWidth();
+             naturalSize[1] = newB.getHeight();
+             Platform.runLater(updateScale);
+          }
+       });
+       Bounds initialBounds = content.getLayoutBounds();
+       if (initialBounds.getWidth() > 0 && initialBounds.getHeight() > 0) {
+          naturalSize[0] = initialBounds.getWidth();
+          naturalSize[1] = initialBounds.getHeight();
+          Platform.runLater(updateScale);
+       }
+       contentPane.widthProperty().addListener((obs, oldW, newW) -> Platform.runLater(updateScale));
+       contentPane.heightProperty().addListener((obs, oldH, newH) -> Platform.runLater(updateScale));
+
+       BorderPane decorated = new BorderPane();
+       decorated.setStyle("-fx-background-color: black;");
+       decorated.setTop(titleLabel);
+       decorated.setCenter(contentPane);
+
+       StackPane panel = new StackPane(decorated);
+       panel.setStyle("-fx-background-color: black;");
+       return panel;
+    }
+
+    // Swing wrapper that mirrors the FX createPanelTitle visual style so that
+    // the GLG beans get the same cyan-on-slate header as the JavaFX panels.
+    // contentTopCrop hides the GLG drawing's internal title bar by translating
+    // the bean upward inside a clipping panel.
+    private JComponent wrapWithTitle(final JComponent content, String titleText, final int contentTopCrop) {
+       JLabel title = new JLabel(titleText, SwingConstants.CENTER);
+       title.setOpaque(true);
+       title.setBackground(new Color(0x0e, 0x17, 0x26));
+       title.setForeground(Color.CYAN);
+       title.setFont(new java.awt.Font("System", java.awt.Font.PLAIN, 24));
+       title.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
+       title.setPreferredSize(new java.awt.Dimension(0, 42));
+
+       JComponent contentArea;
+       if (contentTopCrop > 0) {
+          final JPanel cropPanel = new JPanel(null);
+          cropPanel.setOpaque(false);
+          cropPanel.add(content);
+          cropPanel.addComponentListener(new java.awt.event.ComponentAdapter() {
+             @Override
+             public void componentResized(java.awt.event.ComponentEvent e) {
+                content.setBounds(0, -contentTopCrop, cropPanel.getWidth(), cropPanel.getHeight() + contentTopCrop);
+             }
+          });
+          contentArea = cropPanel;
+       }
+       else {
+          JPanel pass = new JPanel(new java.awt.BorderLayout());
+          pass.setOpaque(false);
+          pass.add(content, java.awt.BorderLayout.CENTER);
+          contentArea = pass;
+       }
+
+       JPanel contentWrapper = new JPanel(new java.awt.BorderLayout());
+       contentWrapper.setBackground(new Color(0x21, 0x30, 0x4F));
+       contentWrapper.setBorder(BorderFactory.createLineBorder(Color.CYAN, 2));
+       contentWrapper.add(contentArea, java.awt.BorderLayout.CENTER);
+
+       JPanel wrapper = new JPanel(new java.awt.BorderLayout(0, 0));
+       wrapper.setBackground(Color.black);
+       wrapper.add(title, java.awt.BorderLayout.NORTH);
+       wrapper.add(contentWrapper, java.awt.BorderLayout.CENTER);
+       return wrapper;
     }
 
     public void exitProgram() {
@@ -996,7 +1168,6 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
        
        try {
           loadURL1();
-          loadURL2();
           while (true) {
 	     // Get rid of GlgLogic popup window
 	     Frame[] frames = Frame.getFrames();
