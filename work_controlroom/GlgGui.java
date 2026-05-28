@@ -200,7 +200,7 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
                   javafx.scene.layout.VBox.setVgrow(safetyNEPane, javafx.scene.layout.Priority.ALWAYS);
                   javafx.scene.layout.VBox.setVgrow(safetyWEPane, javafx.scene.layout.Priority.ALWAYS);
 
-                  javafx.scene.layout.VBox safetyLeftPane = new javafx.scene.layout.VBox(8, safetyCBPane, safetyLegendPane);
+                  javafx.scene.layout.VBox safetyLeftPane = new javafx.scene.layout.VBox(30, safetyCBPane, safetyLegendPane);
                   safetyLeftPane.setMinSize(0, 0);
                   safetyLeftPane.setStyle("-fx-background-color: black;");
                   safetyCBPane.setMinSize(0, 0);

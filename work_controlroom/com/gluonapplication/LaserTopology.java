@@ -22,8 +22,13 @@ import java.util.function.Function;
  * valves are reported OPEN. Edges with zero valves are unconditionally open
  * (e.g. CryoLink* valves, which have optical viewports).
  *
- * SQZ branch (SQZDET1, SQZDET2, SQZ0N, SQZ300N, plus a second Green source)
- * is deliberately NOT modelled yet — add edges below once expert info arrives.
+ * SQZ branch (SQZDET1 ↔ SQZDET2 ↔ SQZ0N ↔ SQZTUBE ↔ SQZ300N, a.k.a. SQB1 →
+ * SQB2 → FCIN → FCEND) is an isolated subgraph: it is *not* connected to DET,
+ * so neither the IB YAG nor the WE/NE GREEN reach it. Both YAG and GREEN are
+ * driven by an SQZ-local source at SQB1: GREEN is gated by the SHG lock,
+ * YAG by the EQB1 fast shutter. All SQZ edges are zero-valve (every valve on
+ * this path has an optical viewport), so each source signal propagates
+ * uniformly to every SQZ tower indicator.
  */
 public final class LaserTopology {
 
@@ -40,6 +45,18 @@ public final class LaserTopology {
    public static final String TUBEW = "TUBEW";
    public static final String NE    = "NE";
    public static final String WE    = "WE";
+   public static final String SQZDET1 = "SQZDET1";
+   public static final String SQZDET2 = "SQZDET2";
+   public static final String SQZ0N   = "SQZ0N";
+   public static final String SQZTUBE = "SQZTUBE";
+   public static final String SQZ300N = "SQZ300N";
+
+   /* SQZ source channels (single-source-of-truth). Used by both
+    * computeSqzGreenSourceState() / computeSqzYagSourceState() and the
+    * dedicated CIRCLE_SQZ_LOCK_STATUS_COLOR / SHUTTER_SQZ_FAST_STATUS_COLOR
+    * renderers. */
+   private static final String CH_SQZ_SHG_LOCK     = "SQZ_SHG_Lock_Status_MAX";
+   private static final String CH_SQZ_FAST_SHUTTER = "EQB1_FAST_SHUTTER_MONI_MAX";
 
    /* Valve channel names — single source of truth */
    private static final String V_CENTRAL_LI = "VAC_VALVECENTRAL_VLIST";
@@ -79,8 +96,15 @@ public final class LaserTopology {
       addEdge(g, WI,    TUBEW, V_CRYO_WI, V_BIG_WI);
       addEdge(g, TUBEN, NE,    V_CRYO_NE, V_BIG_NE);
       addEdge(g, TUBEW, WE,    V_CRYO_WE, V_BIG_WE);
-      /* TODO: SQZ branch (DET ↔ SQZDET1 ↔ SQZDET2 ↔ SQZ0N ↔ SQZ300N
-       *       + the second Green source). Waiting on expert valve list. */
+      /* SQZ branch: isolated subgraph (no DET edge). Every SQZ valve has an
+       * optical viewport, so both YAG and GREEN propagate through the whole
+       * branch regardless of valve state — modelled with zero-valve edges.
+       * Source is at SQB1 (SQZDET1), driven by the SHG-lock + fast-shutter
+       * signals; see compute*SqzSourceState() below. */
+      addEdge(g, SQZDET1, SQZDET2);
+      addEdge(g, SQZDET2, SQZ0N);
+      addEdge(g, SQZ0N,   SQZTUBE);
+      addEdge(g, SQZTUBE, SQZ300N);
 
       Map<String, List<Edge>> immutable = new HashMap<>();
       for (Map.Entry<String, List<Edge>> e : g.entrySet()) {
@@ -94,9 +118,10 @@ public final class LaserTopology {
       g.computeIfAbsent(b, k -> new ArrayList<>()).add(new Edge(a, valves));
    }
 
-   /* Source-tower mappings */
-   public static final List<String> YAG_SOURCE_TOWERS   = Collections.unmodifiableList(Arrays.asList(IB));
-   public static final List<String> GREEN_SOURCE_TOWERS = Collections.unmodifiableList(Arrays.asList(WE, NE));
+   /* Source-tower mappings. SQZDET1 (SQB1) is the entry point of the isolated
+    * SQZ subgraph for both YAG and GREEN. */
+   public static final List<String> YAG_SOURCE_TOWERS   = Collections.unmodifiableList(Arrays.asList(IB, SQZDET1));
+   public static final List<String> GREEN_SOURCE_TOWERS = Collections.unmodifiableList(Arrays.asList(WE, NE, SQZDET1));
 
    /* fx:id of a Yag/Green tower indicator -> its tower. Any indicator NOT in
     * the map is left untouched by propagation (e.g. WE/NE MiniGreen, which are
@@ -122,6 +147,11 @@ public final class LaserTopology {
       ym.put("WEMiniYag",  WE);
       ym.put("NEYag",      NE);
       ym.put("NEMiniYag",  NE);
+      ym.put("SQZDET1Yag", SQZDET1);
+      ym.put("SQZDET2Yag", SQZDET2);
+      ym.put("SQZ0NYag",   SQZ0N);
+      ym.put("SQZTUBEYag", SQZTUBE);
+      ym.put("SQZ300NYag", SQZ300N);
       YAG_INDICATORS = Collections.unmodifiableMap(ym);
 
       Map<String, String> gm = new LinkedHashMap<>();
@@ -141,6 +171,11 @@ public final class LaserTopology {
       gm.put("WEMiniGreen",  WE);
       gm.put("NEGreen",      NE);
       gm.put("NEMiniGreen",  NE);
+      gm.put("SQZDET1Green", SQZDET1);
+      gm.put("SQZDET2Green", SQZDET2);
+      gm.put("SQZ0NGreen",   SQZ0N);
+      gm.put("SQZTUBEGreen", SQZTUBE);
+      gm.put("SQZ300NGreen", SQZ300N);
       GREEN_INDICATORS = Collections.unmodifiableMap(gm);
    }
 
@@ -214,9 +249,11 @@ public final class LaserTopology {
     * the server fetch, before the per-element render loop.
     */
    public static void applyPropagation(DataSet data) {
-      Tri yagSrc     = computeYagSourceState(data);
-      Tri greenWeSrc = computeGreenSourceState(data, "WESourceGreen");
-      Tri greenNeSrc = computeGreenSourceState(data, "NESourceGreen");
+      Tri yagSrc       = computeYagSourceState(data);
+      Tri greenWeSrc   = computeGreenSourceState(data, "WESourceGreen");
+      Tri greenNeSrc   = computeGreenSourceState(data, "NESourceGreen");
+      Tri sqzYagSrc    = computeSqzYagSourceState(data);
+      Tri sqzGreenSrc  = computeSqzGreenSourceState(data);
 
       Function<String, String> valveLookup = chan -> {
          for (int i = 0; i < data.list.size(); i++) {
@@ -230,15 +267,17 @@ public final class LaserTopology {
       };
 
       Map<String, Tri> yagSources = new HashMap<>();
-      yagSources.put(IB, yagSrc);
+      yagSources.put(IB,      yagSrc);
+      yagSources.put(SQZDET1, sqzYagSrc);
       Map<String, Tri> yagReach = reach(yagSources, valveLookup);
 
       Map<String, Tri> greenSources = new HashMap<>();
-      greenSources.put(WE, greenWeSrc);
-      greenSources.put(NE, greenNeSrc);
+      greenSources.put(WE,      greenWeSrc);
+      greenSources.put(NE,      greenNeSrc);
+      greenSources.put(SQZDET1, sqzGreenSrc);
       Map<String, Tri> greenReach = reach(greenSources, valveLookup);
 
-      logIfChanged(yagSrc, greenWeSrc, greenNeSrc, yagReach, greenReach, valveLookup);
+      // logIfChanged(yagSrc, greenWeSrc, greenNeSrc, sqzYagSrc, sqzGreenSrc, yagReach, greenReach, valveLookup);
 
       writeReachIntoSvrValueList(data, YAG_INDICATORS, yagReach);
       writeReachIntoSvrValueList(data, GREEN_INDICATORS, greenReach);
@@ -247,13 +286,16 @@ public final class LaserTopology {
    /* Print one line per state transition (avoids per-frame log spam). */
    private static String lastLogLine = "";
    private static void logIfChanged(Tri yag, Tri gWe, Tri gNe,
+                                    Tri sqzYag, Tri sqzGreen,
                                     Map<String, Tri> yagReach,
                                     Map<String, Tri> greenReach,
                                     java.util.function.Function<String, String> valveLookup) {
       StringBuilder sb = new StringBuilder();
       sb.append("[LaserProp] srcYag=").append(yag)
         .append(" srcGreenWE=").append(gWe)
-        .append(" srcGreenNE=").append(gNe);
+        .append(" srcGreenNE=").append(gNe)
+        .append(" srcSqzYag=").append(sqzYag)
+        .append(" srcSqzGreen=").append(sqzGreen);
       sb.append(" yag{");
       for (Map.Entry<String, Tri> e : yagReach.entrySet()) {
          sb.append(e.getKey()).append('=').append(triShort(e.getValue())).append(' ');
@@ -267,10 +309,12 @@ public final class LaserTopology {
       if (!line.equals(lastLogLine)) {
          lastLogLine = line;
          System.out.println(line);
-         /* Also dump the raw channels driving the Yag source decision once. */
+         /* Also dump the raw channels driving the source decisions. */
          System.out.println("  INJ_EIB_POUT_PD_MAX=" + valveLookup.apply("INJ_EIB_POUT_PD_MAX")
                           + " BsX_QF_DC_MAX=" + valveLookup.apply("BsX_QF_DC_MAX")
                           + " BsX_QN_DC_MAX=" + valveLookup.apply("BsX_QN_DC_MAX"));
+         System.out.println("  SQZ_SHG_Lock_Status_MAX=" + valveLookup.apply("SQZ_SHG_Lock_Status_MAX")
+                          + " EQB1_FAST_SHUTTER_MONI_MAX=" + valveLookup.apply("EQB1_FAST_SHUTTER_MONI_MAX"));
       }
    }
    private static String triShort(Tri t) {
@@ -377,6 +421,29 @@ public final class LaserTopology {
     *  ~10 mW; raised here for the current bench setup. Adjust HERE only — both
     *  the SourceCO2 circle and the propagation BFS read this value. */
    private static final double CO2_ON_THRESHOLD = 20.0;
+
+   /** SQZ Green source state at SQB1: ON iff the SHG is locked (lock < 5).
+    *  Matches CIRCLE_SQZ_LOCK_STATUS_COLOR. The fast shutter does not gate
+    *  the GREEN propagation in this chain — see computeSqzYagSourceState. */
+   public static Tri computeSqzGreenSourceState(DataSet data) {
+      String lockRaw = findRaw(data, CH_SQZ_SHG_LOCK);
+      if (lockRaw == null) return Tri.UNKNOWN;
+      try {
+         return Double.parseDouble(lockRaw) < 5.0 ? Tri.ON : Tri.OFF;
+      }
+      catch (NumberFormatException ex) { return Tri.UNKNOWN; }
+   }
+
+   /** SQZ Yag source state at SQB1: ON iff the EQB1 fast shutter is OPEN
+    *  (shutter <= 1). Matches SHUTTER_SQZ_FAST_STATUS_COLOR. */
+   public static Tri computeSqzYagSourceState(DataSet data) {
+      String shutterRaw = findRaw(data, CH_SQZ_FAST_SHUTTER);
+      if (shutterRaw == null) return Tri.UNKNOWN;
+      try {
+         return Double.parseDouble(shutterRaw) <= 1.0 ? Tri.ON : Tri.OFF;
+      }
+      catch (NumberFormatException ex) { return Tri.UNKNOWN; }
+   }
 
    private static String findRaw(DataSet data, String svrName) {
       for (int i = 0; i < data.list.size(); i++) {

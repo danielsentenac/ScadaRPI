@@ -47,6 +47,7 @@ public class DataSetCBSafety extends DataSet {
       list.addElement(new DataElement("SQZDET1Yag",  Type.CIRCLE_YAG_STATUS_COLOR, ""));
       list.addElement(new DataElement("SQZDET2Yag",  Type.CIRCLE_YAG_STATUS_COLOR, ""));
       list.addElement(new DataElement("SQZ0NYag",    Type.CIRCLE_YAG_STATUS_COLOR, ""));
+      list.addElement(new DataElement("SQZTUBEYag",  Type.CIRCLE_YAG_STATUS_COLOR, ""));
       list.addElement(new DataElement("SQZ300NYag",  Type.CIRCLE_YAG_STATUS_COLOR, ""));
       list.addElement(new DataElement("TUBENYag",    Type.CIRCLE_YAG_STATUS_COLOR, ""));
       list.addElement(new DataElement("TUBEWYag",    Type.CIRCLE_YAG_STATUS_COLOR, ""));
@@ -80,6 +81,11 @@ public class DataSetCBSafety extends DataSet {
       list.addElement(new DataElement("DETMiniGreen", Type.CIRCLE_GREEN_STATUS_COLOR, ""));
       list.addElement(new DataElement("PRMiniGreen",  Type.CIRCLE_GREEN_STATUS_COLOR, ""));
       list.addElement(new DataElement("IBMiniGreen",  Type.CIRCLE_GREEN_STATUS_COLOR, ""));
+      list.addElement(new DataElement("SQZDET1Green", Type.CIRCLE_GREEN_STATUS_COLOR, ""));
+      list.addElement(new DataElement("SQZDET2Green", Type.CIRCLE_GREEN_STATUS_COLOR, ""));
+      list.addElement(new DataElement("SQZ0NGreen",   Type.CIRCLE_GREEN_STATUS_COLOR, ""));
+      list.addElement(new DataElement("SQZTUBEGreen", Type.CIRCLE_GREEN_STATUS_COLOR, ""));
+      list.addElement(new DataElement("SQZ300NGreen", Type.CIRCLE_GREEN_STATUS_COLOR, ""));
 
       // Local control status (rectangles).
       // Two SAT channels per tower (F0_DC_ENBL and F7_DC_ON) share the fx:id;
@@ -109,6 +115,12 @@ public class DataSetCBSafety extends DataSet {
       list.addElement(new DataElement("NICO2Shutter", Type.SHUTTER_CO2_STATUS_COLOR, "TCS_CO2_REL5"));
       list.addElement(new DataElement("NICO2Shutter", Type.SHUTTER_CO2_STATUS_COLOR, "TCS_CO2_REL6"));
       list.addElement(new DataElement("NICO2Shutter", Type.SHUTTER_CO2_STATUS_COLOR, "TCS_CO2_REL7"));
+
+      // SQZ source indicators (single-channel thresholds, not part of LaserTopology propagation):
+      //  - SHG Lock: value < 5 => ON (green), otherwise OFF (grey).
+      //  - Fast shutter: value > 1 => CLOSED (grey), otherwise OPEN (green).
+      list.addElement(new DataElement("SQZSourceGreen",  Type.CIRCLE_SQZ_LOCK_STATUS_COLOR,  "SQZ_SHG_Lock_Status_MAX"));
+      list.addElement(new DataElement("SQZYagShutter", Type.SHUTTER_SQZ_FAST_STATUS_COLOR, "EQB1_FAST_SHUTTER_MONI_MAX"));
 
       // ---- Propagation-only channels (no FXML element renders these) ----
       // Cross-panel channels needed by LaserTopology.applyPropagation to compute

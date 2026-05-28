@@ -110,10 +110,12 @@ public interface DataTypes {
    /**/  SHUTTER_CO2_STATUS_COLOR,
    /**/  CIRCLE_SOURCE_YAG_STATUS_COLOR,
    /**/  CIRCLE_SOURCE_GREEN_STATUS_COLOR,
-   /**/  CIRCLE_SOURCE_CO2_STATUS_COLOR
+   /**/  CIRCLE_SOURCE_CO2_STATUS_COLOR,
+   /**/  CIRCLE_SQZ_LOCK_STATUS_COLOR,
+   /**/  SHUTTER_SQZ_FAST_STATUS_COLOR
    }
 
-   String LABEL_STRING_STYLE = "-fx-border-color: #cfcfcf; -fx-font-size: 11; -fx-border-width: 1; -fx-font-weight: regular; -fx-border-radius: 5; -fx-text-fill: ";
+   String LABEL_STRING_STYLE = "-fx-border-color: #cfcfcf; -fx-font-size: 11; -fx-border-width: 1; -fx-font-weight: normal; -fx-border-radius: 5; -fx-text-fill: ";
    String LABEL_BACKGROUND_STYLE = "-fx-background-radius: 5; -fx-border-radius: 5;  -fx-background-color: ";
    String RECTANGLE_FILL_STYLE = "-fx-arc-height: 20; -fx-arc-width: 20; -fx-fill: linear-gradient(to top, ";
    String FILL_STYLE = "-fx-fill: linear-gradient(to top, ";

@@ -50,19 +50,16 @@
       <Circle fx:id="TUBEWYag" fill="#ff1f1f" layoutX="261.0" layoutY="147.0" radius="9.0" stroke="#ff1f1f" strokeType="INSIDE" />
       <Circle fx:id="WEGreen" fill="#21ff27" layoutX="99.0" layoutY="182.0" radius="9.0" stroke="#21ff27" strokeType="INSIDE" />
       <Circle fx:id="TUBEWGreen" fill="#21ff27" layoutX="261.0" layoutY="170.0" radius="9.0" stroke="#21ff27" strokeType="INSIDE" />
-      <Label fx:id="WEMini" alignment="CENTER" contentDisplay="CENTER" layoutX="34.0" layoutY="133.0" prefHeight="45.0" prefWidth="48.0" style="-fx-background-color: e1e4db; -fx-background-radius: 5; -fx-border-radius: 5; ">
-         <font>
-            <Font name="System" size="12.0" />
-         </font>
+      <Label fx:id="WEMini" alignment="TOP_CENTER" contentDisplay="CENTER" layoutX="34.0" layoutY="133.0" prefHeight="45.0" prefWidth="48.0" style="-fx-background-color: e1e4db; -fx-background-radius: 5; -fx-border-radius: 5; " text="SWEB">
          <effect>
             <InnerShadow />
          </effect>
       </Label>
-      <Circle fx:id="WEMiniGreen" fill="#21ff27" layoutX="47.0" layoutY="167.0" radius="9.0" stroke="#21ff27" strokeType="INSIDE" />
-      <Circle fx:id="WEMiniYag" fill="#ff1f1f" layoutX="47.0" layoutY="144.0" radius="9.0" stroke="#ff1f1f" strokeType="INSIDE" />
+      <Circle fx:id="WEMiniGreen" fill="#21ff27" layoutX="69.0" layoutY="167.0" radius="9.0" stroke="#21ff27" strokeType="INSIDE" />
+      <Circle fx:id="WEMiniYag" fill="#ff1f1f" layoutX="45.0" layoutY="166.0" radius="9.0" stroke="#ff1f1f" strokeType="INSIDE" />
       <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="32.0" layoutX="177.0" layoutY="71.0" stroke="#21ff27" strokeType="INSIDE" width="56.0" />
       <Circle fx:id="WESourceGreen" fill="#21ff27" layoutX="192.0" layoutY="86.0" radius="9.0" stroke="#21ff27" strokeType="INSIDE" />
-      <SVGPath fx:id="WEGreenShutter" content="M61.72.28a61.18,61.18,0,0,1,38.93,13.91L46.86,45.24V2.1A61.21,61.21,0,0,1,61.72.28ZM106,19.12a61.25,61.25,0,0,1,17.17,42.6,62,62,0,0,1-.64,8.89L69.66,40.09l36.33-21Zm15.06,58.64a61.59,61.59,0,0,1-34.91,40.36V57.6l34.91,20.16ZM79.21,120.64A61.6,61.6,0,0,1,25.05,111L79.21,79.75v40.89Zm-59.8-14.37A61.28,61.28,0,0,1,.28,61.72a62.4,62.4,0,0,1,.65-8.91L55.44,85.46l-36,20.81Zm-17-60.65A61.6,61.6,0,0,1,39.91,4.27l-.44,63.54-37-22.19Z" fill="#21ff27" layoutX="155.0" layoutY="26.0" scaleX="0.17" scaleY="0.17" />
+      <SVGPath fx:id="WEGreenShutter" content="M61.72.28a61.18,61.18,0,0,1,38.93,13.91L46.86,45.24V2.1A61.21,61.21,0,0,1,61.72.28ZM106,19.12a61.25,61.25,0,0,1,17.17,42.6,62,62,0,0,1-.64,8.89L69.66,40.09l36.33-21Zm15.06,58.64a61.59,61.59,0,0,1-34.91,40.36V57.6l34.91,20.16ZM79.21,120.64A61.6,61.6,0,0,1,25.05,111L79.21,79.75v40.89Zm-59.8-14.37A61.28,61.28,0,0,1,.28,61.72a62.4,62.4,0,0,1,.65-8.91L55.44,85.46l-36,20.81Zm-17-60.65A61.6,61.6,0,0,1,39.91,4.27l-.44,63.54-37-22.19Z" fill="#21ff27" layoutX="155.0" layoutY="26.0" scaleX="0.17" scaleY="0.17" stroke="#21ff27" strokeWidth="2.0" />
       <Text fill="#d1d1e0" layoutX="155.0" layoutY="54.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Source Green">
          <font>
             <Font size="16.0" />

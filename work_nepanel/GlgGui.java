@@ -180,7 +180,7 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
           panel.add(wrapWithTitle(glg_bean1, "NE BUILDING PARTICLE MONITORING", 30), new GridBagConstraints(0, 1, 1, 1, 0.1, 0.5
 						     , GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						     new Insets(1, 1, 1, 1), 0, 0));
-          panel.add(wrapWithTitle(glg_bean2, "O2 SENSORS", 30), new GridBagConstraints(1, 1, 1, 1, 1.2, 1.0
+          panel.add(wrapWithTitle(glg_bean2, "O₂ SENSORS", 30), new GridBagConstraints(1, 1, 1, 1, 1.2, 1.0
 						     , GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						     new Insets(1, 1, 1, 1), 0, 0));
 	  panel.add(jfxPanel3, new GridBagConstraints(2, 1, 1, 1, 1.0, 0.5

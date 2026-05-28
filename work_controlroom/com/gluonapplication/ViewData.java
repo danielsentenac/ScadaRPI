@@ -60,7 +60,7 @@ public class ViewData extends View implements Runnable, DataTypes {
         name = _name;
         try {
            mainLoader = new FXMLLoader(getClass().getResource("/" + fxml + ".fxml"));
-           mainLoader.setClassLoader(cachingClassLoader); 
+           mainLoader.setClassLoader(cachingClassLoader);
            mainPane =  mainLoader.load();
            backgroundPane = new Pane();
            backgroundPane.getChildren().addAll(mainPane);
@@ -353,12 +353,12 @@ public class ViewData extends View implements Runnable, DataTypes {
                 case CIRCLE_GREEN_STATUS_COLOR:
                         Circle greenCircle = (Circle) lookup("#" + data.list.elementAt(i).name);
                         if (greenCircle != null)
-                           Platform.runLater(() -> {greenCircle.setFill(LASER_STATUS_COLOR.get(value));});
+                           Platform.runLater(() -> {greenCircle.setFill(GREEN_STATUS_COLOR.get(value));});
                      break;
                 case CIRCLE_CO2_STATUS_COLOR:
                         Circle co2Circle = (Circle) lookup("#" + data.list.elementAt(i).name);
                         if (co2Circle != null)
-                           Platform.runLater(() -> {co2Circle.setFill(LASER_STATUS_COLOR.get(value));});
+                           Platform.runLater(() -> {co2Circle.setFill(CO2_STATUS_COLOR.get(value));});
                      break;
                 case RECTANGLE_LOCALCTRL_STATUS_COLOR:
                         Rectangle laserRect = (Rectangle) lookup("#" + data.list.elementAt(i).name);
@@ -467,7 +467,41 @@ public class ViewData extends View implements Runnable, DataTypes {
                            Platform.runLater(() -> {co2Shutter.setFill(CO2_STATUS_COLOR.get(shutterState));});
                         }
                      break;
-                case CIRCLE_RGA_2_STATUS_COLOR: 
+                case CIRCLE_SQZ_LOCK_STATUS_COLOR:
+                        Circle sqzLockCircle = (Circle) lookup("#" + data.list.elementAt(i).name);
+                        if (sqzLockCircle != null) {
+                           // SHG locked => ON (green) iff value < 5; otherwise OFF (grey).
+                           String raw = data.svrValueList.elementAt(i).replace(" ", "").replace(",", ".");
+                           String state;
+                           if (raw.contains("NOTEXIST") || raw.contains("TIMOUT")) {
+                              state = "---";
+                           } else {
+                              try { state = (Double.parseDouble(raw) < 5.0) ? "1" : "0"; }
+                              catch (NumberFormatException ex) { state = "---"; }
+                           }
+                           final String sqzLockState = state;
+                           Platform.runLater(() -> {sqzLockCircle.setFill(GREEN_STATUS_COLOR.get(sqzLockState));});
+                        }
+                     break;
+                case SHUTTER_SQZ_FAST_STATUS_COLOR:
+                        SVGPath sqzYagShutter = (SVGPath) lookup("#" + data.list.elementAt(i).name);
+                        if (sqzYagShutter != null) {
+                           // Fast shutter CLOSED iff value > 1; otherwise OPEN.
+                           // The fast shutter gates the YAG beam, so follow YAG colour
+                           // convention: OPEN => red (hazard), CLOSED => dark grey.
+                           String raw = data.svrValueList.elementAt(i).replace(" ", "").replace(",", ".");
+                           String state;
+                           if (raw.contains("NOTEXIST") || raw.contains("TIMOUT")) {
+                              state = "---";
+                           } else {
+                              try { state = (Double.parseDouble(raw) > 1.0) ? "0" : "1"; }
+                              catch (NumberFormatException ex) { state = "---"; }
+                           }
+                           final String sqzFastState = state;
+                           Platform.runLater(() -> {sqzYagShutter.setFill(LASER_STATUS_COLOR.get(sqzFastState));});
+                        }
+                     break;
+                case CIRCLE_RGA_2_STATUS_COLOR:
                         Circle rga2 = (Circle) lookup("#" + data.list.elementAt(i).name);
                         if (rga2 != null)
                            Platform.runLater(() -> {rga2.setFill(RGA_2_STATUS_COLOR.get(value));});
