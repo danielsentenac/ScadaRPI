@@ -499,7 +499,7 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
                   if ( glgName.contains("Cycle") && glgName.contains("Str") )  // Str is a tag for object status (short type) string property
                      glg_bean2.SetSTag(glgName, glgNameTmp + " : " + (int) dataElement.value, true);
                   if ( glgName.contains("Flow") && glgName.contains("Str") )  // Str is a tag for object status (short type) string property
-                     glg_bean2.SetSTag(glgName, glgNameTmp + ":" + (int) dataElement.value + "mLPM", true);
+                     glg_bean2.SetSTag(glgName, glgNameTmp + ":" +  String.format("%.2f", dataElement.value) + " CFM", true);
                }
                if ( glgName.contains("Val") && // Val is a tag for object value (double type) property
                    !glgName.contains("sub") && // Val is a tag for object value (double type) property

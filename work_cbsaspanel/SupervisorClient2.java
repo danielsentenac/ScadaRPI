@@ -61,8 +61,8 @@ public class SupervisorClient2 extends Device {
        // Particle counter cycle number value
        addDataElement( new DataElement(name, "VAC_PCOUNTERMOB" + i + "_CYCLE", DataType.READ_AND_WRITE_VALUE,RegisterType.INT16,mbRegisterEnd+=1));
        // Particle counter flow value
-       addDataElement( new DataElement(name, "VAC_PCOUNTERMOB" + i + "_FLOW", DataType.READ_ONLY_VALUE,RegisterType.INT16,mbRegisterEnd+=1));
-       addDataElement( new DataElement(name, "VAC_PCOUNTERMOB" + i + "_INSTRST", DataType.READ_ONLY_STATUS,RegisterType.INT16,mbRegisterEnd+=1));
+       addDataElement( new DataElement(name, "VAC_PCOUNTERMOB" + i + "_FLOW", DataType.READ_ONLY_VALUE,RegisterType.FLOAT32,mbRegisterEnd+=1));
+       addDataElement( new DataElement(name, "VAC_PCOUNTERMOB" + i + "_INSTRST", DataType.READ_ONLY_STATUS,RegisterType.INT16,mbRegisterEnd+=2));
        addDataElement( new DataElement(name, "VAC_PCOUNTERMOB" + i + "_ST", DataType.READ_ONLY_STATUS,RegisterType.INT16,mbRegisterEnd+=1));
        addDataElement( new DataElement(name, "VAC_PCOUNTERMOB" + i + "_COMST", DataType.READ_ONLY_STATUS,RegisterType.INT16,mbRegisterEnd+=1));  
     }

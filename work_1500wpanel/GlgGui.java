@@ -120,10 +120,14 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
     }
 
     private JComponent wrapWithTitle(JComponent content, String titleText) {
-       return wrapWithTitle(content, titleText, 0);
+       return wrapWithTitle(content, titleText, new Insets(0, 0, 0, 0));
     }
 
-    private JComponent wrapWithTitle(final JComponent content, String titleText, final int contentTopCrop) {
+    private JComponent wrapWithTitle(JComponent content, String titleText, int contentTopCrop) {
+       return wrapWithTitle(content, titleText, new Insets(contentTopCrop, 0, 0, 0));
+    }
+
+    private JComponent wrapWithTitle(final JComponent content, String titleText, final Insets crop) {
        JLabel title = new JLabel(titleText, SwingConstants.CENTER);
        title.setOpaque(true);
        title.setBackground(new Color(0x0e, 0x17, 0x26));
@@ -133,14 +137,21 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
        title.setPreferredSize(new java.awt.Dimension(0, 42));
 
        JComponent contentArea;
-       if (contentTopCrop > 0) {
+       if (crop.top > 0 || crop.bottom > 0 || crop.left > 0 || crop.right > 0) {
+          // The GLG drawing renders with empty padding around its inner frame.
+          // Lay the bean over an oversized rect that extends past the visible
+          // panel on every side specified by `crop`; the parent panel clips
+          // the overflow, so the visible region "zooms in" on the inner frame
+          // and the drawing fills the cyan-bordered wrapper edge-to-edge.
           final JPanel cropPanel = new JPanel(null);
           cropPanel.setOpaque(false);
           cropPanel.add(content);
           cropPanel.addComponentListener(new java.awt.event.ComponentAdapter() {
              @Override
              public void componentResized(java.awt.event.ComponentEvent e) {
-                content.setBounds(0, -contentTopCrop, cropPanel.getWidth(), cropPanel.getHeight() + contentTopCrop);
+                content.setBounds(-crop.left, -crop.top,
+                                  cropPanel.getWidth() + crop.left + crop.right,
+                                  cropPanel.getHeight() + crop.top + crop.bottom);
              }
           });
           contentArea = cropPanel;
@@ -161,6 +172,12 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
        wrapper.setBackground(Color.black);
        wrapper.add(title, java.awt.BorderLayout.NORTH);
        wrapper.add(contentWrapper, java.awt.BorderLayout.CENTER);
+       // The GlgJLWBean reports a large intrinsic preferred size that would
+       // dominate GridBagLayout column sizing and make weightx changes have no
+       // visible effect. Pin the wrapper's preferred/minimum size to zero so
+       // the cell width is governed purely by weightx distribution.
+       wrapper.setPreferredSize(new java.awt.Dimension(0, 0));
+       wrapper.setMinimumSize(new java.awt.Dimension(0, 0));
        return wrapper;
     }
 
@@ -227,12 +244,12 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
 
           // Top-row JavaFX panels (O2, Safety, Vac, Legend)
           initWebComponents();
-          
+
           // Add component to a frame
-          panel.add(wrapWithTitle(glg_bean1, "PARTICLE MONITORING 1500W", 30), new GridBagConstraints(0, 1, 1, 1, 1.5, 0.7
+          panel.add(wrapWithTitle(glg_bean1, "PARTICLE MONITORING 1500W"), new GridBagConstraints(0, 1, 1, 1, 3, 0.7
 						     , GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						     new Insets(1, 1, 1, 1), 0, 0));
-          panel.add(wrapWithTitle(glg_bean2, "PARTICLE MONITORING MOBILE", 30), new GridBagConstraints(1, 1, 1, 1, 0.7, 0.7
+          panel.add(wrapWithTitle(glg_bean2, "PARTICLE MONITORING MOBILE", 30), new GridBagConstraints(1, 1, 1, 1, 2, 0.7
 						     , GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						     new Insets(1, 1, 1, 1), 0, 0));
 	  panel.add(jfxPanel4, new GridBagConstraints(2, 1, 1, 1, 0.1,0.7
@@ -240,22 +257,23 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
 						     new Insets(1, 1, 1, 1), 0, 0));
           panel.add(panelweb, new GridBagConstraints(0, 0, 3, 1, 1.0, 1.1
 						     , GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						     new Insets(1, 1, 1, 1), 0, 0));	
-	  			     
-          
-          glg_bean1.SetSTag("title", "", true);
+						     new Insets(1, 1, 1, 1), 0, 0));
+
+          // Tags must be set after the beans are added to the hierarchy so
+          // the GLG drawing is loaded; setting them earlier silently no-ops
+          // and the labels show their default ("PCounter") text.
+         // glg_bean1.SetSTag("title", "", true);
           glg_bean2.SetSTag("title", "", true);
-          
+
           glg_bean1.SetSTag("pcounter1", "Payload L.", true);
           glg_bean1.SetSTag("pcounter2", "Fiber L.", true);
           glg_bean1.SetSTag("pcounter3", "Clean R. Sas", true);
-          glg_bean1.SetSTag("pcounter4", "Main Hall", true);
-          glg_bean1.SetSTag("pcounter5", "SQZ Lab.", true);
-          
+          glg_bean1.SetSTag("pcounter4", "SQZ Lab.", true);
+
           glg_bean2.SetSTag("pcountermob1", "Mobile 1", true);
           glg_bean2.SetSTag("pcountermob2", "Mobile 2", true);
           glg_bean2.SetSTag("pcountermob3", "Mobile 3", true);
-          
+
           // Start thread
           this.doStart();
        }
@@ -265,12 +283,12 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
        }
     }
     private void initWebComponents() {
-        jfxPanel1 = createEmbeddedPanel("CB O₂ sensor panel unavailable (JavaFX missing)");
-        jfxPanel2 = createEmbeddedPanel("CB safety panel unavailable (JavaFX missing)");
+        jfxPanel1 = createEmbeddedPanel("WE O₂ sensor panel unavailable (JavaFX missing)");
+        jfxPanel2 = createEmbeddedPanel("WE safety panel unavailable (JavaFX missing)");
         jfxPanel4 = createEmbeddedPanel("LEGEND unavailable (JavaFX missing)");
         createSensorO2Scene();
         createSafetyScene();
-        panelweb.add(jfxPanel1, new GridBagConstraints(0, 0, 1, 1, 0.8, 1.0
+        panelweb.add(jfxPanel1, new GridBagConstraints(0, 0, 1, 1, 1.2, 1.0
 						     , GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						     new Insets(1, 1, 1, 1), 0, 0));
         panelweb.add(jfxPanel2, new GridBagConstraints(1, 0, 1, 1, 0.8, 1.0
@@ -356,12 +374,12 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
            @Override
            public void run() {
               try {
-                 Object safetyCB = Class.forName("com.gluonapplication.ViewSafetyFlags")
+                 Object safetyWE = Class.forName("com.gluonapplication.ViewSafetyFlags")
                          .getDeclaredConstructor(String.class, String.class)
-                         .newInstance("CBSAFETYFLAGS", "SafetyFlagsCB");
-                 safetyCB.getClass().getField("isSuspended").setBoolean(safetyCB, false);
-                 if (safetyCB instanceof Runnable) {
-                    new Thread((Runnable) safetyCB).start();
+                         .newInstance("WESAFETYFLAGS", "SafetyFlagsWE");
+                 safetyWE.getClass().getField("isSuspended").setBoolean(safetyWE, false);
+                 if (safetyWE instanceof Runnable) {
+                    new Thread((Runnable) safetyWE).start();
                  }
                  Class<?> loaderClass = Class.forName("javafx.fxml.FXMLLoader");
                  Object loader = loaderClass.getConstructor(URL.class)
@@ -371,13 +389,13 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
                  Class<?> paneClass = Class.forName("javafx.scene.layout.Pane");
                  Class<?> sceneClass = Class.forName("javafx.scene.Scene");
                  Class<?> fxBuilder = Class.forName("CbsaspanelFx");
-                 Object safetyScene = fxBuilder.getMethod("buildSafetyScene", paneClass).invoke(null, safetyCB);
+                 Object safetyScene = fxBuilder.getMethod("buildSafetyScene", paneClass).invoke(null, safetyWE);
                  jfxPanel2.getClass().getMethod("setScene", sceneClass).invoke(jfxPanel2, safetyScene);
                  Object legendScene = fxBuilder.getMethod("buildLegendScene", paneClass).invoke(null, legend);
                  jfxPanel4.getClass().getMethod("setScene", sceneClass).invoke(jfxPanel4, legendScene);
               }
               catch (ReflectiveOperationException | LinkageError ex) {
-                 logger.log(Level.WARNING, "GlgGui:createSafetyScene> Unable to start CB safety panel", ex);
+                 logger.log(Level.WARNING, "GlgGui:createSafetyScene> Unable to start WE safety panel", ex);
               }
            }
         });
@@ -398,12 +416,12 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
        Device dev1 = deviceManager.getDevice("SC");
        if ( dev1 != null ) {
           DataElement dcom = dev1.getDataElement("COMST");
-          if ( dcom.value == 1 ) {
+         /* if ( dcom.value == 1 ) {
               glg_bean1.SetGTag( "titleCol", new GlgPoint(0.5,0.5,0.5), true ); // Title grey for no connection
           }
           else
               glg_bean1.SetGTag( "titleCol", new GlgPoint(0.,1.0,1.0), true ); // Title blue for good connection
-             
+             */
        }
        // Update PCOUNTER data
        for (Map.Entry<String, String> e : PCOUNTERSTATUS.entrySet()) {
@@ -496,7 +514,7 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
                   if ( glgName.contains("Cycle") && glgName.contains("Str") )  // Str is a tag for object status (short type) string property
                      glg_bean2.SetSTag(glgName, glgNameTmp + " : " + (int) dataElement.value, true);
                   if ( glgName.contains("Flow") && glgName.contains("Str") )  // Str is a tag for object status (short type) string property
-                     glg_bean2.SetSTag(glgName, glgNameTmp + ":" + (int) dataElement.value + "mLPM", true);
+                     glg_bean2.SetSTag(glgName, glgNameTmp + ":" +  String.format("%.2f", dataElement.value) + " CFM", true);
                }
                if ( glgName.contains("Val") && // Val is a tag for object value (double type) property
                    !glgName.contains("sub") && // Val is a tag for object value (double type) property

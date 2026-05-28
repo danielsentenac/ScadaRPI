@@ -17,7 +17,7 @@ public class CbsaspanelFx {
     private static final double CONTENT_MARGIN = 8.0;
 
     public static Scene buildO2Scene(Pane o2Pane) {
-        applyStatusFontOverride(o2Pane, new String[] {"ControllerCB", "AlarmCB"}, 16);
+        applyStatusFontOverride(o2Pane, new String[] {"ControllerWE", "AlarmWE"}, 16);
         BorderPane decorated = wrapWithTitle("O₂ SENSORS", o2Pane);
         decorated.setStyle("-fx-background-color: black;");
         return new Scene(decorated);
@@ -45,7 +45,7 @@ public class CbsaspanelFx {
     }
 
     public static Scene buildSafetyScene(Pane safetyCB) {
-        BorderPane decorated = wrapWithTitle("LASER BEAMS - CB", safetyCB);
+        BorderPane decorated = wrapWithTitle("LASER BEAMS WE", safetyCB);
         decorated.setStyle("-fx-background-color: black;");
         return new Scene(decorated);
     }
