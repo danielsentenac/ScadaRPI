@@ -4,3 +4,4 @@ scripts
 build/
 tools/
 .codex
+work_controlroom/*.log
