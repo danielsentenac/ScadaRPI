@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<!--
+  Port of SENSORO2.fxml. Unlike the safety-flag panels (absolute SVG coords),
+  this FXML is a fluid VBox/HBox layout — flexbox in HTML is the natural mapping.
+
+  Element id == fx:id from the FXML, so a data-binding loop can populate text/colour
+  by fx:id later (e.g. document.getElementById("CBZoneA60").textContent = value).
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sensor O₂ — port</title>
+<style>
+  :root {
+    --panel-bg: #21304F;
+    --card-bg: #17233d;
+    --accent: #00e5ff;
+    --label-fg: #d7e6ff;
+    --value-fg: #f3f6ff;
+    --value-border: #cfcfcf;
+    --idle-circle: #d1d1e0;
+  }
+  html, body { margin: 0; padding: 16px; background: #000; color: var(--value-fg);
+               font-family: "DejaVu Sans", "Liberation Sans", "Helvetica", sans-serif; }
+  .header { font-size: 13px; color: #ccc; margin-bottom: 4px; }
+  .panel {
+    background: var(--panel-bg);
+    border: 2px solid var(--accent);
+    border-radius: 5px;
+    padding: 8px;
+    width: 525px;
+    box-sizing: border-box;
+  }
+  .panel > .stack { display: flex; flex-direction: column; gap: 8px; }
+  .card {
+    background: var(--card-bg);
+    border: 1px solid #00e5ff44;
+    border-radius: 8px;
+    padding: 10px 8px 12px 8px;
+  }
+  .card-title {
+    color: var(--label-fg);
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 6px;
+  }
+  .section-title {
+    text-align: center;
+    color: var(--accent);
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  .top-row { display: flex; gap: 8px; }
+  .top-row > .card { flex: 1; }
+  .vbox { display: flex; flex-direction: column; gap: 8px; }
+  .row { display: flex; align-items: center; gap: 6px; }
+  .row.compact { gap: 4px; }
+  .row .name { color: var(--label-fg); width: 40px; font-size: 22px; }
+  .row .name-wide { color: var(--label-fg); width: 140px; font-size: 16px; text-align: right; }
+  .value {
+    flex: 1; min-width: 100px;
+    border: 1px solid var(--value-border);
+    border-radius: 5px;
+    color: var(--value-fg);
+    text-align: center;
+    padding: 2px 6px;
+    font-size: 22px;
+  }
+  .value.small {
+    min-width: 130px; font-size: 16px; padding: 0 4px;
+  }
+  .status {
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--idle-circle);
+    /* InnerShadow approximation matching the safety-flag panels */
+    box-shadow: inset 0 0 4px rgba(0,0,0,0.55);
+    flex-shrink: 0;
+  }
+  .room-columns { display: flex; gap: 10px; }
+  .room-columns > .vbox { flex: 1; min-width: 270px; }
+</style>
+</head>
+<body>
+
+<div class="header">SENSORO2.fxml &rarr; HTML/CSS (natural width 525)</div>
+<div class="panel">
+  <div class="stack">
+
+    <!-- Top row: Controller Status + Alarms -->
+    <div class="top-row">
+      <div class="card">
+        <div class="card-title">Controller Status</div>
+        <div class="vbox">
+          <div class="row"><div class="name">CB</div><div class="value" id="ControllerCB"></div></div>
+          <div class="row"><div class="name">NE</div><div class="value" id="ControllerNE"></div></div>
+          <div class="row"><div class="name">WE</div><div class="value" id="ControllerWE"></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Alarms</div>
+        <div class="vbox">
+          <div class="row"><div class="name">CB</div><div class="value" id="AlarmCB"></div></div>
+          <div class="row"><div class="name">NE</div><div class="value" id="AlarmNE"></div></div>
+          <div class="row"><div class="name">WE</div><div class="value" id="AlarmWE"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CB section -->
+    <div class="card">
+      <div class="section-title">CB</div>
+      <div class="room-columns">
+        <div class="vbox">
+          <div class="row compact"><div class="name-wide">Zone A 60</div>  <div class="value small" id="CBZoneA60"></div>  <div class="status" id="CBZoneA60Status"></div></div>
+          <div class="row compact"><div class="name-wide">Zone A 120</div> <div class="value small" id="CBZoneA120"></div> <div class="status" id="CBZoneA120Status"></div></div>
+          <div class="row compact"><div class="name-wide">Zone B 120</div> <div class="value small" id="CBZoneB120"></div> <div class="status" id="CBZoneB120Status"></div></div>
+          <div class="row compact"><div class="name-wide">Zone B 170</div> <div class="value small" id="CBZoneB170"></div> <div class="status" id="CBZoneB170Status"></div></div>
+          <div class="row compact"><div class="name-wide">Zone C 60</div>  <div class="value small" id="CBZoneC60"></div>  <div class="status" id="CBZoneC60Status"></div></div>
+          <div class="row compact"><div class="name-wide">Zone C 120</div> <div class="value small" id="CBZoneC120"></div> <div class="status" id="CBZoneC120Status"></div></div>
+          <div class="row compact"><div class="name-wide">Zone D 120</div> <div class="value small" id="CBZoneD120"></div> <div class="status" id="CBZoneD120Status"></div></div>
+          <div class="row compact"><div class="name-wide">Zone D 170</div> <div class="value small" id="CBZoneD170"></div> <div class="status" id="CBZoneD170Status"></div></div>
+        </div>
+        <div class="vbox">
+          <div class="row compact"><div class="name-wide">Zone E 60</div>  <div class="value small" id="CBZoneE60"></div>  <div class="status" id="CBZoneE60Status"></div></div>
+          <div class="row compact"><div class="name-wide">Zone E 120</div> <div class="value small" id="CBZoneE120"></div> <div class="status" id="CBZoneE120Status"></div></div>
+          <div class="row compact"><div class="name-wide">Zone F 60</div>  <div class="value small" id="CBZoneF60"></div>  <div class="status" id="CBZoneF60Status"></div></div>
+          <div class="row compact"><div class="name-wide">Zone F 120</div> <div class="value small" id="CBZoneF120"></div> <div class="status" id="CBZoneF120Status"></div></div>
+          <div class="row compact"><div class="name-wide">Zone G 60</div>  <div class="value small" id="CBZoneG60"></div>  <div class="status" id="CBZoneG60Status"></div></div>
+          <div class="row compact"><div class="name-wide">Zone G 120</div> <div class="value small" id="CBZoneG120"></div> <div class="status" id="CBZoneG120Status"></div></div>
+          <div class="row compact"><div class="name-wide">Clean Rm 60</div> <div class="value small" id="CBCleanRoom60"></div>  <div class="status" id="CBCleanRoom60Status"></div></div>
+          <div class="row compact"><div class="name-wide">Clean Rm 120</div><div class="value small" id="CBCleanRoom120"></div> <div class="status" id="CBCleanRoom120Status"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NE section -->
+    <div class="card">
+      <div class="section-title">NE</div>
+      <div class="room-columns">
+        <div class="vbox">
+          <div class="row compact"><div class="name-wide">Tower DX 60</div>  <div class="value small" id="NETowerDx60"></div>     <div class="status" id="NETowerDx60Status"></div></div>
+          <div class="row compact"><div class="name-wide">Tower DX120</div>  <div class="value small" id="NETowerDx120"></div>    <div class="status" id="NETowerDx120Status"></div></div>
+          <div class="row compact"><div class="name-wide">Base Rm 60</div>   <div class="value small" id="NEBaseRoom60"></div>    <div class="status" id="NEBaseRoom60Status"></div></div>
+          <div class="row compact"><div class="name-wide">Base Rm 120</div>  <div class="value small" id="NEBaseRoom120"></div>   <div class="status" id="NEBaseRoom120Status"></div></div>
+          <div class="row compact"><div class="name-wide">Clean Rm 60</div>  <div class="value small" id="NECleanRoom60"></div>   <div class="status" id="NECleanRoom60Status"></div></div>
+          <div class="row compact"><div class="name-wide">Clean Rm 120</div> <div class="value small" id="NECleanRoom120"></div>  <div class="status" id="NECleanRoom120Status"></div></div>
+        </div>
+        <div class="vbox">
+          <div class="row compact"><div class="name-wide">Tower SX 60</div>  <div class="value small" id="NETowerSx60"></div>     <div class="status" id="NETowerSx60Status"></div></div>
+          <div class="row compact"><div class="name-wide">Tower SX120</div>  <div class="value small" id="NETowerSx120"></div>    <div class="status" id="NETowerSx120Status"></div></div>
+          <div class="row compact"><div class="name-wide">Tunnel 60</div>    <div class="value small" id="NETunnel60"></div>      <div class="status" id="NETunnel60Status"></div></div>
+          <div class="row compact"><div class="name-wide">Tunnel 120</div>   <div class="value small" id="NETunnel120"></div>     <div class="status" id="NETunnel120Status"></div></div>
+          <div class="row compact"><div class="name-wide">Tunnel Dr 60</div> <div class="value small" id="NETunnelDoor60"></div>  <div class="status" id="NETunnelDoor60Status"></div></div>
+          <div class="row compact"><div class="name-wide">Tunnel Dr120</div> <div class="value small" id="NETunnelDoor120"></div> <div class="status" id="NETunnelDoor120Status"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WE section -->
+    <div class="card">
+      <div class="section-title">WE</div>
+      <div class="room-columns">
+        <div class="vbox">
+          <div class="row compact"><div class="name-wide">Tower DX 60</div>  <div class="value small" id="WETowerDx60"></div>     <div class="status" id="WETowerDx60Status"></div></div>
+          <div class="row compact"><div class="name-wide">Tower DX120</div>  <div class="value small" id="WETowerDx120"></div>    <div class="status" id="WETowerDx120Status"></div></div>
+          <div class="row compact"><div class="name-wide">Base Rm 60</div>   <div class="value small" id="WEBaseRoom60"></div>    <div class="status" id="WEBaseRoom60Status"></div></div>
+          <div class="row compact"><div class="name-wide">Base Rm 120</div>  <div class="value small" id="WEBaseRoom120"></div>   <div class="status" id="WEBaseRoom120Status"></div></div>
+          <div class="row compact"><div class="name-wide">Clean Rm 60</div>  <div class="value small" id="WECleanRoom60"></div>   <div class="status" id="WECleanRoom60Status"></div></div>
+          <div class="row compact"><div class="name-wide">Clean Rm 120</div> <div class="value small" id="WECleanRoom120"></div>  <div class="status" id="WECleanRoom120Status"></div></div>
+        </div>
+        <div class="vbox">
+          <div class="row compact"><div class="name-wide">Tower SX 60</div>  <div class="value small" id="WETowerSx60"></div>     <div class="status" id="WETowerSx60Status"></div></div>
+          <div class="row compact"><div class="name-wide">Tower SX120</div>  <div class="value small" id="WETowerSx120"></div>    <div class="status" id="WETowerSx120Status"></div></div>
+          <div class="row compact"><div class="name-wide">Tunnel 60</div>    <div class="value small" id="WETunnel60"></div>      <div class="status" id="WETunnel60Status"></div></div>
+          <div class="row compact"><div class="name-wide">Tunnel 120</div>   <div class="value small" id="WETunnel120"></div>     <div class="status" id="WETunnel120Status"></div></div>
+          <div class="row compact"><div class="name-wide">Tunnel Dr 60</div> <div class="value small" id="WETunnelDoor60"></div>  <div class="status" id="WETunnelDoor60Status"></div></div>
+          <div class="row compact"><div class="name-wide">Tunnel Dr120</div> <div class="value small" id="WETunnelDoor120"></div> <div class="status" id="WETunnelDoor120Status"></div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

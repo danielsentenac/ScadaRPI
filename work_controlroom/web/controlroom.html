@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<!--
+  Combined Control Room display: O2 sensors + LASER BEAMS CB/NE/WE + LEGEND.
+  Layout mirrors GlgGui.java:
+    - Left  : O2 panel  (~30% width, full height)
+    - Center: CB (top 78%) + LEGEND (bottom 22%)
+    - Right : NE (top 50%) + WE (bottom 50%)
+  Each panel has a cyan title bar (#0e1726 bg, AQUA text) and cyan-bordered content.
+  SVG `viewBox` does the scaling — panels resize to whatever cell the grid gives them.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Virgo Vacuum — Control Room</title>
+<style>
+  :root {
+    --panel-bg: #21304F;
+    --title-bg: #0e1726;
+    --card-bg: #17233d;
+    --accent: #00e5ff;
+    --aqua: #00ffff;
+    --label-fg: #d7e6ff;
+    --value-fg: #f3f6ff;
+    --value-border: #cfcfcf;
+    --idle-circle: #d1d1e0;
+  }
+  html, body { margin: 0; height: 100%; background: #000;
+               font-family: "DejaVu Sans", "Liberation Sans", "Helvetica", sans-serif;
+               color: var(--value-fg); }
+
+  .grid {
+    display: flex; gap: 8px; padding: 8px;
+    height: 100vh; box-sizing: border-box;
+  }
+  .col { display: flex; flex-direction: column; gap: 8px; min-width: 0; min-height: 0; }
+  .col-o2    { flex: 31; }
+  .col-left  { flex: 46; }
+  .col-right { flex: 23; }
+
+  .panel {
+    display: flex; flex-direction: column;
+    background: #000;
+    min-width: 0; min-height: 0;
+  }
+  .panel-cb  { flex: 75; }
+  .panel-leg { flex: 25; }
+  .panel-ne  { flex: 1; }
+  .panel-we  { flex: 1; }
+  .panel-o2  { flex: 1; }
+
+  .title {
+    background: var(--title-bg);
+    color: var(--aqua);
+    text-align: center;
+    font-size: 24px;
+    line-height: 42px;
+    height: 42px;
+    border-radius: 5px;
+    margin-bottom: 4px;
+    flex-shrink: 0;
+  }
+  .content {
+    background: var(--panel-bg);
+    border: 2px solid var(--accent);
+    border-radius: 5px;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    padding: 14px;
+  }
+  .content > svg { display: block; width: 100%; height: 100%; }
+
+  /* --- O2 panel styling (HTML/CSS, not SVG) ---
+     GridBagLayout-style fit: section cards distribute the available height
+     proportional to their row count (CB: 8, NE: 6, WE: 6), rows within each
+     section share their card's height evenly, and font sizes scale with the
+     container's height via CSS container query units. No scrollbar — content
+     always fits the panel rectangle. */
+  .content-o2 {
+    container-type: size;
+    padding: 4px;
+    overflow: hidden;
+  }
+  .o2-stack {
+    display: flex; flex-direction: column;
+    gap: 0.6cqh;
+    height: 100%; min-height: 0;
+  }
+  .o2-card {
+    background: var(--card-bg);
+    border: 1px solid #00e5ff44;
+    border-radius: 6px;
+    padding: 0.5cqh 0.8cqh 0.6cqh 0.8cqh;
+    min-height: 0;
+    display: flex; flex-direction: column;
+  }
+  /* Section card weights — proportional to per-column row count. */
+  .o2-stack > .o2-card:nth-child(2) { flex: 8; }   /* CB (8 rows per col) */
+  .o2-stack > .o2-card:nth-child(3) { flex: 6; }   /* NE (6 rows per col) */
+  .o2-stack > .o2-card:nth-child(4) { flex: 6; }   /* WE (6 rows per col) */
+
+  .o2-top-row { flex: 0 0 auto; display: flex; gap: 0.6cqh; }
+  .o2-top-row > .o2-card { flex: 1; }
+
+  .o2-card-title {
+    color: var(--label-fg);
+    font-size: clamp(9px, 1.6cqh, 14px);
+    font-weight: bold; margin-bottom: 0.2cqh;
+    flex-shrink: 0;
+  }
+  .o2-section-title {
+    text-align: center; color: var(--accent);
+    font-size: clamp(12px, 2.4cqh, 20px);
+    font-weight: bold; margin-bottom: 0.4cqh;
+    flex-shrink: 0;
+  }
+
+  .o2-room-columns {
+    flex: 1; display: flex; gap: 0; min-height: 0;
+  }
+  .o2-room-columns > .o2-vbox {
+    flex: 1; display: flex; flex-direction: column;
+    min-height: 0; min-width: 0;
+    gap: 0.2cqh;
+  }
+  .o2-vbox > .o2-row { flex: 1; min-height: 0; }
+
+  .o2-row { display: flex; align-items: center; gap: 0.5cqh; }
+  .o2-row.compact { gap: 0.4cqh; }
+  .o2-row .name {
+    color: var(--label-fg);
+    width: clamp(20px, 3.2cqh, 28px);
+    font-size: clamp(9px, 1.6cqh, 14px);
+  }
+  .o2-row .name-wide {
+    color: var(--label-fg);
+    width: clamp(70px, 11cqh, 100px);
+    font-size: clamp(8px, 1.2cqh, 11px);
+    text-align: right;
+  }
+  .o2-value {
+    flex: 1; min-width: 0;
+    border: 1px solid var(--value-border); border-radius: 3px;
+    color: var(--value-fg); text-align: center;
+    padding: 0 0.5cqh;
+    font-size: clamp(8px, 1.4cqh, 12px);
+  }
+  .o2-value.small { font-size: clamp(8px, 1.2cqh, 11px); padding: 0 0.4cqh; }
+  .o2-status {
+    width: clamp(8px, 1.4cqh, 12px);
+    height: clamp(8px, 1.4cqh, 12px);
+    border-radius: 50%;
+    background: var(--idle-circle);
+    box-shadow: inset 0 0 3px rgba(0,0,0,0.55);
+    flex-shrink: 0;
+  }
+
+  .jfx { font-family: "DejaVu Sans", "Liberation Sans", "Helvetica", sans-serif; }
+
+  /* --- Legend (HTML grid + inline SVG icons; same fonts as O2 panel) --- */
+  .content-legend { padding: 6px 12px; overflow: hidden; }
+  .legend-grid {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 100%;
+    gap: 12px;
+    font-family: "DejaVu Sans", "Liberation Sans", "Helvetica", sans-serif;
+    color: #d1d1e0;
+  }
+  .legend-col {
+    display: flex; flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+  }
+  .legend-item {
+    display: flex; align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  .legend-item > svg { flex-shrink: 0; width: 22px; height: 22px; }
+  .legend-item > svg.icon-valve { width: 30px; height: 18px; }
+
+  /* --- GPS label (over the WE panel, intentionally clipping the panel's bottom
+       cyan border so the label sits cleanly inside the panel area) --- */
+  .gps-label {
+    position: fixed; right: 16px; bottom: 12px;
+    font-size: 13px; color: #00e5ff;
+    background: var(--panel-bg);
+    padding: 2px 8px; border-radius: 4px;
+    pointer-events: none;
+    font-family: "DejaVu Sans Mono", "Liberation Mono", monospace;
+  }
+
+  /* --- Connection-error banner (hidden by default) --- */
+  .conn-banner {
+    position: fixed; left: 50%; top: 8px;
+    transform: translateX(-50%);
+    background: #ff3339; color: #fff;
+    padding: 4px 12px; border-radius: 5px;
+    font-size: 14px; font-weight: bold;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    z-index: 100;
+    display: none;
+  }
+  .conn-banner.show { display: block; }
+</style>
+</head>
+<body>
+
+<!-- Shared SVG defs (filter + symbols). Inline, zero size, just for url(#id) refs. -->
+<svg width="0" height="0" style="position:absolute" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="innerShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+      <feOffset dx="0" dy="0"/>
+      <feComposite in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="shadowDiff"/>
+      <feFlood flood-color="black" flood-opacity="0.55"/>
+      <feComposite in2="shadowDiff" operator="in"/>
+      <feComposite in="SourceGraphic" operator="over"/>
+    </filter>
+    <symbol id="pinwheel" overflow="visible">
+      <path d="M61.72.28a61.18,61.18,0,0,1,38.93,13.91L46.86,45.24V2.1A61.21,61.21,0,0,1,61.72.28ZM106,19.12a61.25,61.25,0,0,1,17.17,42.6,62,62,0,0,1-.64,8.89L69.66,40.09l36.33-21Zm15.06,58.64a61.59,61.59,0,0,1-34.91,40.36V57.6l34.91,20.16ZM79.21,120.64A61.6,61.6,0,0,1,25.05,111L79.21,79.75v40.89Zm-59.8-14.37A61.28,61.28,0,0,1,.28,61.72a62.4,62.4,0,0,1,.65-8.91L55.44,85.46l-36,20.81Zm-17-60.65A61.6,61.6,0,0,1,39.91,4.27l-.44,63.54-37-22.19Z"/>
+    </symbol>
+    <symbol id="valve" overflow="visible">
+      <path d="M17 26 V 44 L 53 26 V 44 Z"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="grid">
+
+  <!-- ============================================================
+       O2 SENSORS panel (HTML/CSS, port of SENSORO2.fxml)
+       ============================================================ -->
+  <div class="col col-o2">
+    <div class="panel panel-o2">
+      <div class="title">O₂ SENSORS</div>
+      <div class="content content-o2">
+        <div class="o2-stack">
+
+          <div class="o2-top-row">
+            <div class="o2-card">
+              <div class="o2-card-title">Controller Status</div>
+              <div class="o2-vbox">
+                <div class="o2-row"><div class="name">CB</div><div class="o2-value" id="ControllerCB"></div></div>
+                <div class="o2-row"><div class="name">NE</div><div class="o2-value" id="ControllerNE"></div></div>
+                <div class="o2-row"><div class="name">WE</div><div class="o2-value" id="ControllerWE"></div></div>
+              </div>
+            </div>
+            <div class="o2-card">
+              <div class="o2-card-title">Alarms</div>
+              <div class="o2-vbox">
+                <div class="o2-row"><div class="name">CB</div><div class="o2-value" id="AlarmCB"></div></div>
+                <div class="o2-row"><div class="name">NE</div><div class="o2-value" id="AlarmNE"></div></div>
+                <div class="o2-row"><div class="name">WE</div><div class="o2-value" id="AlarmWE"></div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="o2-card">
+            <div class="o2-section-title">CB</div>
+            <div class="o2-room-columns">
+              <div class="o2-vbox">
+                <div class="o2-row compact"><div class="name-wide">Zone A 60</div>  <div class="o2-value small" id="CBZoneA60"></div>  <div class="o2-status" id="CBZoneA60Status"></div></div>
+                <div class="o2-row compact"><div class="name-wide">Zone A 120</div> <div class="o2-value small" id="CBZoneA120"></div> <div class="o2-status" id="CBZoneA120Status"></div></div>
+                <div class="o2-row compact"><div class="name-wide">Zone B 120</div> <div class="o2-value small" id="CBZoneB120"></div> <div class="o2-status" id="CBZoneB120Status"></div></div>
+                <div class="o2-row compact"><div class="name-wide">Zone B 170</div> <div class="o2-value small" id="CBZoneB170"></div> <div class="o2-status" id="CBZoneB170Status"></div></div>
+                <div class="o2-row compact"><div class="name-wide">Zone C 60</div>  <div class="o2-value small" id="CBZoneC60"></div>  <div class="o2-status" id="CBZoneC60Status"></div></div>
+                <div class="o2-row compact"><div class="name-wide">Zone C 120</div> <div class="o2-value small" id="CBZoneC120"></div> <div class="o2-status" id="CBZoneC120Status"></div></div>
+                <div class="o2-row compact"><div class="name-wide">Zone D 120</div> <div class="o2-value small" id="CBZoneD120"></div> <div class="o2-status" id="CBZoneD120Status"></div></div>
+                <div class="o2-row compact"><div class="name-wide">Zone D 170</div> <div class="o2-value small" id="CBZoneD170"></div> <div class="o2-status" id="CBZoneD170Status"></div></div>
+              </div>
+              <div class="o2-vbox">
+                <div class="o2-row compact"><div class="name-wide">Zone E 60</div>  <div class="o2-value small" id="CBZoneE60"></div>  <div class="o2-status" id="CBZoneE60Status"></div></div>
+                <div class="o2-row compact"><div class="name-wide">Zone E 120</div> <div class="o2-value small" id="CBZoneE120"></div> <div class="o2-status" id="CBZoneE120Status"></div></div>
+                <div class="o2-row compact"><div class="name-wide">Zone F 60</div>  <div class="o2-value small" id="CBZoneF60"></div>  <div class="o2-status" id="CBZoneF60Status"></div></div>
+                <div class="o2-row compact"><div class="name-wide">Zone F 120</div> <div class="o2-value small" id="CBZoneF120"></div> <div class="o2-status" id="CBZoneF120Status"></div></div>
+                <div class="o2-row compact"><div class="name-wide">Zone G 60</div>  <div class="o2-value small" id="CBZoneG60"></div>  <div class="o2-status" id="CBZoneG60Status"></div></div>
+                <div class="o2-row compact"><div class="name-wide">Zone G 120</div> <div class="o2-value small" id="CBZoneG120"></div> <div class="o2-status" id="CBZoneG120Status"></div></div>
+                <div class="o2-row compact"><div class="name-wide">Clean Rm 60</div> <div class="o2-value small" id="CBCleanRoom60"></div>  <div class="o2-status" id="CBCleanRoom60Status"></div></div>
+                <div class="o2-row compact"><div class="name-wide">Clean Rm 120</div><div class="o2-value small" id="CBCleanRoom120"></div> <div class="o2-status" id="CBCleanRoom120Status"></div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="o2-card">
+            <div class="o2-section-title">NE</div>
+            <div class="o2-room-columns">
+              <div class="o2-vbox">
+                <div class="o2-row compact"><div class="name-wide">Tower DX 60</div>  <div class="o2-value small" id="NETowerDx60"></div>     <div class="o2-status" id="NETowerDx60Status"></div></div>
+                <div class="o2-row compact"><div class="name-wide">Tower DX120</div>  <div class="o2-value small" id="NETowerDx120"></div>    <div class="o2-status" id="NETowerDx120Status"></div></div>
+                <div class="o2-row compact"><div class="name-wide">Base Rm 60</div>   <div class="o2-value small" id="NEBaseRoom60"></div>    <div class="o2-status" id="NEBaseRoom60Status"></div></div>
+                <div class="o2-row compact"><div class="name-wide">Base Rm 120</div>  <div class="o2-value small" id="NEBaseRoom120"></div>   <div class="o2-status" id="NEBaseRoom120Status"></div></div>
+                <div class="o2-row compact"><div class="name-wide">Clean Rm 60</div>  <div class="o2-value small" id="NECleanRoom60"></div>   <div class="o2-status" id="NECleanRoom60Status"></div></div>
+                <div class="o2-row compact"><div class="name-wide">Clean Rm 120</div> <div class="o2-value small" id="NECleanRoom120"></div>  <div class="o2-status" id="NECleanRoom120Status"></div></div>
+              </div>
+              <div class="o2-vbox">
+                <div class="o2-row compact"><div class="name-wide">Tower SX 60</div>  <div class="o2-value small" id="NETowerSx60"></div>     <div class="o2-status" id="NETowerSx60Status"></div></div>
+                <div class="o2-row compact"><div class="name-wide">Tower SX120</div>  <div class="o2-value small" id="NETowerSx120"></div>    <div class="o2-status" id="NETowerSx120Status"></div></div>
+                <div class="o2-row compact"><div class="name-wide">Tunnel 60</div>    <div class="o2-value small" id="NETunnel60"></div>      <div class="o2-status" id="NETunnel60Status"></div></div>
+                <div class="o2-row compact"><div class="name-wide">Tunnel 120</div>   <div class="o2-value small" id="NETunnel120"></div>     <div class="o2-status" id="NETunnel120Status"></div></div>
+                <div class="o2-row compact"><div class="name-wide">Tunnel Dr 60</div> <div class="o2-value small" id="NETunnelDoor60"></div>  <div class="o2-status" id="NETunnelDoor60Status"></div></div>
+                <div class="o2-row compact"><div class="name-wide">Tunnel Dr120</div> <div class="o2-value small" id="NETunnelDoor120"></div> <div class="o2-status" id="NETunnelDoor120Status"></div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="o2-card">
+            <div class="o2-section-title">WE</div>
+            <div class="o2-room-columns">
+              <div class="o2-vbox">
+                <div class="o2-row compact"><div class="name-wide">Tower DX 60</div>  <div class="o2-value small" id="WETowerDx60"></div>     <div class="o2-status" id="WETowerDx60Status"></div></div>
+                <div class="o2-row compact"><div class="name-wide">Tower DX120</div>  <div class="o2-value small" id="WETowerDx120"></div>    <div class="o2-status" id="WETowerDx120Status"></div></div>
+                <div class="o2-row compact"><div class="name-wide">Base Rm 60</div>   <div class="o2-value small" id="WEBaseRoom60"></div>    <div class="o2-status" id="WEBaseRoom60Status"></div></div>
+                <div class="o2-row compact"><div class="name-wide">Base Rm 120</div>  <div class="o2-value small" id="WEBaseRoom120"></div>   <div class="o2-status" id="WEBaseRoom120Status"></div></div>
+                <div class="o2-row compact"><div class="name-wide">Clean Rm 60</div>  <div class="o2-value small" id="WECleanRoom60"></div>   <div class="o2-status" id="WECleanRoom60Status"></div></div>
+                <div class="o2-row compact"><div class="name-wide">Clean Rm 120</div> <div class="o2-value small" id="WECleanRoom120"></div>  <div class="o2-status" id="WECleanRoom120Status"></div></div>
+              </div>
+              <div class="o2-vbox">
+                <div class="o2-row compact"><div class="name-wide">Tower SX 60</div>  <div class="o2-value small" id="WETowerSx60"></div>     <div class="o2-status" id="WETowerSx60Status"></div></div>
+                <div class="o2-row compact"><div class="name-wide">Tower SX120</div>  <div class="o2-value small" id="WETowerSx120"></div>    <div class="o2-status" id="WETowerSx120Status"></div></div>
+                <div class="o2-row compact"><div class="name-wide">Tunnel 60</div>    <div class="o2-value small" id="WETunnel60"></div>      <div class="o2-status" id="WETunnel60Status"></div></div>
+                <div class="o2-row compact"><div class="name-wide">Tunnel 120</div>   <div class="o2-value small" id="WETunnel120"></div>     <div class="o2-status" id="WETunnel120Status"></div></div>
+                <div class="o2-row compact"><div class="name-wide">Tunnel Dr 60</div> <div class="o2-value small" id="WETunnelDoor60"></div>  <div class="o2-status" id="WETunnelDoor60Status"></div></div>
+                <div class="o2-row compact"><div class="name-wide">Tunnel Dr120</div> <div class="o2-value small" id="WETunnelDoor120"></div> <div class="o2-status" id="WETunnelDoor120Status"></div></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       CB + LEGEND column
+       ============================================================ -->
+  <div class="col col-left">
+
+    <!-- LASER BEAMS - CB -->
+    <div class="panel panel-cb">
+      <div class="title">LASER BEAMS - CB</div>
+      <div class="content">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 590 500" preserveAspectRatio="xMidYMid meet">
+          <rect x="205" y="238" width="41" height="27" rx="5" ry="5" fill="none" stroke="#efff21"/>
+          <rect x="366" y="460" width="41" height="27" rx="5" ry="5" fill="none" stroke="#ff1f1f"/>
+          <rect x="216" y="188" width="41" height="27" rx="5" ry="5" fill="none" stroke="#efff21"/>
+          <g transform="translate(174 467) translate(30 8.5) scale(1.5) translate(-30 -8.5)"><rect width="60" height="17" fill="#e1e4db" filter="url(#innerShadow)"/></g>
+          <g transform="translate(41 287) translate(40 10) scale(1.5) translate(-40 -10)"><rect width="80" height="20" fill="#e1e4db" filter="url(#innerShadow)"/><text class="jfx" x="40" y="10" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#000">WEST</text></g>
+          <g transform="translate(118 459) translate(16.5 16.5) scale(1.5) translate(-16.5 -16.5)"><rect width="33" height="33" rx="5" ry="5" fill="#e1e4db" filter="url(#innerShadow)"/><text class="jfx" x="16.5" y="16.5" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#000">MC</text></g>
+          <g transform="translate(437 94) translate(30 10) rotate(90) scale(1.5) translate(-30 -10)"><rect width="60" height="20" fill="#e1e4db" filter="url(#innerShadow)"/><text class="jfx" x="30" y="10" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#000">SQZ</text></g>
+          <g transform="translate(432 16) translate(35 35) rotate(90) scale(0.5 1.5) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g>
+          <g transform="translate(432 122) translate(35 35) rotate(90) scale(0.5 1.5) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g>
+          <g transform="translate(457 168) translate(10 9) scale(1.5) translate(-10 -9)"><rect width="20" height="18" fill="#e1e4db" filter="url(#innerShadow)"/><text class="jfx" x="10" y="6" text-anchor="middle" font-size="5" fill="#000">FCIN</text></g>
+          <g transform="translate(432 164) translate(35 35) rotate(90) scale(0.5 1.5) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g>
+          <g transform="translate(457 211) translate(10 9) scale(1.5) translate(-10 -9)"><rect width="20" height="18" fill="#e1e4db" filter="url(#innerShadow)"/><text class="jfx" x="10" y="6" text-anchor="middle" font-size="5" fill="#000">SQB2</text></g>
+          <g transform="translate(432 207) translate(35 35) rotate(90) scale(0.5 1.5) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g>
+          <g transform="translate(457 20) translate(10 9) scale(1.5) translate(-10 -9)"><rect width="20" height="18" fill="#e1e4db" filter="url(#innerShadow)"/><text class="jfx" x="10" y="6" text-anchor="middle" font-size="5" fill="#000">FCEND</text></g>
+          <g transform="translate(256 126) translate(35 35) rotate(90) scale(0.5 1.5) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g>
+          <g transform="translate(115 263) translate(35 35) scale(0.5 1.5) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g>
+          <g transform="translate(223 440) translate(35 35) scale(0.5 1.5) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g>
+          <g transform="translate(256 166) translate(35 35) rotate(90) scale(0.5 1.5) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g>
+          <g transform="translate(156 264) translate(35 35) scale(0.5 1.5) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g>
+          <g transform="translate(208 283) translate(16.5 16.5) scale(1.5) translate(-16.5 -16.5)"><rect width="33" height="33" rx="5" ry="5" fill="#e1e4db" filter="url(#innerShadow)"/><text class="jfx" x="16.5" y="16.5" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#000">WI</text></g>
+          <g transform="translate(257 233) translate(35 35) rotate(90) scale(0.5 1.5) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g>
+          <g transform="translate(223 265) translate(35 35) scale(0.5 1.5) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g>
+          <g transform="translate(257 298) translate(35 35) rotate(90) scale(0.5 1.5) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g>
+          <g transform="translate(290 265) translate(35 35) scale(0.5 1.5) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g>
+          <g transform="translate(358 265) translate(35 35) scale(0.5 1.5) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g>
+          <g transform="translate(257 365) translate(35 35) rotate(90) scale(0.5 1.5) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g>
+          <g transform="translate(275 350) translate(16.5 16.5) scale(1.5) translate(-16.5 -16.5)"><rect width="33" height="33" rx="5" ry="5" fill="#e1e4db" filter="url(#innerShadow)"/><text class="jfx" x="16.5" y="16.5" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#000">PR</text></g>
+          <g transform="translate(343 283) translate(16.5 16.5) scale(1.5) translate(-16.5 -16.5)"><rect width="33" height="33" rx="5" ry="5" fill="#e1e4db" filter="url(#innerShadow)"/><text class="jfx" x="16.5" y="16.5" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#000">SR</text></g>
+          <g transform="translate(275 283) translate(16.5 16.5) scale(1.5) translate(-16.5 -16.5)"><rect width="33" height="33" rx="5" ry="5" fill="#e1e4db" filter="url(#innerShadow)"/><text class="jfx" x="16.5" y="16.5" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#000">BS</text></g>
+          <g transform="translate(275 218) translate(16.5 16.5) scale(1.5) translate(-16.5 -16.5)"><rect width="33" height="33" rx="5" ry="5" fill="#e1e4db" filter="url(#innerShadow)"/><text class="jfx" x="16.5" y="16.5" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#000">NI</text></g>
+          <g transform="translate(284 171) translate(7.5 10) rotate(90) scale(1.5) translate(-7.5 -10)"><rect width="15" height="20" fill="#00bfff" filter="url(#innerShadow)"/></g>
+          <g transform="translate(163 288) translate(7.5 10) scale(1.5) translate(-7.5 -10)"><rect width="15" height="20" fill="#00bfff" filter="url(#innerShadow)"/></g>
+          <g transform="translate(406 290) translate(7.5 10) scale(1.5) translate(-7.5 -10)"><rect width="15" height="20" fill="#00bfff" filter="url(#innerShadow)"/></g>
+          <g transform="translate(285 410) translate(7.5 10) rotate(90) scale(1.5) translate(-7.5 -10)"><rect width="15" height="20" fill="#00bfff" filter="url(#innerShadow)"/></g>
+          <g transform="translate(257 405) translate(35 35) rotate(90) scale(0.5 1.5) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g>
+          <g transform="translate(275 457) translate(16.5 16.5) scale(1.5) translate(-16.5 -16.5)"><rect width="33" height="33" rx="5" ry="5" fill="#e1e4db" filter="url(#innerShadow)"/><text class="jfx" x="16.5" y="16.5" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#000">IB</text></g>
+          <g transform="translate(450 283) translate(16.5 16.5) scale(1.5) translate(-16.5 -16.5)"><rect width="33" height="33" rx="5" ry="5" fill="#e1e4db" filter="url(#innerShadow)"/><text class="jfx" x="16.5" y="16.5" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#000">DET</text></g>
+          <g transform="translate(398 265) translate(35 35) scale(0.5 1.5) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g>
+          <g transform="translate(457 253) translate(10 9) scale(1.5) translate(-10 -9)"><rect width="20" height="18" fill="#e1e4db" filter="url(#innerShadow)"/><text class="jfx" x="10" y="6" text-anchor="middle" font-size="5" fill="#000">SQB1</text></g>
+          <g transform="translate(252 81) translate(40 10.5) rotate(90) scale(1.5) translate(-40 -10.5)"><rect width="80" height="21" fill="#e1e4db" filter="url(#innerShadow)"/><text class="jfx" x="40" y="10.5" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#000">NORTH</text></g>
+          <circle cx="276" cy="457" r="6" fill="#ff1f1f"/>
+          <circle cx="276" cy="350" r="6" fill="#ff1f1f"/>
+          <circle cx="276" cy="284" r="6" fill="#ff1f1f"/>
+          <circle cx="276" cy="218" r="6" fill="#ff1f1f"/>
+          <circle cx="344" cy="284" r="6" fill="#ff1f1f"/>
+          <circle cx="209" cy="283" r="6" fill="#ff1f1f"/>
+          <circle cx="451" cy="284" r="6" fill="#ff1f1f"/>
+          <circle cx="119" cy="460" r="6" fill="#ff1f1f"/>
+          <circle cx="217" cy="251" r="6" fill="#efff21"/>
+          <circle cx="228" cy="201" r="6" fill="#efff21"/>
+          <g transform="translate(302 245) translate(6 6) scale(0.5) translate(-6 -6)"><rect width="12" height="12" rx="5" ry="5" fill="#ff1f1f"/></g>
+          <g transform="translate(236 308) translate(6 6) scale(0.5) translate(-6 -6)"><rect width="12" height="12" rx="5" ry="5" fill="#ff1f1f"/></g>
+          <g transform="translate(302 308) translate(6 6) scale(0.5) translate(-6 -6)"><rect width="12" height="12" rx="5" ry="5" fill="#ff1f1f"/></g>
+          <g transform="translate(302 377) translate(6 6) scale(0.5) translate(-6 -6)"><rect width="12" height="12" rx="5" ry="5" fill="#ff1f1f"/></g>
+          <g transform="translate(302 484) translate(6 6) scale(0.5) translate(-6 -6)"><rect width="12" height="12" rx="5" ry="5" fill="#ff1f1f"/></g>
+          <g transform="translate(145 484) translate(6 6) scale(0.5) translate(-6 -6)"><rect width="12" height="12" rx="5" ry="5" fill="#ff1f1f"/></g>
+          <g transform="translate(369 308) translate(6 6) scale(0.5) translate(-6 -6)"><rect width="12" height="12" rx="5" ry="5" fill="#ff1f1f"/></g>
+          <g transform="translate(477 308) translate(6 6) scale(0.5) translate(-6 -6)"><rect width="12" height="12" rx="5" ry="5" fill="#ff1f1f"/></g>
+          <g transform="translate(182 140) translate(62 62) scale(0.11) translate(-62 -62)" fill="#efff21" stroke="#efff21" stroke-width="2"><use href="#pinwheel"/></g>
+          <g transform="translate(171 190) translate(62 62) scale(0.11) translate(-62 -62)" fill="#efff21" stroke="#efff21" stroke-width="2"><use href="#pinwheel"/></g>
+          <circle cx="460" cy="266" r="4" fill="#ff1f1f"/>
+          <circle cx="460" cy="224" r="4" fill="#ff1f1f"/>
+          <circle cx="460" cy="181" r="4" fill="#ff1f1f"/>
+          <circle cx="459" cy="34"  r="4" fill="#ff1f1f"/>
+          <circle cx="284" cy="143" r="6" fill="#ff1f1f"/>
+          <circle cx="129" cy="290" r="6" fill="#ff1f1f"/>
+          <circle cx="276" cy="489" r="6" fill="#21ff27"/>
+          <circle cx="275" cy="382" r="6" fill="#21ff27"/>
+          <circle cx="275" cy="317" r="6" fill="#21ff27"/>
+          <circle cx="275" cy="251" r="6" fill="#21ff27"/>
+          <circle cx="208" cy="316" r="6" fill="#21ff27"/>
+          <circle cx="129" cy="305" r="6" fill="#21ff27"/>
+          <circle cx="300" cy="143" r="6" fill="#21ff27"/>
+          <circle cx="344" cy="317" r="6" fill="#21ff27"/>
+          <circle cx="451" cy="316" r="6" fill="#21ff27"/>
+          <g transform="translate(491 283)"><rect width="33" height="33" rx="5" ry="5" fill="#e1e4db" filter="url(#innerShadow)"/><text class="jfx" x="16.5" y="14" text-anchor="middle" font-size="11" fill="#000">SDT2</text></g>
+          <g transform="translate(235 329)"><rect width="33" height="33" rx="5" ry="5" fill="#e1e4db" filter="url(#innerShadow)"/><text class="jfx" x="16.5" y="15" text-anchor="middle" font-size="12" fill="#000">SPRB</text></g>
+          <circle cx="516" cy="307" r="6" fill="#21ff27"/>
+          <circle cx="259" cy="353" r="6" fill="#21ff27"/>
+          <g transform="translate(318 457)"><rect width="33" height="33" rx="5" ry="5" fill="#e1e4db" filter="url(#innerShadow)"/><text class="jfx" x="16.5" y="15" text-anchor="middle" font-size="12" fill="#000">SIB2</text></g>
+          <circle cx="342" cy="482" r="6" fill="#21ff27"/>
+          <circle cx="306" cy="218" r="6" fill="#efff21"/>
+          <text class="jfx" x="121" y="204" font-size="12" fill="#d1d1e0">Source CO₂ NI</text>
+          <circle cx="240" cy="283" r="6" fill="#efff21"/>
+          <text class="jfx" x="108" y="254" font-size="12" fill="#d1d1e0">Source CO₂ WI</text>
+          <circle cx="387" cy="473" r="6" fill="#ff1f1f"/>
+          <text class="jfx" x="413" y="479" font-size="16" fill="#d1d1e0">Source Yag</text>
+          <circle cx="327" cy="482" r="6" fill="#ff1f1f"/>
+          <circle cx="500" cy="307" r="6" fill="#ff1f1f"/>
+          <circle cx="243" cy="352" r="6" fill="#ff1f1f"/>
+          <circle cx="475" cy="266" r="4" fill="#21ff27"/>
+          <circle cx="475" cy="224" r="4" fill="#21ff27"/>
+          <circle cx="475" cy="181" r="4" fill="#21ff27"/>
+          <circle cx="474" cy="140" r="4" fill="#21ff27"/>
+          <circle cx="474" cy="34"  r="4" fill="#21ff27"/>
+          <circle cx="460" cy="140" r="4" fill="#ff1f1f"/>
+          <text class="jfx" x="13"  y="36"  font-size="12" fill="#d1d1e0"> ZONE A (EXT. TANK)</text>
+          <text class="jfx" x="149" y="274" font-size="12" fill="#d1d1e0">ZONE B</text>
+          <text class="jfx" x="148" y="331" font-size="12" fill="#d1d1e0">ZONE C</text>
+          <text class="jfx" x="318" y="170" font-size="12" fill="#d1d1e0">ZONE D</text>
+          <text class="jfx" x="223" y="170" font-size="12" fill="#d1d1e0">ZONE E</text>
+          <text class="jfx" x="394" y="275" font-size="12" fill="#d1d1e0">ZONE F</text>
+          <text class="jfx" x="224" y="424" font-size="12" fill="#d1d1e0">ZONE G</text>
+          <rect x="495" y="247" width="41" height="27" rx="5" ry="5" fill="none" stroke="#ff1f1f"/>
+          <rect x="540" y="247" width="41" height="27" rx="5" ry="5" fill="none" stroke="#21ff27"/>
+          <circle cx="560" cy="261" r="6" fill="#21ff27"/>
+          <g transform="translate(453 199) translate(62 62) scale(0.11) translate(-62 -62)" fill="#ff1f1f" stroke="#ff1f1f" stroke-width="2"><use href="#pinwheel"/></g>
+          <text class="jfx" x="541" y="213" font-size="10" fill="#d1d1e0"><tspan x="541" dy="0">Source</tspan><tspan x="541" dy="12">SQZ</tspan><tspan x="541" dy="12">Green</tspan></text>
+          <text class="jfx" x="494" y="213" font-size="10" fill="#d1d1e0"><tspan x="494" dy="0">Source</tspan><tspan x="494" dy="12">SQZ</tspan><tspan x="494" dy="12">Yag</tspan></text>
+        </svg>
+      </div>
+    </div>
+
+    <!-- LEGEND -->
+    <div class="panel panel-leg">
+      <div class="title">LEGEND</div>
+      <div class="content content-legend">
+        <!-- HTML grid: text in HTML (same font as O2 panel), only the icons are
+             inline SVG. `justify-content: space-around` gives natural inter-
+             column spacing, independent of the icon shapes. -->
+        <div class="legend-grid">
+
+          <!-- Column 1: Valves + Yag + Yag Shutter -->
+          <div class="legend-col">
+            <div class="legend-item">
+              <svg class="icon-valve" viewBox="17 26 38 22"><use href="#valve" fill="#ff9933" filter="url(#innerShadow)"/></svg>
+              Valve Open
+            </div>
+            <div class="legend-item">
+              <svg class="icon-valve" viewBox="17 26 38 22"><use href="#valve" fill="#33ff57" filter="url(#innerShadow)"/></svg>
+              Valve Close
+            </div>
+            <div class="legend-item">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#ff1f1f" stroke="#ff1f1f"/></svg>
+              Yag On
+            </div>
+            <div class="legend-item">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#4e514e" stroke="#ff1f1f"/></svg>
+              Yag Off
+            </div>
+            <div class="legend-item">
+              <svg viewBox="-2 -2 128 128"><use href="#pinwheel" fill="#ff1f1f" stroke="#ff1f1f" stroke-width="3"/></svg>
+              Shutter Open
+            </div>
+            <div class="legend-item">
+              <svg viewBox="-2 -2 128 128"><use href="#pinwheel" fill="#4e514e" stroke="#ff1f1f" stroke-width="3"/></svg>
+              Shutter Close
+            </div>
+          </div>
+
+          <!-- Column 2: Green -->
+          <div class="legend-col">
+            <div class="legend-item">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#21ff27" stroke="#21ff27"/></svg>
+              Green On
+            </div>
+            <div class="legend-item">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#4e514e" stroke="#21ff27"/></svg>
+              Green Off
+            </div>
+            <div class="legend-item">
+              <svg viewBox="-2 -2 128 128"><use href="#pinwheel" fill="#21ff27" stroke="#21ff27" stroke-width="3"/></svg>
+              Shutter Open
+            </div>
+            <div class="legend-item">
+              <svg viewBox="-2 -2 128 128"><use href="#pinwheel" fill="#4e514e" stroke="#21ff27" stroke-width="3"/></svg>
+              Shutter Close
+            </div>
+          </div>
+
+          <!-- Column 3: CO2 + Shutter + F0+F7 -->
+          <div class="legend-col">
+            <div class="legend-item">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#efff21" stroke="#efff21"/></svg>
+              CO₂ On
+            </div>
+            <div class="legend-item">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#4e514e" stroke="#efff21"/></svg>
+              CO₂ Off
+            </div>
+            <div class="legend-item">
+              <svg viewBox="-2 -2 128 128"><use href="#pinwheel" fill="#efff21" stroke="#efff21" stroke-width="3"/></svg>
+              Shutter Open
+            </div>
+            <div class="legend-item">
+              <svg viewBox="-2 -2 128 128"><use href="#pinwheel" fill="#4e514e" stroke="#efff21" stroke-width="3"/></svg>
+              Shutter Close
+            </div>
+            <div class="legend-item">
+              <svg viewBox="0 0 16 16"><rect x="1" y="1" width="14" height="14" rx="3" ry="3" fill="#ff1f1f" stroke="#ff1f1f"/></svg>
+              F0+F7 Current On
+            </div>
+            <div class="legend-item">
+              <svg viewBox="0 0 16 16"><rect x="1" y="1" width="14" height="14" rx="3" ry="3" fill="#4e514e" stroke="#ff1f1f"/></svg>
+              F0+F7 Current Off
+            </div>
+          </div>
+
+          <!-- Column 4: Sensor O2 -->
+          <div class="legend-col">
+            <div class="legend-item">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="yellow"/></svg>
+              Sensor O₂ Alarm 1
+            </div>
+            <div class="legend-item">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#ff7f00"/></svg>
+              Sensor O₂ Alarm 2
+            </div>
+            <div class="legend-item">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="red"/></svg>
+              Sensor O₂ Alarm 3
+            </div>
+            <div class="legend-item">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#d1d1e0"/></svg>
+              Sensor O₂ Off
+            </div>
+            <div class="legend-item">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#ff7f7f"/></svg>
+              Sensor O₂ Reset
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============================================================
+       NE + WE column
+       ============================================================ -->
+  <div class="col col-right">
+
+    <!-- LASER BEAMS - NE -->
+    <div class="panel panel-ne">
+      <div class="title">LASER BEAMS - NE</div>
+      <div class="content">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 407 425" preserveAspectRatio="xMidYMid meet">
+          <rect x="232" y="91" width="59" height="34" rx="5" ry="5" fill="none" stroke="#21ff27"/>
+          <g transform="translate(133 169) translate(35 35) rotate(90) scale(0.75 2.25) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g>
+          <g transform="translate(132 110) translate(35 35) rotate(90) scale(0.75 2.25) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g>
+          <g transform="translate(150 78) translate(16.5 16.5) scale(2.25) translate(-16.5 -16.5)"><rect width="33" height="33" rx="5" ry="5" fill="#e1e4db" filter="url(#innerShadow)"/><text class="jfx" x="16.5" y="16.5" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#000">NE</text></g>
+          <g transform="translate(160 164) translate(7.5 10) rotate(90) scale(2.25) translate(-7.5 -10)"><rect width="15" height="20" fill="#00bfff" filter="url(#innerShadow)"/></g>
+          <g transform="translate(128 297) translate(40 10.5) rotate(90) scale(2.25) translate(-40 -10.5)"><rect width="80" height="21" fill="#e1e4db" filter="url(#innerShadow)"/><text class="jfx" x="40" y="10.5" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#000">NORTH</text></g>
+          <circle cx="144" cy="70" r="9" fill="#ff1f1f"/>
+          <g transform="translate(186 114) translate(6 6) scale(0.75) translate(-6 -6)"><rect width="12" height="12" rx="5" ry="5" fill="#ff1f1f"/></g>
+          <circle cx="155" cy="230" r="9" fill="#ff1f1f"/>
+          <circle cx="144" cy="118" r="9" fill="#21ff27"/>
+          <circle cx="181" cy="230" r="9" fill="#21ff27"/>
+          <g transform="translate(142 9)"><rect width="45" height="48" rx="5" ry="5" fill="#e1e4db" filter="url(#innerShadow)"/><text class="jfx" x="22.5" y="20" text-anchor="middle" font-size="15" fill="#000">SNEB</text></g>
+          <circle cx="247" cy="107" r="9" fill="#21ff27"/>
+          <g transform="translate(211 46) translate(62 62) scale(0.17) translate(-62 -62)" fill="#21ff27" stroke="#21ff27" stroke-width="2"><use href="#pinwheel"/></g>
+          <circle cx="176" cy="43" r="9" fill="#21ff27"/>
+          <text class="jfx" x="232" y="79" font-size="16" fill="#d1d1e0">Source Green</text>
+          <circle cx="153" cy="43" r="9" fill="#ff1f1f"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- LASER BEAMS - WE -->
+    <div class="panel panel-we">
+      <div class="title">LASER BEAMS - WE</div>
+      <div class="content">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 446 324" preserveAspectRatio="xMidYMid meet">
+          <g transform="translate(198 124) translate(35 35) scale(0.75 2.25) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g>
+          <g transform="translate(136 123) translate(35 35) scale(0.75 2.25) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g>
+          <g transform="translate(103 142) translate(16.5 16.5) scale(2.25) translate(-16.5 -16.5)"><rect width="33" height="33" rx="5" ry="5" fill="#e1e4db" filter="url(#innerShadow)"/><text class="jfx" x="16.5" y="16.5" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#000">WE</text></g>
+          <g transform="translate(195 148) translate(7.5 10) scale(2.25) translate(-7.5 -10)"><rect width="15" height="20" fill="#00bfff" filter="url(#innerShadow)"/></g>
+          <g transform="translate(297 148) translate(40 10.5) scale(2.25) translate(-40 -10.5)"><rect width="80" height="21" fill="#e1e4db" filter="url(#innerShadow)"/><text class="jfx" x="40" y="10.5" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#000">WEST</text></g>
+          <circle cx="99" cy="136" r="9" fill="#ff1f1f"/>
+          <g transform="translate(140 180) translate(6 6) scale(0.75) translate(-6 -6)"><rect width="12" height="12" rx="5" ry="5" fill="#ff1f1f"/></g>
+          <circle cx="261" cy="147" r="9" fill="#ff1f1f"/>
+          <circle cx="99" cy="182" r="9" fill="#21ff27"/>
+          <circle cx="261" cy="170" r="9" fill="#21ff27"/>
+          <g transform="translate(34 133)"><rect width="48" height="45" rx="5" ry="5" fill="#e1e4db" filter="url(#innerShadow)"/><text class="jfx" x="24" y="17" text-anchor="middle" font-size="12" fill="#000">SWEB</text></g>
+          <circle cx="69" cy="167" r="9" fill="#21ff27"/>
+          <circle cx="45" cy="166" r="9" fill="#ff1f1f"/>
+          <rect x="177" y="71" width="56" height="32" rx="5" ry="5" fill="none" stroke="#21ff27"/>
+          <circle cx="192" cy="86" r="9" fill="#21ff27"/>
+          <g transform="translate(155 26) translate(62 62) scale(0.17) translate(-62 -62)" fill="#21ff27" stroke="#21ff27" stroke-width="2"><use href="#pinwheel"/></g>
+          <text class="jfx" x="155" y="54" font-size="16" fill="#d1d1e0">Source Green</text>
+        </svg>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Connection-error banner (toggled by controlroom.js) -->
+<div id="connBanner" class="conn-banner">jchv unreachable</div>
+
+<!-- GPS label (updated by controlroom.js with the trailing GPS value from each jchv response) -->
+<div id="gpsLabel" class="gps-label">GPS: ---</div>
+
+<!--
+  Live data polling. controlroom.js:
+    1. Walks the SVG above and tags interactive elements with their fx:id
+       (by matching unique `transform="translate(X Y)"` prefixes or circle cx/cy).
+    2. POSTs the union of all channels to /jchv/jchv every 1 s and renders.
+
+  To point at a different jchv host, set window.JCHV_URL before this tag, e.g.:
+    <script>window.JCHV_URL = "http://olserver135.virgo.infn.it:8081/jchv/jchv";</script>
+  (cross-origin requires CORS headers on JChvServlet7).
+-->
+<script src="controlroom.js"></script>
+
+</body>
+</html>

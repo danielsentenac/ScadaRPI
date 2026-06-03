@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<!-- SVG port of CBSAFETYFLAGS.fxml. Same mapping rules as the NE/WE ports. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CB Safety Flags — SVG port</title>
+<style>
+  html, body { margin: 0; padding: 16px; background: #000; color: #d1d1e0; font-family: sans-serif; }
+  .label { font-size: 13px; color: #ccc; margin-bottom: 4px; }
+  svg.panel { background: #21304F; display: block; border: 2px solid #00e5ff; border-radius: 5px; }
+  .jfx-text { font-family: "DejaVu Sans", "Liberation Sans", "Helvetica", sans-serif; }
+</style>
+</head>
+<body>
+
+<div class="label">CBSAFETYFLAGS.fxml &rarr; SVG (natural size 555 &times; 490)</div>
+<svg class="panel" xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 555 490" width="555" height="490">
+
+  <defs>
+    <filter id="innerShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+      <feOffset dx="0" dy="0"/>
+      <feComposite in2="SourceAlpha" operator="arithmetic"
+                   k2="-1" k3="1" result="shadowDiff"/>
+      <feFlood flood-color="black" flood-opacity="0.55"/>
+      <feComposite in2="shadowDiff" operator="in"/>
+      <feComposite in="SourceGraphic" operator="over"/>
+    </filter>
+    <!-- "Pinwheel" used for CO2 and SQZ shutters; bbox ≈ (0..123, 0..123), center ≈ 62,62 -->
+    <symbol id="pinwheel" overflow="visible">
+      <path d="M61.72.28a61.18,61.18,0,0,1,38.93,13.91L46.86,45.24V2.1A61.21,61.21,0,0,1,61.72.28ZM106,19.12a61.25,61.25,0,0,1,17.17,42.6,62,62,0,0,1-.64,8.89L69.66,40.09l36.33-21Zm15.06,58.64a61.59,61.59,0,0,1-34.91,40.36V57.6l34.91,20.16ZM79.21,120.64A61.6,61.6,0,0,1,25.05,111L79.21,79.75v40.89Zm-59.8-14.37A61.28,61.28,0,0,1,.28,61.72a62.4,62.4,0,0,1,.65-8.91L55.44,85.46l-36,20.81Zm-17-60.65A61.6,61.6,0,0,1,39.91,4.27l-.44,63.54-37-22.19Z"/>
+    </symbol>
+    <!-- Valve triangle (m17,26v18l36-18v18z), bbox 17..53 × 26..44, center (35,35) -->
+    <symbol id="valve" overflow="visible">
+      <path d="M17 26 V 44 L 53 26 V 44 Z"/>
+    </symbol>
+  </defs>
+
+  <!-- ============================================================
+       Containment rectangles (decorative, no fx:id)
+       ============================================================ -->
+  <rect x="205" y="238" width="41" height="27" rx="5" ry="5" fill="none" stroke="#efff21"/>
+  <rect x="366" y="460" width="41" height="27" rx="5" ry="5" fill="none" stroke="#ff1f1f"/>
+  <rect x="216" y="188" width="41" height="27" rx="5" ry="5" fill="none" stroke="#efff21"/>
+
+  <!-- ============================================================
+       Tube + chamber labels
+       ============================================================ -->
+
+  <!-- TUBEMC (60x17 scale 1.5, no text) -->
+  <g transform="translate(174 467) translate(30 8.5) scale(1.5) translate(-30 -8.5)">
+    <rect width="60" height="17" fill="#e1e4db" filter="url(#innerShadow)"/>
+  </g>
+
+  <!-- TUBEW "WEST" (80x20 scale 1.5) -->
+  <g transform="translate(41 287) translate(40 10) scale(1.5) translate(-40 -10)">
+    <rect width="80" height="20" fill="#e1e4db" filter="url(#innerShadow)"/>
+    <text class="jfx-text" x="40" y="10"
+          text-anchor="middle" dominant-baseline="central"
+          font-size="12" fill="#000">WEST</text>
+  </g>
+
+  <!-- MC label (33x33 scale 1.5, translate (+1,-1) -> effective layout (118,459)) -->
+  <g transform="translate(118 459) translate(16.5 16.5) scale(1.5) translate(-16.5 -16.5)">
+    <rect width="33" height="33" rx="5" ry="5" fill="#e1e4db" filter="url(#innerShadow)"/>
+    <text class="jfx-text" x="16.5" y="16.5"
+          text-anchor="middle" dominant-baseline="central"
+          font-size="12" fill="#000">MC</text>
+  </g>
+
+  <!-- Sqz "SQZ" (60x20 scale 1.5 rotate 90) -->
+  <g transform="translate(437 94) translate(30 10) rotate(90) scale(1.5) translate(-30 -10)">
+    <rect width="60" height="20" fill="#e1e4db" filter="url(#innerShadow)"/>
+    <text class="jfx-text" x="30" y="10"
+          text-anchor="middle" dominant-baseline="central"
+          font-size="12" fill="#000">SQZ</text>
+  </g>
+
+  <!-- ============================================================
+       SQZ branch valves + small labels (FCEND/FCIN/SQB2/SQB1)
+       ============================================================ -->
+
+  <!-- StatusValveSqz300N (rotate 90 scale 0.5x1.5) -->
+  <g transform="translate(432 16) translate(35 35) rotate(90) scale(0.5 1.5) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g>
+  <!-- StatusValveSqz0N -->
+  <g transform="translate(432 122) translate(35 35) rotate(90) scale(0.5 1.5) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g>
+
+  <!-- Sqz0N "FCIN" (20x18 scale 1.5, TOP_CENTER, font 5 from inline style) -->
+  <g transform="translate(457 168) translate(10 9) scale(1.5) translate(-10 -9)">
+    <rect width="20" height="18" fill="#e1e4db" filter="url(#innerShadow)"/>
+    <text class="jfx-text" x="10" y="6" text-anchor="middle" font-size="5" fill="#000">FCIN</text>
+  </g>
+
+  <!-- StatusValveSqzDet2 -->
+  <g transform="translate(432 164) translate(35 35) rotate(90) scale(0.5 1.5) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g>
+
+  <!-- SqzDet2 "SQB2" -->
+  <g transform="translate(457 211) translate(10 9) scale(1.5) translate(-10 -9)">
+    <rect width="20" height="18" fill="#e1e4db" filter="url(#innerShadow)"/>
+    <text class="jfx-text" x="10" y="6" text-anchor="middle" font-size="5" fill="#000">SQB2</text>
+  </g>
+
+  <!-- StatusValveSqzDet1 -->
+  <g transform="translate(432 207) translate(35 35) rotate(90) scale(0.5 1.5) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g>
+
+  <!-- Sqz300N "FCEND" -->
+  <g transform="translate(457 20) translate(10 9) scale(1.5) translate(-10 -9)">
+    <rect width="20" height="18" fill="#e1e4db" filter="url(#innerShadow)"/>
+    <text class="jfx-text" x="10" y="6" text-anchor="middle" font-size="5" fill="#000">FCEND</text>
+  </g>
+
+  <!-- ============================================================
+       Central valves (Big / Cryo / Central / CryoLink)
+       ============================================================ -->
+
+  <g transform="translate(256 126) translate(35 35) rotate(90) scale(0.5 1.5) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g> <!-- BigNI -->
+  <g transform="translate(115 263) translate(35 35) scale(0.5 1.5) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g> <!-- BigWI -->
+  <g transform="translate(223 440) translate(35 35) scale(0.5 1.5) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g> <!-- CentralLI -->
+  <g transform="translate(256 166) translate(35 35) rotate(90) scale(0.5 1.5) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g> <!-- CryoNI -->
+  <g transform="translate(156 264) translate(35 35) scale(0.5 1.5) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g> <!-- CryoWI -->
+
+  <!-- WI label -->
+  <g transform="translate(208 283) translate(16.5 16.5) scale(1.5) translate(-16.5 -16.5)">
+    <rect width="33" height="33" rx="5" ry="5" fill="#e1e4db" filter="url(#innerShadow)"/>
+    <text class="jfx-text" x="16.5" y="16.5" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#000">WI</text>
+  </g>
+
+  <g transform="translate(257 233) translate(35 35) rotate(90) scale(0.5 1.5) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g> <!-- CentralNS -->
+  <g transform="translate(223 265) translate(35 35) scale(0.5 1.5) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g> <!-- CentralWS -->
+  <g transform="translate(257 298) translate(35 35) rotate(90) scale(0.5 1.5) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g> <!-- CentralPS -->
+  <g transform="translate(290 265) translate(35 35) scale(0.5 1.5) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g> <!-- CentralSS -->
+  <g transform="translate(358 265) translate(35 35) scale(0.5 1.5) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g> <!-- CryoLinkDETVs1 -->
+  <g transform="translate(257 365) translate(35 35) rotate(90) scale(0.5 1.5) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g> <!-- CryoLinkIBVs2 -->
+
+  <!-- PR label -->
+  <g transform="translate(275 350) translate(16.5 16.5) scale(1.5) translate(-16.5 -16.5)">
+    <rect width="33" height="33" rx="5" ry="5" fill="#e1e4db" filter="url(#innerShadow)"/>
+    <text class="jfx-text" x="16.5" y="16.5" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#000">PR</text>
+  </g>
+  <!-- SR label -->
+  <g transform="translate(343 283) translate(16.5 16.5) scale(1.5) translate(-16.5 -16.5)">
+    <rect width="33" height="33" rx="5" ry="5" fill="#e1e4db" filter="url(#innerShadow)"/>
+    <text class="jfx-text" x="16.5" y="16.5" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#000">SR</text>
+  </g>
+  <!-- BS label -->
+  <g transform="translate(275 283) translate(16.5 16.5) scale(1.5) translate(-16.5 -16.5)">
+    <rect width="33" height="33" rx="5" ry="5" fill="#e1e4db" filter="url(#innerShadow)"/>
+    <text class="jfx-text" x="16.5" y="16.5" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#000">BS</text>
+  </g>
+  <!-- NI label -->
+  <g transform="translate(275 218) translate(16.5 16.5) scale(1.5) translate(-16.5 -16.5)">
+    <rect width="33" height="33" rx="5" ry="5" fill="#e1e4db" filter="url(#innerShadow)"/>
+    <text class="jfx-text" x="16.5" y="16.5" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#000">NI</text>
+  </g>
+
+  <!-- Cryo blue labels (15x20 scale 1.5, no text) -->
+  <g transform="translate(284 171) translate(7.5 10) rotate(90) scale(1.5) translate(-7.5 -10)">
+    <rect width="15" height="20" fill="#00bfff" filter="url(#innerShadow)"/>
+  </g> <!-- CryoNI -->
+  <g transform="translate(163 288) translate(7.5 10) scale(1.5) translate(-7.5 -10)">
+    <rect width="15" height="20" fill="#00bfff" filter="url(#innerShadow)"/>
+  </g> <!-- CryoWI -->
+  <g transform="translate(406 290) translate(7.5 10) scale(1.5) translate(-7.5 -10)">
+    <rect width="15" height="20" fill="#00bfff" filter="url(#innerShadow)"/>
+  </g> <!-- CryoLinkDet -->
+  <g transform="translate(285 410) translate(7.5 10) rotate(90) scale(1.5) translate(-7.5 -10)">
+    <rect width="15" height="20" fill="#00bfff" filter="url(#innerShadow)"/>
+  </g> <!-- CryoLinkIB -->
+
+  <g transform="translate(257 405) translate(35 35) rotate(90) scale(0.5 1.5) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g> <!-- CryoLinkIBVs1 -->
+
+  <!-- IB label -->
+  <g transform="translate(275 457) translate(16.5 16.5) scale(1.5) translate(-16.5 -16.5)">
+    <rect width="33" height="33" rx="5" ry="5" fill="#e1e4db" filter="url(#innerShadow)"/>
+    <text class="jfx-text" x="16.5" y="16.5" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#000">IB</text>
+  </g>
+  <!-- Det "DET" label -->
+  <g transform="translate(450 283) translate(16.5 16.5) scale(1.5) translate(-16.5 -16.5)">
+    <rect width="33" height="33" rx="5" ry="5" fill="#e1e4db" filter="url(#innerShadow)"/>
+    <text class="jfx-text" x="16.5" y="16.5" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#000">DET</text>
+  </g>
+
+  <g transform="translate(398 265) translate(35 35) scale(0.5 1.5) translate(-35 -35)" filter="url(#innerShadow)" fill="#e1e4db"><use href="#valve"/></g> <!-- CryoLinkDETVs2 -->
+
+  <!-- SqzDet1 "SQB1" -->
+  <g transform="translate(457 253) translate(10 9) scale(1.5) translate(-10 -9)">
+    <rect width="20" height="18" fill="#e1e4db" filter="url(#innerShadow)"/>
+    <text class="jfx-text" x="10" y="6" text-anchor="middle" font-size="5" fill="#000">SQB1</text>
+  </g>
+
+  <!-- TUBEN "NORTH" (80x21 scale 1.5 rotate 90) -->
+  <g transform="translate(252 81) translate(40 10.5) rotate(90) scale(1.5) translate(-40 -10.5)">
+    <rect width="80" height="21" fill="#e1e4db" filter="url(#innerShadow)"/>
+    <text class="jfx-text" x="40" y="10.5"
+          text-anchor="middle" dominant-baseline="central"
+          font-size="12" fill="#000">NORTH</text>
+  </g>
+
+  <!-- ============================================================
+       Yag (red r=6) dots
+       ============================================================ -->
+  <circle cx="276" cy="457" r="6" fill="#ff1f1f"/> <!-- IBYag -->
+  <circle cx="276" cy="350" r="6" fill="#ff1f1f"/> <!-- PRYag -->
+  <circle cx="276" cy="284" r="6" fill="#ff1f1f"/> <!-- BSYag -->
+  <circle cx="276" cy="218" r="6" fill="#ff1f1f"/> <!-- NIYag -->
+  <circle cx="344" cy="284" r="6" fill="#ff1f1f"/> <!-- SRYag -->
+  <circle cx="209" cy="283" r="6" fill="#ff1f1f"/> <!-- WIYag -->
+  <circle cx="451" cy="284" r="6" fill="#ff1f1f"/> <!-- DETYag -->
+  <circle cx="119" cy="460" r="6" fill="#ff1f1f"/> <!-- MCYag -->
+
+  <!-- CO2 sources (yellow r=6) -->
+  <circle cx="217" cy="251" r="6" fill="#efff21"/> <!-- WISourceCO2 -->
+  <circle cx="228" cy="201" r="6" fill="#efff21"/> <!-- NISourceCO2 -->
+
+  <!-- ============================================================
+       LocalCtrl small squares (12x12 scale 0.5)
+       ============================================================ -->
+  <g transform="translate(302 245) translate(6 6) scale(0.5) translate(-6 -6)"><rect width="12" height="12" rx="5" ry="5" fill="#ff1f1f"/></g> <!-- NI -->
+  <g transform="translate(236 308) translate(6 6) scale(0.5) translate(-6 -6)"><rect width="12" height="12" rx="5" ry="5" fill="#ff1f1f"/></g> <!-- WI -->
+  <g transform="translate(302 308) translate(6 6) scale(0.5) translate(-6 -6)"><rect width="12" height="12" rx="5" ry="5" fill="#ff1f1f"/></g> <!-- BS -->
+  <g transform="translate(302 377) translate(6 6) scale(0.5) translate(-6 -6)"><rect width="12" height="12" rx="5" ry="5" fill="#ff1f1f"/></g> <!-- PR -->
+  <g transform="translate(302 484) translate(6 6) scale(0.5) translate(-6 -6)"><rect width="12" height="12" rx="5" ry="5" fill="#ff1f1f"/></g> <!-- IB -->
+  <g transform="translate(145 484) translate(6 6) scale(0.5) translate(-6 -6)"><rect width="12" height="12" rx="5" ry="5" fill="#ff1f1f"/></g> <!-- MC -->
+  <g transform="translate(369 308) translate(6 6) scale(0.5) translate(-6 -6)"><rect width="12" height="12" rx="5" ry="5" fill="#ff1f1f"/></g> <!-- SR -->
+  <g transform="translate(477 308) translate(6 6) scale(0.5) translate(-6 -6)"><rect width="12" height="12" rx="5" ry="5" fill="#ff1f1f"/></g> <!-- DET -->
+
+  <!-- ============================================================
+       CO2 shutter pinwheels (scale 0.11)
+       ============================================================ -->
+  <g transform="translate(182 140) translate(62 62) scale(0.11) translate(-62 -62)"
+     fill="#efff21" stroke="#efff21" stroke-width="2"><use href="#pinwheel"/></g> <!-- NICO2Shutter -->
+  <g transform="translate(171 190) translate(62 62) scale(0.11) translate(-62 -62)"
+     fill="#efff21" stroke="#efff21" stroke-width="2"><use href="#pinwheel"/></g> <!-- WICO2Shutter -->
+
+  <!-- ============================================================
+       SQZ branch small Yag (r=4)
+       ============================================================ -->
+  <circle cx="460" cy="266" r="4" fill="#ff1f1f"/> <!-- SQZDET1Yag -->
+  <circle cx="460" cy="224" r="4" fill="#ff1f1f"/> <!-- SQZDET2Yag -->
+  <circle cx="460" cy="181" r="4" fill="#ff1f1f"/> <!-- SQZ0NYag -->
+  <circle cx="459" cy="34"  r="4" fill="#ff1f1f"/> <!-- SQZ300NYag -->
+
+  <!-- Tube Yag dots -->
+  <circle cx="284" cy="143" r="6" fill="#ff1f1f"/> <!-- TUBENYag -->
+  <circle cx="129" cy="290" r="6" fill="#ff1f1f"/> <!-- TUBEWYag -->
+
+  <!-- ============================================================
+       Green (r=6) dots
+       ============================================================ -->
+  <circle cx="276" cy="489" r="6" fill="#21ff27"/> <!-- IBGreen -->
+  <circle cx="275" cy="382" r="6" fill="#21ff27"/> <!-- PRGreen -->
+  <circle cx="275" cy="317" r="6" fill="#21ff27"/> <!-- BSGreen -->
+  <circle cx="275" cy="251" r="6" fill="#21ff27"/> <!-- NIGreen -->
+  <circle cx="208" cy="316" r="6" fill="#21ff27"/> <!-- WIGreen -->
+  <circle cx="129" cy="305" r="6" fill="#21ff27"/> <!-- TUBEWGreen -->
+  <circle cx="300" cy="143" r="6" fill="#21ff27"/> <!-- TUBENGreen -->
+  <circle cx="344" cy="317" r="6" fill="#21ff27"/> <!-- SRGreen -->
+  <circle cx="451" cy="316" r="6" fill="#21ff27"/> <!-- DETGreen -->
+
+  <!-- ============================================================
+       Mini chamber labels (33x33, no scale, TOP_CENTER)
+       ============================================================ -->
+  <g transform="translate(491 283)">
+    <rect width="33" height="33" rx="5" ry="5" fill="#e1e4db" filter="url(#innerShadow)"/>
+    <text class="jfx-text" x="16.5" y="14" text-anchor="middle" font-size="11" fill="#000">SDT2</text>
+  </g>
+  <g transform="translate(235 329)">
+    <rect width="33" height="33" rx="5" ry="5" fill="#e1e4db" filter="url(#innerShadow)"/>
+    <text class="jfx-text" x="16.5" y="15" text-anchor="middle" font-size="12" fill="#000">SPRB</text>
+  </g>
+  <circle cx="516" cy="307" r="6" fill="#21ff27"/> <!-- DETMiniGreen -->
+  <circle cx="259" cy="353" r="6" fill="#21ff27"/> <!-- PRMiniGreen -->
+
+  <g transform="translate(318 457)">
+    <rect width="33" height="33" rx="5" ry="5" fill="#e1e4db" filter="url(#innerShadow)"/>
+    <text class="jfx-text" x="16.5" y="15" text-anchor="middle" font-size="12" fill="#000">SIB2</text>
+  </g>
+  <circle cx="342" cy="482" r="6" fill="#21ff27"/> <!-- IBMiniGreen -->
+  <circle cx="306" cy="218" r="6" fill="#efff21"/> <!-- NICO2 -->
+
+  <!-- Source CO₂ NI text -->
+  <text class="jfx-text" x="121" y="204" font-size="12" fill="#d1d1e0">Source CO₂ NI</text>
+
+  <circle cx="240" cy="283" r="6" fill="#efff21"/> <!-- WICO2 -->
+  <text class="jfx-text" x="108" y="254" font-size="12" fill="#d1d1e0">Source CO₂ WI</text>
+
+  <circle cx="387" cy="473" r="6" fill="#ff1f1f"/> <!-- SourceYag -->
+  <text class="jfx-text" x="413" y="479" font-size="16" fill="#d1d1e0">Source Yag</text>
+
+  <!-- Mini Yag dots (drawn after their boxes, on top of mini greens) -->
+  <circle cx="327" cy="482" r="6" fill="#ff1f1f"/> <!-- IBMiniYag -->
+  <circle cx="500" cy="307" r="6" fill="#ff1f1f"/> <!-- DETMiniYag -->
+  <circle cx="243" cy="352" r="6" fill="#ff1f1f"/> <!-- PRMiniYag -->
+
+  <!-- SQZ branch small Green (r=4) -->
+  <circle cx="475" cy="266" r="4" fill="#21ff27"/> <!-- SQZDET1Green -->
+  <circle cx="475" cy="224" r="4" fill="#21ff27"/> <!-- SQZDET2Green -->
+  <circle cx="475" cy="181" r="4" fill="#21ff27"/> <!-- SQZ0NGreen -->
+  <circle cx="474" cy="140" r="4" fill="#21ff27"/> <!-- SQZTUBEGreen -->
+  <circle cx="474" cy="34"  r="4" fill="#21ff27"/> <!-- SQZ300NGreen -->
+  <circle cx="460" cy="140" r="4" fill="#ff1f1f"/> <!-- SQZTUBEYag -->
+
+  <!-- ============================================================
+       Zone text labels (font 12, fill #d1d1e0)
+       ============================================================ -->
+  <text class="jfx-text" x="13"  y="36"  font-size="12" fill="#d1d1e0"> ZONE A (EXT. TANK)</text>
+  <text class="jfx-text" x="149" y="274" font-size="12" fill="#d1d1e0">ZONE B</text>
+  <text class="jfx-text" x="148" y="331" font-size="12" fill="#d1d1e0">ZONE C</text>
+  <text class="jfx-text" x="318" y="170" font-size="12" fill="#d1d1e0">ZONE D</text>
+  <text class="jfx-text" x="223" y="170" font-size="12" fill="#d1d1e0">ZONE E</text>
+  <text class="jfx-text" x="394" y="275" font-size="12" fill="#d1d1e0">ZONE F</text>
+  <text class="jfx-text" x="224" y="424" font-size="12" fill="#d1d1e0">ZONE G</text>
+
+  <!-- ============================================================
+       Source SQZ block (lower right)
+       ============================================================ -->
+  <rect x="495" y="247" width="41" height="27" rx="5" ry="5" fill="none" stroke="#ff1f1f"/>
+  <rect x="540" y="247" width="41" height="27" rx="5" ry="5" fill="none" stroke="#21ff27"/>
+  <circle cx="560" cy="261" r="6" fill="#21ff27"/> <!-- SQZSourceGreen -->
+
+  <!-- SQZYagShutter pinwheel (red) -->
+  <g transform="translate(453 199) translate(62 62) scale(0.11) translate(-62 -62)"
+     fill="#ff1f1f" stroke="#ff1f1f" stroke-width="2"><use href="#pinwheel"/></g>
+
+  <!-- Wrapped source-SQZ labels (font 10, wrappingWidth ~40-50; JavaFX wraps at spaces) -->
+  <!-- "Source SQZ Green" -> Source / SQZ / Green -->
+  <text class="jfx-text" x="541" y="213" font-size="10" fill="#d1d1e0">
+    <tspan x="541" dy="0">Source</tspan>
+    <tspan x="541" dy="12">SQZ</tspan>
+    <tspan x="541" dy="12">Green</tspan>
+  </text>
+  <!-- "Source SQZ Yag" -> Source / SQZ / Yag -->
+  <text class="jfx-text" x="494" y="213" font-size="10" fill="#d1d1e0">
+    <tspan x="494" dy="0">Source</tspan>
+    <tspan x="494" dy="12">SQZ</tspan>
+    <tspan x="494" dy="12">Yag</tspan>
+  </text>
+
+</svg>
+
+</body>
+</html>
