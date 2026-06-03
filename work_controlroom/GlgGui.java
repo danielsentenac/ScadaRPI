@@ -192,7 +192,7 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
                   StackPane safetyCBPane = createScaledSafetyPanel(safetyFlagsCB, "LASER BEAMS - CB");
                   StackPane safetyNEPane = createScaledSafetyPanel(safetyFlagsNE, "LASER BEAMS - NE");
                   StackPane safetyWEPane = createScaledSafetyPanel(safetyFlagsWE, "LASER BEAMS - WE");
-                  StackPane safetyLegendPane = createLegendPanel();
+                  StackPane safetyLegendPane = createLegendPanel(safetyFlagsCB);
 
                   javafx.scene.layout.VBox safetyRightPane = new javafx.scene.layout.VBox(8, safetyNEPane, safetyWEPane);
                   safetyRightPane.setMinSize(0, 0);
@@ -257,10 +257,15 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
        return createScaledNodePanel(view, panelTitle, SAFETY_CONTENT_MARGIN);
     }
 
-    private StackPane createLegendPanel() {
+    private StackPane createLegendPanel(ViewData gpsSource) {
        try {
           javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/SAFETYFLAGSLEGEND.fxml"));
           javafx.scene.layout.Pane legend = loader.load();
+          // The legend has no data thread; let a polling safety view feed its GPS label.
+          javafx.scene.Node gpsNode = legend.lookup("#GPS");
+          if (gpsSource != null && gpsNode instanceof Label) {
+             gpsSource.externalGpsLabel = (Label) gpsNode;
+          }
           return createScaledNodePanel(legend, "LEGEND", SAFETY_CONTENT_MARGIN);
        }
        catch (java.io.IOException ex) {

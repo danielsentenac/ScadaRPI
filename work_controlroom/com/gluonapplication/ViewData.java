@@ -45,7 +45,11 @@ public class ViewData extends View implements Runnable, DataTypes {
     public boolean connectionError = false;
     public boolean serverError = false;
     public String fxml = "";
-    public String name = ""; 
+    public String name = "";
+    // Optional GPS label living outside this view's own scene-graph (e.g. the
+    // standalone LEGEND panel, which has no data thread of its own). When set,
+    // this view also pushes its GPS value into it on each refresh.
+    public javafx.scene.control.Label externalGpsLabel = null;
     private int initCnt = 0;
     private int max_fr = 0;
     protected static FXMLLoader mainLoader;
@@ -565,16 +569,20 @@ public class ViewData extends View implements Runnable, DataTypes {
                      break;
              }
          }
-         // Show GPS value
+         // Show GPS value (in this view's own #GPS label if present, and/or in an
+         // external label such as the standalone LEGEND panel which has no data thread)
          Label gps = (Label) lookup("#GPS");
-         if (gps != null) {
+         if ((gps != null || externalGpsLabel != null) && !data.svrValueList.isEmpty()) {
             String svrValue =  data.svrValueList.lastElement().replace(" ", "").replace(",", ".");
             if (svrValue.contains("NOTEXIST"))
                 svrValue = "---";
              if (svrValue.contains("TIMOUT"))
                 svrValue = "...";
             final String value = svrValue;
-            Platform.runLater(() -> {gps.setText("GPS: " + value);});
+            if (gps != null)
+               Platform.runLater(() -> {gps.setText("GPS: " + value);});
+            if (externalGpsLabel != null)
+               Platform.runLater(() -> {externalGpsLabel.setText("GPS: " + value);});
          }
          if (connectionError == true) {
             Platform.runLater(() -> {
