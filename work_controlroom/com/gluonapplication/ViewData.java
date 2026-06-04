@@ -211,8 +211,8 @@ public class ViewData extends View implements Runnable, DataTypes {
              String svrValue =  data.svrValueList.elementAt(i).replace(" ", "").replace(",", ".");
              String svrUnits = " " + data.svrUnitsList.elementAt(i);
              //System.out.println(data.svrNameList.elementAt(i) + "=" + data.svrValueList.elementAt(i));
-             if ( tmpData.svrValueList.size() > 0 && 
-                  initCnt != max_fr + 1 && 
+             if ( tmpData.svrValueList.size() > 0 &&
+                  initCnt != max_fr + 1 &&
                   svrValue.equals(tmpData.svrValueList.elementAt(i).replace(" ", "").replace(",", ".") ) )
                 continue;
              if (svrValue.contains("NOTEXIST")) {
@@ -419,6 +419,22 @@ public class ViewData extends View implements Runnable, DataTypes {
                               LaserTopology.triToColorKey(
                                  LaserTopology.computeCo2SourceState(data, data.list.elementAt(i).name));
                            Platform.runLater(() -> {sourceCo2BeamCircle.setFill(CO2_STATUS_COLOR.get(sourceCo2BeamState));});
+                        }
+                     break;
+                case CIRCLE_PCAL_STATUS_COLOR:
+                        // PCAL (1047 Hz) laser on/off. Both the Source circle and the
+                        // Tower circle share the same channel, so the tower beam
+                        // mirrors the source directly: ON => both orange, OFF => grey.
+                        // The _MAX channel may arrive as "0"/"1" or as a float
+                        // ("0.0"/"1.0"), so decide on/off numerically rather than by
+                        // exact string match; anything non-numeric (---/...) => no-data.
+                        Circle pcalCircle = (Circle) lookup("#" + data.list.elementAt(i).name);
+                        if (pcalCircle != null) {
+                           String pcalState;
+                           try { pcalState = (Double.parseDouble(value) != 0.0) ? "1" : "0"; }
+                           catch (NumberFormatException ex) { pcalState = "255"; }
+                           final String pcalKey = pcalState;
+                           Platform.runLater(() -> {pcalCircle.setFill(PCAL_STATUS_COLOR.get(pcalKey));});
                         }
                      break;
                 case SHUTTER_GREEN_STATUS_COLOR:

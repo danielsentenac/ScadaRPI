@@ -111,5 +111,9 @@
       <Text fill="#d1d1e0" layoutX="282.0" layoutY="235.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Sensor O₂ Reset">
          <font><Font size="12.0" /></font>
       </Text>
+      <Circle fill="#ff7e21" layoutX="250.0" layoutY="256.0" radius="10.0" stroke="#ff7e21" strokeType="INSIDE" />
+      <Text fill="#d1d1e0" layoutX="282.0" layoutY="261.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Source PCAL (1047 Hz)">
+         <font><Font size="12.0" /></font>
+      </Text>
    </children>
 </AnchorPane>

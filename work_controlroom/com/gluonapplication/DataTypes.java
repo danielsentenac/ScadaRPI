@@ -111,6 +111,7 @@ public interface DataTypes {
    /**/  CIRCLE_SOURCE_YAG_STATUS_COLOR,
    /**/  CIRCLE_SOURCE_GREEN_STATUS_COLOR,
    /**/  CIRCLE_SOURCE_CO2_STATUS_COLOR,
+   /**/  CIRCLE_PCAL_STATUS_COLOR,
    /**/  CIRCLE_SQZ_LOCK_STATUS_COLOR,
    /**/  SHUTTER_SQZ_FAST_STATUS_COLOR
    }
@@ -1229,6 +1230,17 @@ public interface DataTypes {
       put("...", Color.rgb(0, 0, 0));
    }};
    
+   //
+   // PCAL STATUS (1047 Hz photon calibrator laser on/off)
+   //
+   Hashtable<String, Color> PCAL_STATUS_COLOR = new Hashtable<String, Color>(){{
+      put("0", Color.rgb(78, 81, 78));    // off / safe (dark grey, matches legend)
+      put("1", Color.rgb(255, 126, 33));  // on / hazard (orange #ff7e21)
+      put("255", Color.rgb(0, 0, 0));     // no data (black, distinct from off)
+      put("---", Color.rgb(0, 0, 0));
+      put("...", Color.rgb(0, 0, 0));
+   }};
+
    //
    // GENERAL PUMP
    //

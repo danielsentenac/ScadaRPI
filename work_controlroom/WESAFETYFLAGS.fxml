@@ -65,5 +65,13 @@
             <Font size="16.0" />
          </font>
       </Text>
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="34.0" layoutX="22.0" layoutY="98.0" stroke="#ff7e21" strokeType="INSIDE" width="59.0" />
+      <Circle fx:id="WESourcePCAL" fill="#ff7e21" layoutX="51.0" layoutY="115.0" radius="9.0" stroke="#ff7e21" strokeType="INSIDE" />
+      <Text fill="#d1d1e0" layoutX="14.0" layoutY="86.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Source PCAL">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Text>
+      <Circle fx:id="WEPCAL" fill="#ff7e21" layoutX="142.0" layoutY="135.0" radius="9.0" stroke="#ff7e21" strokeType="INSIDE" />
    </children>
 </AnchorPane>
