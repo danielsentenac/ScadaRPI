@@ -50,6 +50,10 @@
     "0": "#4e514e", "1": "#efff21",
     "255": "#000000", "---": "#000000", "...": "#000000"
   };
+  const PCAL_COLOR = {               // PCAL (1047 Hz) dots — DataTypes.PCAL_STATUS_COLOR
+    "0": "#4e514e", "1": "#ff7e21",
+    "255": "#000000", "---": "#000000", "...": "#000000"
+  };
   const O2SENSOR_COLOR = {           // CIRCLE_O2SENSOR_STATUS_COLOR (post bit-decode)
     "0": "lime", "1": "yellow", "2": "orange", "3": "red",
     "4": "brown", "5": "pink", "6": "lightgrey",
@@ -252,10 +256,15 @@
     { fxId:"NELocalCtrl",       kind:"localctrl",     channels:["SAT_NE_F0_DC_ENBL","SAT_NE_F7_DC_ON"],
       locator:{type:"g", prefix:"translate(186 114)"} },
     { fxId:"NEGreenShutter",    kind:"shutter-green", channels:["ALS_NEB_REL1"],
-      locator:{type:"g", prefix:"translate(211 46)"} },
+      locator:{type:"g", prefix:"translate(211 71)"} },
     { fxId:"NESourceGreen",     kind:"source-green",
       channels:["ALS_NEB_PD_GREEN_MONI_CALI_MEAN","ALS_NEB_REL1"],
-      locator:{type:"circle", cx:247, cy:107} },
+      locator:{type:"circle", cx:247, cy:132} },
+    // PCAL (1047 Hz): tower circle mirrors the source — same channel on both.
+    { fxId:"NESourcePCAL",      kind:"pcal",          channels:["PCAL_NE_laser_on_20kHz_50Hz_MAX"],
+      locator:{type:"circle", cx:218, cy:32} },
+    { fxId:"NEPCAL",            kind:"pcal",          channels:["PCAL_NE_laser_on_20kHz_50Hz_MAX"],
+      locator:{type:"circle", cx:190, cy:71} },
 
     // ----- WE: direct-channel elements -----
     { fxId:"StatusValveBigWE",  kind:"valve",         channels:["VAC_VALVEBIGWE_ST"],
@@ -269,6 +278,11 @@
     { fxId:"WESourceGreen",     kind:"source-green",
       channels:["ALS_WEB_PD_GREEN_MONI_CALI_MEAN","ALS_WEB_REL1"],
       locator:{type:"circle", cx:192, cy:86} },
+    // PCAL (1047 Hz): tower circle mirrors the source — same channel on both.
+    { fxId:"WESourcePCAL",      kind:"pcal",          channels:["PCAL_WE_laser_on_20kHz_50Hz_MAX"],
+      locator:{type:"circle", cx:51,  cy:115} },
+    { fxId:"WEPCAL",            kind:"pcal",          channels:["PCAL_WE_laser_on_20kHz_50Hz_MAX"],
+      locator:{type:"circle", cx:142, cy:135} },
 
     // ----- CB: valves (single-channel) -----
     { fxId:"StatusValveSqz300N",  kind:"valve", channels:["VAC_SQZ300N_VPST"],     locator:{type:"g", prefix:"translate(432 16)"}  },
@@ -484,6 +498,7 @@
     "source-green": "#21ff27",
     "source-co2":   "#efff21",
     "sqz-lock":     "#21ff27",
+    "pcal":         "#ff7e21",
   };
 
   function resolveBindings() {
@@ -621,6 +636,16 @@
       case "source-yag": {
         // Always pull from propagation so the SourceYag circle agrees with the BFS.
         setFill(el, LASER_COLOR[triToKey(propagation.sourceYag)]);
+        break;
+      }
+      case "pcal": {
+        // PCAL (1047 Hz) on/off flag (_MAX aggregate). The channel may arrive as
+        // "0"/"1" or as a float ("0.0"/"1.0"), so decide numerically like
+        // ViewData's CIRCLE_PCAL_STATUS_COLOR case: non-zero => ON (orange),
+        // zero => OFF (grey), non-numeric => no-data (black).
+        const v = asFloat(raw0);
+        const st = (v == null) ? "---" : (v !== 0 ? "1" : "0");
+        setFill(el, PCAL_COLOR[st]);
         break;
       }
       case "sqz-lock": {
