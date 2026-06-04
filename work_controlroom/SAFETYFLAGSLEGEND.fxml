@@ -50,6 +50,15 @@
       <Text fill="#d1d1e0" layoutX="272.0" layoutY="115.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Shutter Close">
          <font><Font size="16.0" /></font>
       </Text>
+      <!-- PCAL (1047 Hz) source: On (orange) / Off (grey fill, orange contour) -->
+      <Circle fill="#ff7e21" layoutX="240.0" layoutY="137.0" radius="10.0" stroke="#ff7e21" strokeType="INSIDE" />
+      <Text fill="#d1d1e0" layoutX="272.0" layoutY="142.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Source PCAL On">
+         <font><Font size="16.0" /></font>
+      </Text>
+      <Circle fill="#4e514e" layoutX="240.0" layoutY="163.0" radius="10.0" stroke="#ff7e21" strokeType="INSIDE" />
+      <Text fill="#d1d1e0" layoutX="272.0" layoutY="168.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Source PCAL Off">
+         <font><Font size="16.0" /></font>
+      </Text>
 
       <!-- Column 3: CO2 On/Off, CO2 Shutter Open/Close -->
       <Circle fill="#efff21" layoutX="450.0" layoutY="32.0" radius="10.0" stroke="#efff21" strokeType="INSIDE" />
