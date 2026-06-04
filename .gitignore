@@ -5,3 +5,6 @@ build/
 tools/
 .codex
 work_controlroom/*.log
+work_nepanel/*.log
+work_wepanel/*.log
+work_1500wpanel/*.log
