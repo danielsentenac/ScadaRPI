@@ -40,7 +40,7 @@ view. From left to right the layout is:
 | Laser Beams – CB | Optical path through the interferometer (WEST – BS – SR – DET – IB – MC – PR – WI – NI – NORTH – SQZ, with the SDT2, SQB1/SQB2, SPRB, FCIN/FCEND sub-elements) plus the CO₂ NI/WI sources, the SQZ Yag and SQZ Green sources, the main Yag and main Green sources |
 | Vacuum Monitoring | Pressure gauges and valve states along the main tubes |
 | Particle Monitoring – CB and Mobile | Six size buckets (0.3 / 0.5 / 1 / 2.5 / 5 / 10 μm) for every fixed and mobile particle counter |
-| Laser Beams – NE / WE | Each end terminal, its near-tower sources (Source Green per end, SNEB / SWEB indicators) and the tube toward the Central Building |
+| Laser Beams – NE / WE | Each end terminal, its near-tower sources (Source Green and Source PCAL per end, SNEB / SWEB indicators) and the tube toward the Central Building |
 | Legend | Icon meanings (see Section 6) |
 
 Because the Control Room panel is the only one that combines all three
@@ -94,10 +94,10 @@ building (West End and North End).
 **Scope:** identical role to the CB panels but restricted to the local end:
 
 - the WE panel shows WE O₂ sensors, the WE laser-beam diagram (WE Source
-  Green, SWEB, tube toward CB), the WE particle counters in the WE clean
-  rooms, and the WE side of the vacuum tube;
-- the NE panel is the symmetric for the North End (NE Source Green, SNEB,
-  NE clean rooms, NE tube).
+  Green, WE Source PCAL, SWEB, tube toward CB), the WE particle counters in
+  the WE clean rooms, and the WE side of the vacuum tube;
+- the NE panel is the symmetric for the North End (NE Source Green, NE
+  Source PCAL, SNEB, NE clean rooms, NE tube).
 
 They are the first display a person sees when entering the building, and
 therefore carry the safety-critical O₂ alarm summary, and include the
@@ -206,6 +206,10 @@ that section. Colour codes are uniform across the three buildings.
 - **Yag shutter:** red shutter glyph open / grey closed.
 - **Green laser:** green disc on / grey off.
 - **Green shutter:** green shutter glyph open / grey closed.
+- **PCAL laser** (1047 Hz, NE / WE only): orange disc = *PCAL On*, grey disc
+  with orange outline = *PCAL Off*. Drawn twice per end diagram — a Source
+  PCAL disc and a tower PCAL disc; the tower disc mirrors the source state
+  (see Section 6.1).
 - **CO₂ heating** (used at NI, WI): yellow disc on / grey off; the
   corresponding shutter has its own open/closed glyph.
 - **F0+F7 current:** red square = energised, grey square = off.
@@ -244,6 +248,20 @@ Rule: `S = sum of the three values`; `S ≥ 0.1 V → ON`, `S < 0.1 V → OFF`.
 | NE | `ALS_NEB_PD_GREEN_MONI_CALI_MEAN` | `ALS_NEB_REL1` |
 
 Rule: `ON` iff `PD ≥ 1.0` AND `REL < 0.5`; otherwise `OFF`.
+
+**PCAL sources (NE / WE)** — photon-calibrator laser (1047 Hz)
+
+| Source | Channel |
+| --- | --- |
+| NE | `PCAL_NE_laser_on_20kHz_50Hz_MAX` |
+| WE | `PCAL_WE_laser_on_20kHz_50Hz_MAX` |
+
+Rule: the channel is a 0/1 flag; `1` → ON (orange), `0` → OFF (grey). The
+`_MAX` aggregate of the flag is used (zFdVac publishes the vect aggregates
+configured by `ZFDIO_VECT_AGGREGATE=meanmax`, so the plain channel name is
+not served); MAX is the hazard-conservative choice for an on/off flag. The
+tower PCAL disc reads the same channel as the Source PCAL disc, so both
+light together — no valve propagation is applied to the PCAL beam.
 
 **CO₂ sources (WI / NI)** – the same channels also back the WI / NI tower
 CO₂ indicators
