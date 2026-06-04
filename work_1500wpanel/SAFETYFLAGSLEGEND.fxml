@@ -112,11 +112,11 @@
          <font><Font size="12.0" /></font>
       </Text>
       <Circle fill="#ff7e21" layoutX="250.0" layoutY="256.0" radius="10.0" stroke="#ff7e21" strokeType="INSIDE" />
-      <Text fill="#d1d1e0" layoutX="282.0" layoutY="261.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Source PCAL On (1047 Hz)">
+      <Text fill="#d1d1e0" layoutX="282.0" layoutY="261.0" strokeType="OUTSIDE" strokeWidth="0.0" text="PCAL On (1047 Hz)">
          <font><Font size="12.0" /></font>
       </Text>
       <Circle fill="#4e514e" layoutX="250.0" layoutY="282.0" radius="10.0" stroke="#ff7e21" strokeType="INSIDE" />
-      <Text fill="#d1d1e0" layoutX="282.0" layoutY="287.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Source PCAL Off">
+      <Text fill="#d1d1e0" layoutX="282.0" layoutY="287.0" strokeType="OUTSIDE" strokeWidth="0.0" text="PCAL Off">
          <font><Font size="12.0" /></font>
       </Text>
    </children>

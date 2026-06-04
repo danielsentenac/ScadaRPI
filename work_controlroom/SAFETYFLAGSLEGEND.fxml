@@ -52,11 +52,11 @@
       </Text>
       <!-- PCAL (1047 Hz) source: On (orange) / Off (grey fill, orange contour) -->
       <Circle fill="#ff7e21" layoutX="240.0" layoutY="137.0" radius="10.0" stroke="#ff7e21" strokeType="INSIDE" />
-      <Text fill="#d1d1e0" layoutX="272.0" layoutY="142.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Source PCAL On">
+      <Text fill="#d1d1e0" layoutX="272.0" layoutY="142.0" strokeType="OUTSIDE" strokeWidth="0.0" text="PCAL On">
          <font><Font size="16.0" /></font>
       </Text>
       <Circle fill="#4e514e" layoutX="240.0" layoutY="163.0" radius="10.0" stroke="#ff7e21" strokeType="INSIDE" />
-      <Text fill="#d1d1e0" layoutX="272.0" layoutY="168.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Source PCAL Off">
+      <Text fill="#d1d1e0" layoutX="272.0" layoutY="168.0" strokeType="OUTSIDE" strokeWidth="0.0" text="PCAL Off">
          <font><Font size="16.0" /></font>
       </Text>
 
