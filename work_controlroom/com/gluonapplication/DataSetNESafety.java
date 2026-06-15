@@ -23,9 +23,13 @@ public class DataSetNESafety extends DataSet {
       list.addElement(new DataElement("NESourceGreen",  Type.CIRCLE_SOURCE_GREEN_STATUS_COLOR, "ALS_NEB_REL1"));
       list.addElement(new DataElement("NEGreenShutter", Type.SHUTTER_GREEN_STATUS_COLOR, "ALS_NEB_REL1"));
       // PCAL (1047 Hz) laser status. Both the Source circle and the Tower beam
-      // circle read the same on/off channel, so the tower mirrors the source.
+      // circle read the same channels, so the tower mirrors the source.
+      // Two channels share each fx:id as a cross-check; the handler in
+      // ViewData.java ORs them: laser on OR laser enabled => ON (orange).
       list.addElement(new DataElement("NESourcePCAL", Type.CIRCLE_PCAL_STATUS_COLOR, "PCAL_NE_laser_on_20kHz_50Hz_MAX"));
+      list.addElement(new DataElement("NESourcePCAL", Type.CIRCLE_PCAL_STATUS_COLOR, "PCAL_NE_laser_enbl_20kHz_MAX"));
       list.addElement(new DataElement("NEPCAL",       Type.CIRCLE_PCAL_STATUS_COLOR, "PCAL_NE_laser_on_20kHz_50Hz_MAX"));
+      list.addElement(new DataElement("NEPCAL",       Type.CIRCLE_PCAL_STATUS_COLOR, "PCAL_NE_laser_enbl_20kHz_MAX"));
       // Local control status (rectangle).
       // F0_DC_ENBL and F7_DC_ON share the fx:id; the handler in ViewData.java
       // ORs them: any "1" => ON, all known "0" => OFF, otherwise no-data.

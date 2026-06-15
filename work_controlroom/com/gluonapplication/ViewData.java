@@ -422,18 +422,31 @@ public class ViewData extends View implements Runnable, DataTypes {
                         }
                      break;
                 case CIRCLE_PCAL_STATUS_COLOR:
-                        // PCAL (1047 Hz) laser on/off. Both the Source circle and the
-                        // Tower circle share the same channel, so the tower beam
+                        // PCAL (1047 Hz) laser status. Both the Source circle and the
+                        // Tower circle share the same channels, so the tower beam
                         // mirrors the source directly: ON => both orange, OFF => grey.
-                        // The _MAX channel may arrive as "0"/"1" or as a float
-                        // ("0.0"/"1.0"), so decide on/off numerically rather than by
-                        // exact string match; anything non-numeric (---/...) => no-data.
+                        // Each fx:id carries two channels as a cross-check: the
+                        // laser-on flag and the laser-enable flag. OR across the
+                        // entries sharing this fx:id: either one non-zero => ON.
+                        // The _MAX channels may arrive as "0"/"1" or as a float
+                        // ("0.0"/"1.0"), so decide numerically; if none is known
+                        // (all ---/...) => no-data.
                         Circle pcalCircle = (Circle) lookup("#" + data.list.elementAt(i).name);
                         if (pcalCircle != null) {
-                           String pcalState;
-                           try { pcalState = (Double.parseDouble(value) != 0.0) ? "1" : "0"; }
-                           catch (NumberFormatException ex) { pcalState = "255"; }
-                           final String pcalKey = pcalState;
+                           String pcalCircleName = data.list.elementAt(i).name;
+                           boolean pcalAnyOn = false;
+                           boolean pcalAnyKnown = false;
+                           for (int k = 0; k < data.list.size(); k++) {
+                              if (!data.list.elementAt(k).name.equals(pcalCircleName)) continue;
+                              String raw = data.svrValueList.elementAt(k).replace(" ", "").replace(",", ".");
+                              if (raw.contains("NOTEXIST") || raw.contains("TIMOUT")) continue;
+                              try {
+                                 if (Double.parseDouble(raw) != 0.0) pcalAnyOn = true;
+                                 pcalAnyKnown = true;
+                              }
+                              catch (NumberFormatException ex) { /* skip parse errors */ }
+                           }
+                           final String pcalKey = pcalAnyOn ? "1" : (pcalAnyKnown ? "0" : "255");
                            Platform.runLater(() -> {pcalCircle.setFill(PCAL_STATUS_COLOR.get(pcalKey));});
                         }
                      break;
