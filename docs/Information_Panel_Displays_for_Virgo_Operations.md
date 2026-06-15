@@ -278,7 +278,7 @@ Virgo specification was `0.1 V` / `~10 mW`).
 
 **CO₂ shutters**
 
-| Shutter | Shutter channels (OR-ed) |
+| Shutter | Shutter relay channels |
 | --- | --- |
 | WI | `TCS_CO2_REL1`, `TCS_CO2_REL2`, `TCS_CO2_REL3` |
 | NI | `TCS_CO2_REL5`, `TCS_CO2_REL6`, `TCS_CO2_REL7` |
