@@ -260,10 +260,11 @@
     { fxId:"NESourceGreen",     kind:"source-green",
       channels:["ALS_NEB_PD_GREEN_MONI_CALI_MEAN","ALS_NEB_REL1"],
       locator:{type:"circle", cx:247, cy:132} },
-    // PCAL (1047 Hz): tower circle mirrors the source — same channel on both.
-    { fxId:"NESourcePCAL",      kind:"pcal",          channels:["PCAL_NE_laser_on_20kHz_50Hz_MAX"],
+    // PCAL (1047 Hz): tower circle mirrors the source — same channels on both.
+    // Cross-check: laser-on OR laser-enable non-zero => ON (orange).
+    { fxId:"NESourcePCAL",      kind:"pcal",          channels:["PCAL_NE_laser_on_20kHz_50Hz_MAX","PCAL_NE_laser_enbl_20kHz_MAX"],
       locator:{type:"circle", cx:218, cy:32} },
-    { fxId:"NEPCAL",            kind:"pcal",          channels:["PCAL_NE_laser_on_20kHz_50Hz_MAX"],
+    { fxId:"NEPCAL",            kind:"pcal",          channels:["PCAL_NE_laser_on_20kHz_50Hz_MAX","PCAL_NE_laser_enbl_20kHz_MAX"],
       locator:{type:"circle", cx:190, cy:71} },
 
     // ----- WE: direct-channel elements -----
@@ -278,10 +279,11 @@
     { fxId:"WESourceGreen",     kind:"source-green",
       channels:["ALS_WEB_PD_GREEN_MONI_CALI_MEAN","ALS_WEB_REL1"],
       locator:{type:"circle", cx:192, cy:86} },
-    // PCAL (1047 Hz): tower circle mirrors the source — same channel on both.
-    { fxId:"WESourcePCAL",      kind:"pcal",          channels:["PCAL_WE_laser_on_20kHz_50Hz_MAX"],
+    // PCAL (1047 Hz): tower circle mirrors the source — same channels on both.
+    // Cross-check: laser-on OR laser-enable non-zero => ON (orange).
+    { fxId:"WESourcePCAL",      kind:"pcal",          channels:["PCAL_WE_laser_on_20kHz_50Hz_MAX","PCAL_WE_laser_enbl_20kHz_MAX"],
       locator:{type:"circle", cx:51,  cy:115} },
-    { fxId:"WEPCAL",            kind:"pcal",          channels:["PCAL_WE_laser_on_20kHz_50Hz_MAX"],
+    { fxId:"WEPCAL",            kind:"pcal",          channels:["PCAL_WE_laser_on_20kHz_50Hz_MAX","PCAL_WE_laser_enbl_20kHz_MAX"],
       locator:{type:"circle", cx:142, cy:135} },
 
     // ----- CB: valves (single-channel) -----
@@ -639,12 +641,19 @@
         break;
       }
       case "pcal": {
-        // PCAL (1047 Hz) on/off flag (_MAX aggregate). The channel may arrive as
-        // "0"/"1" or as a float ("0.0"/"1.0"), so decide numerically like
-        // ViewData's CIRCLE_PCAL_STATUS_COLOR case: non-zero => ON (orange),
-        // zero => OFF (grey), non-numeric => no-data (black).
-        const v = asFloat(raw0);
-        const st = (v == null) ? "---" : (v !== 0 ? "1" : "0");
+        // PCAL (1047 Hz) flags (_MAX aggregates): laser-on and laser-enable.
+        // Cross-check by ORing them like ViewData's CIRCLE_PCAL_STATUS_COLOR
+        // case: either channel non-zero => ON (orange), all known zero => OFF
+        // (grey), none known => no-data (black). Channels may arrive as "0"/"1"
+        // or floats ("0.0"/"1.0"), so decide numerically.
+        let anyOn = false, anyKnown = false;
+        values.forEach(raw => {
+          const v = asFloat(raw);
+          if (v == null) return;
+          anyKnown = true;
+          if (v !== 0) anyOn = true;
+        });
+        const st = anyOn ? "1" : (anyKnown ? "0" : "---");
         setFill(el, PCAL_COLOR[st]);
         break;
       }
