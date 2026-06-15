@@ -1,0 +1,43 @@
+/* Print stylesheet for the panel-display PDF (used by docs/build_pdf.sh).
+   Tuned for headless-Chrome print-to-PDF pagination. */
+@page { size: A4; margin: 14mm 16mm; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body {
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  font-size: 11pt; line-height: 1.5; color: #1b1b1b;
+  max-width: 100%; margin: 0;
+}
+h1 { font-size: 22pt; border-bottom: 2px solid #21304F; padding-bottom: .2em; color: #21304F; }
+h2 { font-size: 16pt; border-bottom: 1px solid #ccc; padding-bottom: .15em; margin-top: 1em; color: #21304F; }
+h3 { font-size: 13pt; margin-top: 1.1em; color: #21304F; }
+/* Keep every heading glued to the text that follows it (no heading stranded
+   at the foot of a page) and never split a heading across pages. */
+h1, h2, h3, h4 { page-break-after: avoid; break-after: avoid; page-break-inside: avoid; }
+/* A bold stand-alone sub-label (e.g. "CO₂ shutters") plus the table right
+   below it are wrapped by the build into <div class="keep"> so they never
+   separate across a page (Chrome ignores page-break-after:avoid here, so we
+   bind them in one no-break block instead). */
+.keep { page-break-inside: avoid; break-inside: avoid; }
+p { margin: .5em 0; orphans: 3; widows: 3; }
+li { margin: .15em 0; orphans: 3; widows: 3; }
+em { color: #444; }
+code { font-family: "DejaVu Sans Mono", Consolas, monospace; font-size: 9.5pt; background: #f2f4f7; padding: .08em .35em; border-radius: 3px; }
+/* Small tables stay whole (never split, so their header is never stranded or
+   duplicated across pages). The one large table — the section-1 Pane/Content
+   table, the first in the document — is allowed to flow across a page break
+   (header repeats, rows never split) so it doesn't bump whole and leave a big
+   gap behind it. */
+table { border-collapse: collapse; width: 100%; margin: .8em 0; font-size: 10pt; page-break-inside: avoid; }
+table:first-of-type { page-break-inside: auto; }
+thead { display: table-header-group; }
+tr { page-break-inside: avoid; break-inside: avoid; }
+th, td { border: 1px solid #b8bfc9; padding: 5px 9px; text-align: left; vertical-align: top; }
+th { background: #21304F; color: #fff; }
+tr:nth-child(even) td { background: #f4f6f9; }
+/* Cap figure height so a screenshot + caption fits in roughly half a page:
+   this lets figures slot in after the preceding text instead of bumping to a
+   fresh page and leaving a big gap behind them. */
+figure { page-break-inside: avoid; break-inside: avoid; margin: .5em 0; text-align: center; }
+img { max-width: 100%; max-height: 80mm; height: auto; width: auto; display: block; margin: .5em auto; border: 1px solid #ddd; }
+figcaption { font-size: 9pt; font-style: italic; color: #555; margin-top: .3em; text-align: left; }
+ul, ol { margin: .4em 0 .4em 1.2em; }
