@@ -257,9 +257,9 @@ Rule: `ON` iff `PD ≥ 1.0` AND `REL < 0.5`; otherwise `OFF`.
 | NE | `PCAL_NE_laser_on_20kHz_50Hz_MAX` / `PCAL_NE_laser_enbl_20kHz_MAX` |
 | WE | `PCAL_WE_laser_on_20kHz_50Hz_MAX` / `PCAL_WE_laser_enbl_20kHz_MAX` |
 
-Rule: each end carries two 0/1 flags — laser on and laser enabled — which are
-ORed as a cross-check; if *either* is non-zero → ON (orange), only when *both*
-are zero → OFF (grey). The `_MAX` aggregate of each flag is used (zFdVac
+Rule: each end carries two 0/1 flags — laser on and laser enabled — combined
+as a cross-check: if *either* flag is non-zero the disc is ON (orange), and
+only when *both* are zero is it OFF (grey). The `_MAX` aggregate of each flag is used (zFdVac
 publishes the vect aggregates configured by `ZFDIO_VECT_AGGREGATE=meanmax`, so
 the plain channel names are not served); MAX is the hazard-conservative choice
 for an on/off flag. The tower PCAL disc reads the same channels as the Source
