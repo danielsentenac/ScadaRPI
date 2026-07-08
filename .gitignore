@@ -8,3 +8,5 @@ work_controlroom/*.log
 work_nepanel/*.log
 work_wepanel/*.log
 work_1500wpanel/*.log
+work_caos/*.log
+*.orig
