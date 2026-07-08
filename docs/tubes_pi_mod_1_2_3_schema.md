@@ -1,12 +1,13 @@
-# Tubes_Pi_Mod_1 / 2 / 3 Technical Schema
+# Tubes_Pi_Mod_1 / 2 / 3 and ShutterBeam Technical Schema
 
-This note summarizes the implemented behavior of the three `Tubes_Pi_Mod_*` sketches from the code, with the SCADA-side names taken from the corresponding Java wrappers.
+This note summarizes the implemented behavior of the three `Tubes_Pi_Mod_*` sketches from the code, with the SCADA-side names taken from the corresponding Java wrappers. Section 6 documents the `ShutterBeam` module, which reuses the `Mod_1` valve control scheme but over Modbus TCP instead of I2C.
 
 Scope:
 
 - `modules/Tubes_Pi_Mod_1/Tubes_Pi_Mod_1.ino`
 - `modules/Tubes_Pi_Mod_2/Tubes_Pi_Mod_2.ino`
 - `modules/Tubes_Pi_Mod_3/Tubes_Pi_Mod_3.ino`
+- `modules/ShutterBeam/ShutterBeam.ino`
 - `work_link/Controllino_1.java`
 - `work_sqz/Controllino_2.java`
 - `work_link/Controllino_3.java`
@@ -316,21 +317,83 @@ flowchart LR
     M3 <-->|local I2C master window| T1
 ```
 
-## 6. Compact Comparison
+## 6. ShutterBeam: beam shutter (Modbus TCP)
+
+Role:
+
+- single beam-shutter actuator, modeled as a valve
+- **not** an I2C/Controllino board: it is an Arduino **Leonardo ETH** acting as a **Modbus TCP slave** on port `502`
+- reproduces the `V21` valve open/close scheme of `Mod_1` (pulse + `ResetAndCheck` + delayed check), but exposes it through Modbus holding registers instead of I2C buffer bits
+- SCADA rack file: `/virgoData/Vacuum/racks/SHUTTERBEAM1.cfg` (parent `VAC_SHUTTERBEAM1`)
+- network: DHCP with a `15 s` timeout, then static fallback `192.168.224.190` (`shutterbeam1`); MAC `96:A2:DA:10:5F:D3`
+- library: `ModbusTCPSlave` from `arduino-Tools40`
+
+### 6.1 Functional Map
+
+| Function | Type | Arduino I/O | Holding register | SCADA name |
+| --- | --- | --- | --- | --- |
+| shutter status | feedback | `A0` open, `A1` close | `0` | `_SHUTTERST` |
+| shutter command | command | `D7` open, `D6` close | `1` | `_SHUTTERCMD` |
+| MCU reset | control only | none | `2` | `_RESETARD` |
+
+Register values (same convention as the `Mod_1` valves):
+
+- `_SHUTTERST`: `1=open` (`A0=1,A1=0`), `2=closed` (`A0=0,A1=1`), `0=moving/unknown`
+- `_SHUTTERCMD`: `1=open`, `2=close`, `0=idle`
+
+### 6.2 Behavior
+
+Wiring / initialization (from the schematic):
+
+- `D7` = open command, idle `LOW`; open = pulse `HIGH`
+- `D6` = close command, idle `HIGH`; close = pulse `LOW`
+
+Command handling reuses the `V21` state machine of `Mod_1`:
+
+- a write to `_SHUTTERCMD` is detected by watching the register for a change; because Modbus TCP has no receive interrupt, this replaces the I2C `receiveEvent` that sets `updateIOFromI2CBool` in `Mod_1`
+- `UpdateIOFromModbus()` starts the D6/D7 pulse and arms `SHUTTER_RESET`
+- `ResetAndCheck()` ends the pulse and clears the command register after `reset_wait = 2 s`; after an open it arms `SHUTTER_CHECK` and, if the shutter still reads closed after `check_wait = 10 s`, re-issues a close
+- `UpdateModbusFromIO()` derives the status from `A0/A1` and re-issues a close if the shutter drifts from open to closed
+
+The runtime flow mirrors the shared pattern in Section 2, with `modbus.update()` in place of the I2C receive/request events.
+
+### 6.3 ShutterBeam Sketch
+
+```mermaid
+flowchart LR
+    PI["Pi / SCADA (Modbus TCP master)"] <-->|TCP port 502<br/>holding registers 0..2| SB["ShutterBeam<br/>Leonardo ETH"]
+
+    subgraph OUTSB["Outputs"]
+      OSB1["D7 open command (idle LOW, pulse HIGH)"]
+      OSB2["D6 close command (idle HIGH, pulse LOW)"]
+    end
+
+    subgraph INSB["Inputs"]
+      ISB1["A0 open status"]
+      ISB2["A1 close status"]
+    end
+
+    SB --> OUTSB
+    INSB --> SB
+```
+
+## 7. Compact Comparison
 
 | Module | Address | Main job | Reply payload | Main controlled equipment |
 | --- | --- | --- | --- | --- |
 | `Mod_1` | `0x08` | valve/pump bank | `buffer + CRC32` | `V21`, `V22`, `V1`, `P22`, `BYPASS` |
 | `Mod_2` | `0x09` | venting/bypass bank | `buffer + CRC32` | `VENT/V24`, `VENTSOFT/V25`, `VP`, `VSPARE`, `BYPASS` |
 | `Mod_3` | `0x10` | fan + rack temperature | `float temp + buffer + CRC32` | fan speed, fan on/off, thermocouple |
+| `ShutterBeam` | Modbus TCP `502` (IP `192.168.224.190`) | beam shutter | Modbus holding registers | shutter open/close |
 
-## 7. Practical Reading of the Three Modules
+## 8. Practical Reading of the Modules
 
-At system level the three modules split responsibilities like this:
+At system level the modules split responsibilities like this:
 
 - `Mod_1` = main vacuum-side valve bank with one pump/stage output
 - `Mod_2` = venting-side valve bank and bypass branch
 - `Mod_3` = rack utility module for fan management and local temperature readback
+- `ShutterBeam` = standalone beam-shutter actuator on Modbus TCP, reusing the `Mod_1` valve logic
 
 If needed, this document can be converted into:
 
