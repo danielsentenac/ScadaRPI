@@ -131,7 +131,6 @@ void loop() {
   // check DHCP lease
   Ethernet.maintain();
   /***********************************************************************************************************/
-  delay(100);
 
    /***********************************************************************************************************/
   // Periodic heartbeat so the console always shows life, network mode, IP and status
@@ -239,13 +238,13 @@ void UpdateIOFromModbus()
   /* Update Shutter position (Open/Close) */
   /***********************************************************************************************************/
   if (holdingRegisters[SHUTTER_CMD_ADDR] == SHUTTER_CMD_CLOSE && SHUTTER_RESET == false) {
-     Serial.println(F("Received CLOSE command: pulse LOW on D6"));
+     //Serial.println(F("Received CLOSE command: pulse LOW on D6"));
      digitalWrite(SHUTTER_CLOSE_CMD,LOW);   // CLOSE SHUTTER (D6 pulse LOW)
      SHUTTERtime = millis();
      SHUTTER_RESET = true;
   }
   else if (holdingRegisters[SHUTTER_CMD_ADDR] == SHUTTER_CMD_OPEN && SHUTTER_RESET == false) {
-     Serial.println(F("Received OPEN command: pulse HIGH on D7"));
+     //Serial.println(F("Received OPEN command: pulse HIGH on D7"));
      digitalWrite(SHUTTER_OPEN_CMD,HIGH);   // OPEN SHUTTER (D7 pulse HIGH)
      SHUTTERtime = millis();
      SHUTTER_RESET = true;
@@ -278,13 +277,13 @@ void UpdateModbusFromIO()
   }
 
   // Log only on change to avoid flooding the console
-  int status = holdingRegisters[SHUTTER_ST_ADDR];
+ /* int status = holdingRegisters[SHUTTER_ST_ADDR];
   if (status != SHUTTER_LAST_STATUS) {
      if (status == SHUTTER_ST_OPEN)        Serial.println(F("Shutter status: OPEN (A0=1,A1=0)"));
      else if (status == SHUTTER_ST_CLOSED) Serial.println(F("Shutter status: CLOSED (A0=0,A1=1)"));
      else                                  Serial.println(F("Shutter status: MOVING/UNKNOWN"));
      SHUTTER_LAST_STATUS = status;
-  }
+  }*/
 }
 
 /*
