@@ -59,14 +59,20 @@ public class DataSetCBSafety extends DataSet {
       list.addElement(new DataElement("WISourceCO2",       Type.CIRCLE_SOURCE_CO2_STATUS_COLOR, "TCS_WI_CO2_PWRLAS_MEAN"));
       list.addElement(new DataElement("NISourceCO2",       Type.CIRCLE_SOURCE_CO2_STATUS_COLOR, "TCS_NI_CO2_CH_PWRLAS_MEAN"));
       list.addElement(new DataElement("NISourceCO2",       Type.CIRCLE_SOURCE_CO2_STATUS_COLOR, "TCS_NI_CO2_PWRLAS_MEAN"));
-      // WICO2 / NICO2 tower indicators reflect the same physics as the source-CO2
-      // circles (CO2 lasers are installed at the WI/NI towers themselves, no
-      // propagation through the ITF). Two channels per fx:id, same logic as
-      // CIRCLE_SOURCE_CO2_STATUS_COLOR.
-      list.addElement(new DataElement("WICO2",             Type.CIRCLE_SOURCE_CO2_STATUS_COLOR, "TCS_WI_CO2_CH_PWRLAS_MEAN"));
-      list.addElement(new DataElement("WICO2",             Type.CIRCLE_SOURCE_CO2_STATUS_COLOR, "TCS_WI_CO2_PWRLAS_MEAN"));
-      list.addElement(new DataElement("NICO2",             Type.CIRCLE_SOURCE_CO2_STATUS_COLOR, "TCS_NI_CO2_CH_PWRLAS_MEAN"));
-      list.addElement(new DataElement("NICO2",             Type.CIRCLE_SOURCE_CO2_STATUS_COLOR, "TCS_NI_CO2_PWRLAS_MEAN"));
+      // WICO2 / NICO2 tower beam indicators: ON iff the CO2 source is ON (any
+      // PWRLAS channel above threshold) AND the viewport shutter is open (any
+      // TCS_CO2_REL channel == 1; 1 = open, 0 = closed). Source circle and
+      // shutter icon stay independent; the beam needs both.
+      list.addElement(new DataElement("WICO2",             Type.CIRCLE_CO2_BEAM_STATUS_COLOR, "TCS_WI_CO2_CH_PWRLAS_MEAN"));
+      list.addElement(new DataElement("WICO2",             Type.CIRCLE_CO2_BEAM_STATUS_COLOR, "TCS_WI_CO2_PWRLAS_MEAN"));
+      list.addElement(new DataElement("WICO2",             Type.CIRCLE_CO2_BEAM_STATUS_COLOR, "TCS_CO2_REL1"));
+      list.addElement(new DataElement("WICO2",             Type.CIRCLE_CO2_BEAM_STATUS_COLOR, "TCS_CO2_REL2"));
+      list.addElement(new DataElement("WICO2",             Type.CIRCLE_CO2_BEAM_STATUS_COLOR, "TCS_CO2_REL3"));
+      list.addElement(new DataElement("NICO2",             Type.CIRCLE_CO2_BEAM_STATUS_COLOR, "TCS_NI_CO2_CH_PWRLAS_MEAN"));
+      list.addElement(new DataElement("NICO2",             Type.CIRCLE_CO2_BEAM_STATUS_COLOR, "TCS_NI_CO2_PWRLAS_MEAN"));
+      list.addElement(new DataElement("NICO2",             Type.CIRCLE_CO2_BEAM_STATUS_COLOR, "TCS_CO2_REL5"));
+      list.addElement(new DataElement("NICO2",             Type.CIRCLE_CO2_BEAM_STATUS_COLOR, "TCS_CO2_REL6"));
+      list.addElement(new DataElement("NICO2",             Type.CIRCLE_CO2_BEAM_STATUS_COLOR, "TCS_CO2_REL7"));
       
       // Green laser status (circles)
       list.addElement(new DataElement("IBGreen",      Type.CIRCLE_GREEN_STATUS_COLOR, ""));
@@ -118,7 +124,7 @@ public class DataSetCBSafety extends DataSet {
 
       // SQZ source indicators (single-channel thresholds, not part of LaserTopology propagation):
       //  - SHG Lock: value < 5 => ON (green), otherwise OFF (grey).
-      //  - Fast shutter: value > 1 => CLOSED (grey), otherwise OPEN (green).
+      //  - Fast shutter: value > 1 => CLOSED (grey), otherwise OPEN (red, YAG hazard).
       list.addElement(new DataElement("SQZSourceGreen",  Type.CIRCLE_SQZ_LOCK_STATUS_COLOR,  "SQZ_SHG_Lock_Status_MAX"));
       list.addElement(new DataElement("SQZYagShutter", Type.SHUTTER_SQZ_FAST_STATUS_COLOR, "EQB1_FAST_SHUTTER_MONI_MAX"));
 

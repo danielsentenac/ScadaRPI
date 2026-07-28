@@ -421,6 +421,18 @@ public class ViewData extends View implements Runnable, DataTypes {
                            Platform.runLater(() -> {sourceCo2BeamCircle.setFill(CO2_STATUS_COLOR.get(sourceCo2BeamState));});
                         }
                      break;
+                case CIRCLE_CO2_BEAM_STATUS_COLOR:
+                        Circle co2BeamCircle = (Circle) lookup("#" + data.list.elementAt(i).name);
+                        if (co2BeamCircle != null) {
+                           // Tower CO2 beam: ON iff the source is ON AND the viewport
+                           // shutter is open — both computed in LaserTopology from the
+                           // PWRLAS and TCS_CO2_REL channels sharing this fx:id.
+                           final String co2BeamState =
+                              LaserTopology.triToColorKey(
+                                 LaserTopology.computeCo2BeamState(data, data.list.elementAt(i).name));
+                           Platform.runLater(() -> {co2BeamCircle.setFill(CO2_STATUS_COLOR.get(co2BeamState));});
+                        }
+                     break;
                 case CIRCLE_PCAL_STATUS_COLOR:
                         // PCAL (1047 Hz) laser status. Both the Source circle and the
                         // Tower circle share the same channels, so the tower beam
@@ -453,6 +465,7 @@ public class ViewData extends View implements Runnable, DataTypes {
                 case SHUTTER_GREEN_STATUS_COLOR:
                         SVGPath greenShutter = (SVGPath) lookup("#" + data.list.elementAt(i).name);
                         if (greenShutter != null) {
+                           // ALS_xEB_REL1: REL == 1 => beam present (green), REL == 0 => shuttered.
                            // Combine all entries sharing this fx:id: any non-zero => "1", all zero => "0",
                            // any unknown (NOTEXIST/TIMOUT/parse error) with no "1" => no-data.
                            String shutterName = data.list.elementAt(i).name;
@@ -466,7 +479,7 @@ public class ViewData extends View implements Runnable, DataTypes {
                                  continue;
                               }
                               try {
-                                 if (Integer.parseInt(raw) != 0) anyOn = false;
+                                 if (Integer.parseInt(raw) != 0) anyOn = true;
                               }
                               catch (NumberFormatException ex) { anyUnknown = true; }
                            }

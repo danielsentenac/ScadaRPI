@@ -17,7 +17,8 @@ public class DataSetNESafety extends DataSet {
       list.addElement(new DataElement("NEGreen",      Type.CIRCLE_GREEN_STATUS_COLOR, ""));
       list.addElement(new DataElement("TUBENGreen",   Type.CIRCLE_GREEN_STATUS_COLOR, ""));
       list.addElement(new DataElement("NEMiniGreen",   Type.CIRCLE_GREEN_STATUS_COLOR, ""));
-      // NESourceGreen: ON iff ALS_NEB_PD_GREEN_MONI_CALI > 1 AND ALS_NEB_REL == 0.
+      // NESourceGreen circle: ON iff ALS_NEB_PD_GREEN_MONI_CALI > 1. The REL1 entry
+      // (shutter: 1 = open, 0 = closed) gates the propagation BFS, not the circle.
       // Two DataElements share the fx:id; the handler in ViewData.java combines them.
       list.addElement(new DataElement("NESourceGreen",  Type.CIRCLE_SOURCE_GREEN_STATUS_COLOR, "ALS_NEB_PD_GREEN_MONI_CALI_MEAN"));
       list.addElement(new DataElement("NESourceGreen",  Type.CIRCLE_SOURCE_GREEN_STATUS_COLOR, "ALS_NEB_REL1"));

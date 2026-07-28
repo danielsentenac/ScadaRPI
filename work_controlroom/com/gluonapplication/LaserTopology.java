@@ -33,18 +33,18 @@ import java.util.function.Function;
 public final class LaserTopology {
 
    /* Tower IDs */
-   public static final String IB    = "IB";
-   public static final String MC    = "MC";
-   public static final String PR    = "PR";
-   public static final String BS    = "BS";
-   public static final String NI    = "NI";
-   public static final String WI    = "WI";
-   public static final String SR    = "SR";
-   public static final String DET   = "DET";
-   public static final String TUBEN = "TUBEN";
-   public static final String TUBEW = "TUBEW";
-   public static final String NE    = "NE";
-   public static final String WE    = "WE";
+   public static final String IB      = "IB";
+   public static final String MC      = "MC";
+   public static final String PR      = "PR";
+   public static final String BS      = "BS";
+   public static final String NI      = "NI";
+   public static final String WI      = "WI";
+   public static final String SR      = "SR";
+   public static final String DET     = "DET";
+   public static final String TUBEN   = "TUBEN";
+   public static final String TUBEW   = "TUBEW";
+   public static final String NE      = "NE";
+   public static final String WE      = "WE";
    public static final String SQZDET1 = "SQZDET1";
    public static final String SQZDET2 = "SQZDET2";
    public static final String SQZ0N   = "SQZ0N";
@@ -250,8 +250,8 @@ public final class LaserTopology {
     */
    public static void applyPropagation(DataSet data) {
       Tri yagSrc       = computeYagSourceState(data);
-      Tri greenWeSrc   = computeGreenSourceState(data, "WESourceGreen");
-      Tri greenNeSrc   = computeGreenSourceState(data, "NESourceGreen");
+      Tri greenWeSrc   = computeGreenBeamState(data, "WESourceGreen");
+      Tri greenNeSrc   = computeGreenBeamState(data, "NESourceGreen");
       Tri sqzYagSrc    = computeSqzYagSourceState(data);
       Tri sqzGreenSrc  = computeSqzGreenSourceState(data);
 
@@ -277,48 +277,8 @@ public final class LaserTopology {
       greenSources.put(SQZDET1, sqzGreenSrc);
       Map<String, Tri> greenReach = reach(greenSources, valveLookup);
 
-      // logIfChanged(yagSrc, greenWeSrc, greenNeSrc, sqzYagSrc, sqzGreenSrc, yagReach, greenReach, valveLookup);
-
       writeReachIntoSvrValueList(data, YAG_INDICATORS, yagReach);
       writeReachIntoSvrValueList(data, GREEN_INDICATORS, greenReach);
-   }
-
-   /* Print one line per state transition (avoids per-frame log spam). */
-   private static String lastLogLine = "";
-   private static void logIfChanged(Tri yag, Tri gWe, Tri gNe,
-                                    Tri sqzYag, Tri sqzGreen,
-                                    Map<String, Tri> yagReach,
-                                    Map<String, Tri> greenReach,
-                                    java.util.function.Function<String, String> valveLookup) {
-      StringBuilder sb = new StringBuilder();
-      sb.append("[LaserProp] srcYag=").append(yag)
-        .append(" srcGreenWE=").append(gWe)
-        .append(" srcGreenNE=").append(gNe)
-        .append(" srcSqzYag=").append(sqzYag)
-        .append(" srcSqzGreen=").append(sqzGreen);
-      sb.append(" yag{");
-      for (Map.Entry<String, Tri> e : yagReach.entrySet()) {
-         sb.append(e.getKey()).append('=').append(triShort(e.getValue())).append(' ');
-      }
-      sb.append("} green{");
-      for (Map.Entry<String, Tri> e : greenReach.entrySet()) {
-         sb.append(e.getKey()).append('=').append(triShort(e.getValue())).append(' ');
-      }
-      sb.append('}');
-      String line = sb.toString();
-      if (!line.equals(lastLogLine)) {
-         lastLogLine = line;
-         System.out.println(line);
-         /* Also dump the raw channels driving the source decisions. */
-         System.out.println("  INJ_EIB_POUT_PD_MAX=" + valveLookup.apply("INJ_EIB_POUT_PD_MAX")
-                          + " BsX_QF_DC_MAX=" + valveLookup.apply("BsX_QF_DC_MAX")
-                          + " BsX_QN_DC_MAX=" + valveLookup.apply("BsX_QN_DC_MAX"));
-         System.out.println("  SQZ_SHG_Lock_Status_MAX=" + valveLookup.apply("SQZ_SHG_Lock_Status_MAX")
-                          + " EQB1_FAST_SHUTTER_MONI_MAX=" + valveLookup.apply("EQB1_FAST_SHUTTER_MONI_MAX"));
-      }
-   }
-   private static String triShort(Tri t) {
-      return t == Tri.ON ? "1" : t == Tri.OFF ? "0" : "?";
    }
 
    private static void writeReachIntoSvrValueList(DataSet data,
@@ -366,30 +326,41 @@ public final class LaserTopology {
       return "---";
    }
 
-   /** Green source state by fx:id — single source of truth for both the
-    *  SourceGreen circle rendering and the laser propagation BFS. Walks every
-    *  entry in the DataSet whose `name` matches `fxIdName` and inspects the
-    *  shared channels: one is the calibrated photodiode (svrName contains
-    *  "PD_GREEN_MONI_CALI"), the other is the release flag. ON iff PD > 1 AND
-    *  REL < 0.5; OFF otherwise; UNKNOWN if either channel is missing/garbled. */
+   /** Green source state by fx:id — drives the SourceGreen circle: ON iff
+    *  the calibrated photodiode (svrName contains "PD_GREEN_MONI_CALI")
+    *  reads >= 1, i.e. the laser is lasing, regardless of the shutter.
+    *  UNKNOWN if the PD channel is missing/garbled. */
    public static Tri computeGreenSourceState(DataSet data, String fxIdName) {
-      Double pdValue = null;
-      Double relValue = null;
-      boolean anyUnknown = false;
+      Double pdValue = findGreenChannel(data, fxIdName, /*pd=*/true);
+      if (pdValue == null) return Tri.UNKNOWN;
+      return pdValue >= 1.0 ? Tri.ON : Tri.OFF;
+   }
+
+   /** Green beam injected into the vacuum by fx:id — seeds the propagation
+    *  BFS: ON iff the source is lasing (PD >= 1) AND the shutter is open
+    *  (REL flag: 1 = open, 0 = closed). UNKNOWN if either channel is
+    *  missing/garbled. */
+   public static Tri computeGreenBeamState(DataSet data, String fxIdName) {
+      Double pdValue  = findGreenChannel(data, fxIdName, /*pd=*/true);
+      Double relValue = findGreenChannel(data, fxIdName, /*pd=*/false);
+      if (pdValue == null || relValue == null) return Tri.UNKNOWN;
+      return (pdValue >= 1.0 && relValue >= 0.5) ? Tri.ON : Tri.OFF;
+   }
+
+   /** Walks every entry whose `name` matches `fxIdName` and returns the
+    *  photodiode value (pd=true, svrName contains "PD_GREEN_MONI_CALI") or
+    *  the shutter flag (pd=false). Null if missing/garbled. */
+   private static Double findGreenChannel(DataSet data, String fxIdName, boolean pd) {
       for (int k = 0; k < data.list.size(); k++) {
          DataElement de = data.list.elementAt(k);
          if (!de.name.equals(fxIdName)) continue;
+         if (de.svrName.contains("PD_GREEN_MONI_CALI") != pd) continue;
          String raw = data.svrValueList.elementAt(k).replace(" ", "").replace(",", ".");
-         if (raw.contains("NOTEXIST") || raw.contains("TIMOUT")) { anyUnknown = true; continue; }
-         try {
-            double v = Double.parseDouble(raw);
-            if (de.svrName.contains("PD_GREEN_MONI_CALI")) pdValue = v;
-            else relValue = v;
-         }
-         catch (NumberFormatException ex) { anyUnknown = true; }
+         if (raw.contains("NOTEXIST") || raw.contains("TIMOUT")) return null;
+         try { return Double.parseDouble(raw); }
+         catch (NumberFormatException ex) { return null; }
       }
-      if (pdValue == null || relValue == null || anyUnknown) return Tri.UNKNOWN;
-      return (pdValue >= 1.0 && relValue < 0.5) ? Tri.ON : Tri.OFF;
+      return null;
    }
 
    /** CO2 source state by fx:id — single source of truth. Walks every entry
@@ -415,6 +386,36 @@ public final class LaserTopology {
       }
       if (!anyKnown) return Tri.UNKNOWN;
       return anyOn ? Tri.ON : Tri.OFF;
+   }
+
+   /** CO2 beam entering the tower by fx:id — ON iff the CO2 source is ON
+    *  (any PWRLAS channel above threshold) AND the viewport shutter is open
+    *  (any TCS_CO2_REL channel non-zero; 1 = open, 0 = closed). The source
+    *  circle and the shutter icon stay independent; this gates the tower
+    *  beam indicator on both, like the green beam. */
+   public static Tri computeCo2BeamState(DataSet data, String fxIdName) {
+      boolean pwrOn = false, pwrKnown = false;
+      boolean relOpen = false, relKnown = false;
+      for (int k = 0; k < data.list.size(); k++) {
+         DataElement de = data.list.elementAt(k);
+         if (!de.name.equals(fxIdName)) continue;
+         String raw = data.svrValueList.elementAt(k).replace(" ", "").replace(",", ".");
+         if (raw.contains("NOTEXIST") || raw.contains("TIMOUT")) continue;
+         try {
+            double v = Double.parseDouble(raw);
+            if (de.svrName.contains("PWRLAS")) {
+               pwrKnown = true;
+               if (v > CO2_ON_THRESHOLD) pwrOn = true;
+            }
+            else if (de.svrName.contains("_REL")) {
+               relKnown = true;
+               if (v != 0.0) relOpen = true;
+            }
+         }
+         catch (NumberFormatException ex) { /* skip parse errors */ }
+      }
+      if (!pwrKnown || !relKnown) return Tri.UNKNOWN;
+      return (pwrOn && relOpen) ? Tri.ON : Tri.OFF;
    }
 
    /** Test-time threshold for CO2 source detection. Original spec used 0.1 V /

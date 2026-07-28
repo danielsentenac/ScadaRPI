@@ -180,11 +180,21 @@
     if (known === 0 || anyUnknown) return "UNKNOWN";
     return sum >= 0.1 ? "ON" : "OFF";
   }
-  function computeGreenSource(cv, pdChannel, relChannel) {
+  // Green source circle: lasing iff PD >= 1, regardless of the shutter
+  // (matches LaserTopology.computeGreenSourceState).
+  function computeGreenSource(cv, pdChannel) {
+    const pd = asFloat(cv[pdChannel]);
+    if (pd == null) return "UNKNOWN";
+    return pd >= 1.0 ? "ON" : "OFF";
+  }
+  // Green beam injected into the vacuum — seeds the propagation BFS: source
+  // lasing (PD >= 1) AND shutter open (REL1: 1 = open, 0 = closed).
+  // Matches LaserTopology.computeGreenBeamState.
+  function computeGreenBeam(cv, pdChannel, relChannel) {
     const pd  = asFloat(cv[pdChannel]);
     const rel = asFloat(cv[relChannel]);
     if (pd == null || rel == null) return "UNKNOWN";
-    return (pd >= 1.0 && rel < 0.5) ? "ON" : "OFF";
+    return (pd >= 1.0 && rel >= 0.5) ? "ON" : "OFF";
   }
   // CO2 source: any channel sharing the fxId above CO2_ON_THRESHOLD => ON.
   // Threshold from LaserTopology.java (CO2_ON_THRESHOLD = 20.0).
@@ -199,6 +209,27 @@
     }
     if (!anyKnown) return "UNKNOWN";
     return anyOn ? "ON" : "OFF";
+  }
+  // CO2 beam entering the tower: source ON (any PWRLAS channel above threshold)
+  // AND viewport shutter open (any TCS_CO2_REL channel non-zero; 1 = open,
+  // 0 = closed). Channels sharing the binding are split by name, mirroring
+  // LaserTopology.computeCo2BeamState.
+  function computeCo2Beam(cv, channels) {
+    let pwrOn = false, pwrKnown = false;
+    let relOpen = false, relKnown = false;
+    for (const ch of channels) {
+      const f = asFloat(cv[ch]);
+      if (f == null) continue;
+      if (ch.includes("PWRLAS")) {
+        pwrKnown = true;
+        if (f > CO2_ON_THRESHOLD) pwrOn = true;
+      } else if (ch.includes("_REL")) {
+        relKnown = true;
+        if (f !== 0) relOpen = true;
+      }
+    }
+    if (!pwrKnown || !relKnown) return "UNKNOWN";
+    return (pwrOn && relOpen) ? "ON" : "OFF";
   }
   function computeSqzGreenSource(cv) {
     const v = asFloat(cv["SQZ_SHG_Lock_Status_MAX"]);
@@ -216,9 +247,11 @@
       [TOWER.IB]:      computeYagSource(cv),
       [TOWER.SQZDET1]: computeSqzYagSource(cv),
     };
+    // BFS is seeded with the injected BEAM (source AND shutter), not the bare
+    // source, so towers only light when both are green.
     const greenSources = {
-      [TOWER.WE]:      computeGreenSource(cv, "ALS_WEB_PD_GREEN_MONI_CALI_MEAN", "ALS_WEB_REL1"),
-      [TOWER.NE]:      computeGreenSource(cv, "ALS_NEB_PD_GREEN_MONI_CALI_MEAN", "ALS_NEB_REL1"),
+      [TOWER.WE]:      computeGreenBeam(cv, "ALS_WEB_PD_GREEN_MONI_CALI_MEAN", "ALS_WEB_REL1"),
+      [TOWER.NE]:      computeGreenBeam(cv, "ALS_NEB_PD_GREEN_MONI_CALI_MEAN", "ALS_NEB_REL1"),
       [TOWER.SQZDET1]: computeSqzGreenSource(cv),
     };
     const valveLookup = (ch) => {
@@ -329,14 +362,16 @@
     { fxId:"WISourceCO2", kind:"source-co2",
       channels:["TCS_WI_CO2_CH_PWRLAS_MEAN","TCS_WI_CO2_PWRLAS_MEAN"],
       locator:{type:"circle", cx:217, cy:251} },
-    { fxId:"WICO2",       kind:"source-co2",
-      channels:["TCS_WI_CO2_CH_PWRLAS_MEAN","TCS_WI_CO2_PWRLAS_MEAN"],
+    { fxId:"WICO2",       kind:"co2-beam",
+      channels:["TCS_WI_CO2_CH_PWRLAS_MEAN","TCS_WI_CO2_PWRLAS_MEAN",
+                "TCS_CO2_REL1","TCS_CO2_REL2","TCS_CO2_REL3"],
       locator:{type:"circle", cx:240, cy:283} },
     { fxId:"NISourceCO2", kind:"source-co2",
       channels:["TCS_NI_CO2_CH_PWRLAS_MEAN","TCS_NI_CO2_PWRLAS_MEAN"],
       locator:{type:"circle", cx:228, cy:201} },
-    { fxId:"NICO2",       kind:"source-co2",
-      channels:["TCS_NI_CO2_CH_PWRLAS_MEAN","TCS_NI_CO2_PWRLAS_MEAN"],
+    { fxId:"NICO2",       kind:"co2-beam",
+      channels:["TCS_NI_CO2_CH_PWRLAS_MEAN","TCS_NI_CO2_PWRLAS_MEAN",
+                "TCS_CO2_REL5","TCS_CO2_REL6","TCS_CO2_REL7"],
       locator:{type:"circle", cx:306, cy:218} },
 
     // ----- CB: Source Yag -----
@@ -499,6 +534,7 @@
     "source-yag":   "#ff1f1f",
     "source-green": "#21ff27",
     "source-co2":   "#efff21",
+    "co2-beam":     "#efff21",
     "sqz-lock":     "#21ff27",
     "pcal":         "#ff7e21",
   };
@@ -602,15 +638,12 @@
         break;
       }
       case "shutter-green": {
-        // Single channel (ALS_NEB_REL1 / ALS_WEB_REL1) — interpreted opposite to the
-        // CO2 shutters: REL == 0 means the safety release is engaged so the beam
-        // passes (OPEN, green); REL != 0 means BLOCKED (CLOSED, grey).
-        // This matches DataSetNESafety.java's comment that NESourceGreen is ON iff
-        // PD > 1 AND REL == 0 (and the ViewData.java SHUTTER_GREEN handler has a
-        // sign bug — `anyOn = false` on the non-zero branch — that masks the
-        // shutter state in the live JavaFX app; not replicated here).
+        // Single channel (ALS_NEB_REL1 / ALS_WEB_REL1): REL == 1 means the beam
+        // passes (OPEN, green); REL == 0 means shuttered (CLOSED, grey).
+        // Matches computeGreenSource (source ON iff PD >= 1 AND REL > 0.5) and
+        // ViewData.java's SHUTTER_GREEN handler.
         const v = asInt(raw0);
-        const st = (v == null) ? "---" : (v === 0 ? "1" : "0");
+        const st = (v == null) ? "---" : (v !== 0 ? "1" : "0");
         setFill(el, GREEN_COLOR[st]);
         setStroke(el, st === "1" || st === "0" ? GREEN_COLOR[st] : "#21ff27");
         break;
@@ -622,12 +655,17 @@
         break;
       }
       case "source-green": {
-        // PD >= 1 AND REL < 0.5 (matches LaserTopology.computeGreenSourceState).
-        const pd  = asFloat(values[0]);
-        const rel = asFloat(values[1]);
-        const st  = (pd == null || rel == null) ? "---"
-                  : ((pd >= 1.0 && rel < 0.5) ? "1" : "0");
+        // Source circle lights on PD >= 1 alone (matches
+        // LaserTopology.computeGreenSourceState); the REL shutter gates the
+        // propagation BFS and the shutter icon, not this circle.
+        const pd = asFloat(values[0]);
+        const st = (pd == null) ? "---" : (pd >= 1.0 ? "1" : "0");
         setFill(el, GREEN_COLOR[st]);
+        break;
+      }
+      case "co2-beam": {
+        // Tower CO2 beam: source ON AND viewport shutter open.
+        setFill(el, CO2_COLOR[triToKey(computeCo2Beam(channelValueMap, b.channels))]);
         break;
       }
       case "source-co2": {

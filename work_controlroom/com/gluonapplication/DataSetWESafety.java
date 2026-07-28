@@ -17,7 +17,8 @@ public class DataSetWESafety extends DataSet {
       list.addElement(new DataElement("WEGreen",      Type.CIRCLE_GREEN_STATUS_COLOR, ""));
       list.addElement(new DataElement("TUBEWGreen",   Type.CIRCLE_GREEN_STATUS_COLOR, ""));
       list.addElement(new DataElement("WEMiniGreen",  Type.CIRCLE_GREEN_STATUS_COLOR, ""));
-      // WESourceGreen: ON iff ALS_WEB_PD_GREEN_MONI_CALI > 1 AND ALS_WEB_REL == 0.
+      // WESourceGreen circle: ON iff ALS_WEB_PD_GREEN_MONI_CALI > 1. The REL1 entry
+      // (shutter: 1 = open, 0 = closed) gates the propagation BFS, not the circle.
       // Two DataElements share the fx:id; the handler in ViewData.java combines them.
       list.addElement(new DataElement("WESourceGreen",  Type.CIRCLE_SOURCE_GREEN_STATUS_COLOR, "ALS_WEB_PD_GREEN_MONI_CALI_MEAN"));
       list.addElement(new DataElement("WESourceGreen",  Type.CIRCLE_SOURCE_GREEN_STATUS_COLOR, "ALS_WEB_REL1"));
