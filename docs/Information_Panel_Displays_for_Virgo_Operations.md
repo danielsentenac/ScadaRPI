@@ -204,24 +204,33 @@ that section. Colour codes are uniform across the three buildings.
 - **Yag laser:** filled red disc = *Yag On*, grey disc = *Yag Off* (main Yag,
   SQZ Yag, and per-tower variants share the same colour key).
 - **Yag shutter:** red shutter glyph open / grey closed.
-- **Green laser:** green disc on / grey off.
-- **Green shutter:** green shutter glyph open / grey closed.
+- **Green laser:** green disc on / grey off. The Source Green disc reports
+  **lasing only** (photodiode above threshold), independently of the shutter.
+- **Green shutter:** green shutter glyph open / grey closed (release flag
+  `1` = open, `0` = closed). Source disc and shutter glyph are independent;
+  the beam reaches the towers only when **both** are green (see Section 6.1).
 - **PCAL laser** (1047 Hz, NE / WE only): orange disc = *PCAL On*, grey disc
   with orange outline = *PCAL Off*. The disc is orange when the laser is
   **on or enabled** (a cross-check of two channels), grey only when both are
   zero. Drawn twice per end diagram — a Source PCAL disc and a tower PCAL
   disc; the tower disc mirrors the source state (see Section 6.1).
 - **CO₂ heating** (used at NI, WI): yellow disc on / grey off; the
-  corresponding shutter has its own open/closed glyph.
+  corresponding shutter has its own open/closed glyph. As for the Green
+  lasers, the Source CO₂ disc and the shutter glyph are independent, and the
+  tower CO₂ disc lights only when the source is ON **and** the viewport
+  shutter is open.
 - **F0+F7 current:** red square = energised, grey square = off.
 
 ### 6.1 Channels and thresholds
 
 The source / shutter indicators are not driven by simple booleans; each one
 aggregates one or more raw channels and applies a fixed threshold. Per-tower
-Yag / Green tiles inside each diagram are **propagated** from the source
-states through the optical topology (across the valves), so a tile turns off
-as soon as either its source or any valve on its path closes.
+Yag / Green tiles inside each diagram are **propagated** through the optical
+topology (across the valves) from the **injected beam** — the source must be
+lasing **and** its shutter open — so a tile turns off as soon as its source
+stops, its shutter closes, or any valve on its path closes. Source discs and
+shutter glyphs remain independent indicators: a lasing but shuttered source
+shows a green disc with a closed (grey) shutter, and no tower lights up.
 
 After discussion with the Injection, Squeezing, Payload and TCS teams, the
 laser beams that shall be **switched off and/or shuttered** to ensure
@@ -248,7 +257,10 @@ Rule: `S = sum of the three values`; `S ≥ 0.1 V → ON`, `S < 0.1 V → OFF`.
 | WE | `ALS_WEB_PD_GREEN_MONI_CALI_MEAN` | `ALS_WEB_REL1` |
 | NE | `ALS_NEB_PD_GREEN_MONI_CALI_MEAN` | `ALS_NEB_REL1` |
 
-Rule: `ON` iff `PD ≥ 1.0` AND `REL < 0.5`; otherwise `OFF`.
+Rule: the Source Green disc is `ON` if `PD ≥ 1.0` (lasing, regardless of
+the shutter). The shutter glyph reads the release flag: `REL = 1` → OPEN,
+`REL = 0` → CLOSED. The beam injected into the vacuum — which seeds the
+tower propagation — is present only when `PD ≥ 1.0` AND `REL = 1`.
 
 **PCAL sources (NE / WE)** — photon-calibrator laser (1047 Hz)
 
@@ -265,15 +277,14 @@ disc reads the same channels as the Source
 PCAL disc, so both light together — no valve propagation is applied to the
 PCAL beam.
 
-**CO₂ sources (WI / NI)** – the same channels also back the WI / NI tower
-CO₂ indicators
+**CO₂ sources (WI / NI)**
 
 | Source | Channels |
 | --- | --- |
 | WI | `TCS_WI_CO2_CH_PWRLAS_MEAN`, `TCS_WI_CO2_PWRLAS_MEAN` |
 | NI | `TCS_NI_CO2_CH_PWRLAS_MEAN`, `TCS_NI_CO2_PWRLAS_MEAN` |
 
-Rule: `ON` iff any channel reads `> 20 V` (test-bench threshold; the original
+Rule: `ON` if any channel reads `> 20 V` (test-bench threshold; the original
 Virgo specification was `0.1 V` / `~10 mW`).
 
 **CO₂ shutters**
@@ -284,6 +295,11 @@ Virgo specification was `0.1 V` / `~10 mW`).
 | NI | `TCS_CO2_REL5`, `TCS_CO2_REL6`, `TCS_CO2_REL7` |
 
 Rule: all relays `0` → CLOSED; any relay non-zero → OPEN.
+
+The WI / NI **tower** CO₂ discs combine the two tables above: they light only
+when the CO₂ source is ON **and** its viewport shutter is OPEN (the CO₂
+lasers are installed at the towers themselves, so no valve propagation is
+involved). The Source CO₂ disc and the shutter glyph stay independent.
 
 **SQZ Green source (CB)**
 
