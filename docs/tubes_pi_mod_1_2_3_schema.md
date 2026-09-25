@@ -1,6 +1,6 @@
-# Tubes_Pi_Mod_1 / 2 / 3 and ShutterBeam Technical Schema
+# Tubes_Pi_Mod_1 / 2 / 3, IONIC and ShutterBeam Technical Schema
 
-This note summarizes the implemented behavior of the three `Tubes_Pi_Mod_*` sketches from the code, with the SCADA-side names taken from the corresponding Java wrappers. Section 6 documents the `ShutterBeam` module, which reuses the `Mod_1` valve control scheme but over Modbus TCP instead of I2C.
+This note summarizes the implemented behavior of the three `Tubes_Pi_Mod_*` sketches from the code, with the SCADA-side names taken from the corresponding Java wrappers. Section 6 documents the `ShutterBeam` module, which reuses the `Mod_1` valve control scheme but over Modbus TCP instead of I2C. Section 7 documents `Tubes_Pi_Mod_1_IONIC`, the status-only variant used by the ion pumping station (`work_ionic`), together with that station's RS485 links.
 
 Scope:
 
@@ -8,9 +8,11 @@ Scope:
 - `modules/Tubes_Pi_Mod_2/Tubes_Pi_Mod_2.ino`
 - `modules/Tubes_Pi_Mod_3/Tubes_Pi_Mod_3.ino`
 - `modules/ShutterBeam/ShutterBeam.ino`
+- `modules/Tubes_Pi_Mod_1_IONIC/Tubes_Pi_Mod_1_IONIC.ino`
 - `work_link/Controllino_1.java`
 - `work_sqz/Controllino_2.java`
 - `work_link/Controllino_3.java`
+- `work_ionic/Controllino.java`, `work_ionic/IonicAgilentIPCMini.java`, `work_ionic/MaxiGauge.java`
 
 The diagrams below describe the code as implemented, not a reconstructed plant P&ID.
 
@@ -377,22 +379,111 @@ flowchart LR
     INSB --> SB
 ```
 
-## 7. Compact Comparison
+## 7. Module 1 IONIC: `Tubes_Pi_Mod_1_IONIC` (work_ionic)
+
+Role:
+
+- valve status module of the ion pumping station (first deployed on `vactube900n`, GUI title `TUBE 900 NORTH`)
+- board: **Controllino MINI** (ATmega328P), unlike the MAXI used by the other modules
+- I2C slave address `0x08`, same `4 data bytes + 4 CRC32 bytes` reply as `Mod_1`
+- **status only**: all valve commands are commented out in the sketch and in `work_ionic/Controllino.java`
+- SCADA wrapper: `work_ionic/Controllino.java` (device name `I2C`)
+
+### 7.1 Functional Map
+
+| Function | Type | Controllino I/O | Buffer bits | SCADA names |
+| --- | --- | --- | --- | --- |
+| `V31` | status only | `A2` open, `A3` close | `4..5` | `I2C_V31ST` |
+| `V32` | status only | `A0` open, `A1` close | `6..7` | `I2C_V32ST` |
+| `VSPARE` | status only | `IN0` open, `IN1` close | `8..9` | `I2C_VSPAREST` |
+| MCU reset | control only | none | `31` | internal reset bit |
+
+Bits `0..3` are reserved for the (disabled) `V31`/`V32` open/close commands.
+
+SCADA-side interpretation (`Controllino.java`): `1=open`, `2=closed`, `0=moving/unknown`; `I2C_COMST` drives the `AlarmComControllino_1` alarm.
+
+### 7.2 MINI-specific constraints
+
+- `CONTROLLINO_A4` / `A5` on the MINI are the MCU's `ADC6` / `ADC7`: **analog-only**, `digitalRead()` does not work on them. This is why `VSPARE` is read on `IN0` / `IN1` (MCU pins 2/3).
+- I2C is on the **pin header** (`CONTROLLINO_PIN_HEADER_SDA` = MCU pin 18, `..._SCL` = pin 19), not on the screw terminals. These are the same MCU pins as outputs **`D6` (SDA)** and **`D7` (SCL)**:
+  - nothing may be wired on the `D6` / `D7` screw terminals;
+  - the `D6` / `D7` LEDs flicker with I2C traffic, a handy check: during polling **both** must flicker (only `D6` = SCL not connected).
+
+### 7.3 Pi to MINI wiring
+
+The MINI is 5 V logic, the Pi 3.3 V: a bidirectional I2C level shifter (BSS138 type) is required.
+
+| Raspberry Pi 3B+ header | Level shifter | Controllino MINI pin header |
+| --- | --- | --- |
+| pin 1 (3.3 V) | LV supply | |
+| | HV supply | 5V |
+| pin 6 (GND) | GND | GND |
+| pin 3 (GPIO2, SDA) | LV1 / HV1 | SDA (= D6) |
+| pin 5 (GPIO3, SCL) | LV2 / HV2 | SCL (= D7) |
+
+Pi side, `/boot/config.txt`:
+
+```
+dtparam=i2c_arm=on
+dtparam=i2c_arm_baudrate=10000
+```
+
+The 10 kHz bus clock matches the other Controllino stations (e.g. `vacsqz300n`). Quick checks on the Pi: `raspi-gpio get 2-3` (both lines idle `level=1`), then an I2C read of `0x08`; the sketch also prints `i2c_buffer=<binary>` every 2 s on its USB serial port (9600 baud).
+
+### 7.4 Station RS485 links (work_ionic)
+
+The same Pi talks to the ion pump controller and the gauge controller through an FTDI **USB-COM485-Plus2** (2 × DB9, serial `FTAFXJQZ`). `Main.java` uses the stable `/dev/serial/by-id/usb-FTDI_USB-COM485_Plus2_FTAFXJQZ-if0N-port0` names.
+
+| Port | by-id | Device | Protocol | Java driver |
+| --- | --- | --- | --- | --- |
+| A | `if00` | Agilent **IPCMini** ion pump controller (X3602-64011) | Agilent window protocol, RS485 2-wire, address `0`, 9600 8N1 | `IonicAgilentIPCMini` (device `DUAL`) |
+| B | `if01` | Pfeiffer **MaxiGauge** | MaxiGauge ASCII (`PRn`, `SEN`, ENQ), 9600 8N1 | `MaxiGauge` (device `MG`) |
+
+IPCMini cable (the IPCMini P2 DB9 carries both RS232 and RS485; a straight RS232 cable lands on the RS232 pins and gives bit-inverted replies):
+
+| USB-COM485 port A (DB9) | IPCMini P2 (DB9) |
+| --- | --- |
+| pin 2 (D+) | pin 6 (A+, RS485) |
+| pin 3 (D-) | pin 8 (B-, RS485) |
+| pin 5 (GND) | pin 5 (GND) |
+| pin 9 (+5 V out) | not connected |
+
+IPCMini settings (front panel or serial): window `504` Serial type = `1` (RS485), `503` address = `0`, `108` baud = `4` (9600), `008` Mode = `0` (Serial). Note that window `008` is the operating **mode** (`0` Serial, `1` Remote, `2` Local, `3` LAN), not the serial type.
+
+`IonicAgilentIPCMini` keeps the element names and Modbus layout of the former `IonicAgilentDual` (`DUAL_P33*`), so GUI and supervisor are unchanged:
+
+| SCADA name | IPCMini window | Notes |
+| --- | --- | --- |
+| `P33ST` | `011` HV, `602` protect, `603` step, `206` error | GUI code: `0` off, `1..4` on step/fixed start/protect, `-5` interlock cable, `-8` over temperature |
+| `P33REMOTEMODE` | `008` | mapped to GUI `0` Local, `1` Remote I/O, `2` Serial |
+| `P33OPMODE` / `P33VOLTMODE` | `602` / `603` | `0` Started / Fixed, `1` Protected / Stepped |
+| `P33ABSVOLT` / `P33ABSCUR` / `P33P` | `810` / `811` / `812` | pressure unit from window `600` |
+| `P33PRTCUR` / `P33MAXVOLT` / `P33MAXW` | `614` I protect / `613` V target / `612` max power | writable, range-checked before sending |
+| `P33ONOFF` | `011` write | trigger `1` on, `2` off |
+| `P33MAXCUR`, `P33STEP1/2VOLT`, `P33STEP1/2CUR` | none | Dual-only, stay `0` |
+
+Port A echoes every request (2-wire); the driver skips the echo and checks the reply CRC.
+
+MaxiGauge sensor status: `SEN` returns `0` ("cannot be switched") for gauges such as the TPR/PCR Pirani; `MaxiGauge.java` then derives `PRnSST` from the `PRn` pressure status (`0..3` → `2` Sensor On, `4` → `1` Sensor Off, `5` no sensor → `0`).
+
+## 8. Compact Comparison
 
 | Module | Address | Main job | Reply payload | Main controlled equipment |
 | --- | --- | --- | --- | --- |
 | `Mod_1` | `0x08` | valve/pump bank | `buffer + CRC32` | `V21`, `V22`, `V1`, `P22`, `BYPASS` |
 | `Mod_2` | `0x09` | venting/bypass bank | `buffer + CRC32` | `VENT/V24`, `VENTSOFT/V25`, `VP`, `VSPARE`, `BYPASS` |
 | `Mod_3` | `0x10` | fan + rack temperature | `float temp + buffer + CRC32` | fan speed, fan on/off, thermocouple |
+| `Mod_1_IONIC` | `0x08` (MINI) | ion pumping station valve status | `buffer + CRC32` | `V31`, `V32`, `VSPARE` status only |
 | `ShutterBeam` | Modbus TCP `502` (IP `192.168.224.190`) | beam shutter | Modbus holding registers | shutter open/close |
 
-## 8. Practical Reading of the Modules
+## 9. Practical Reading of the Modules
 
 At system level the modules split responsibilities like this:
 
 - `Mod_1` = main vacuum-side valve bank with one pump/stage output
 - `Mod_2` = venting-side valve bank and bypass branch
 - `Mod_3` = rack utility module for fan management and local temperature readback
+- `Mod_1_IONIC` = valve status readback for the ion pumping station, alongside the IPCMini and MaxiGauge RS485 links of `work_ionic`
 - `ShutterBeam` = standalone beam-shutter actuator on Modbus TCP, reusing the `Mod_1` valve logic
 
 If needed, this document can be converted into:
