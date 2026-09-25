@@ -50,6 +50,7 @@ put("V31Col","I2C_V31ST"); // Color G Resource type
 put("V32","I2C_V32ST");
 put("V32Col","I2C_V32ST");
 
+
 //
 // Gauges (Maxigauge device)
 //
@@ -96,6 +97,10 @@ put("AlarmComIonicCol","DUAL_P33COMST");
 put("AlarmComMaxigauge","MG_COMST");
 put("AlarmComMaxigaugeStr","MG_COMST");
 put("AlarmComMaxigaugeCol","MG_COMST");
+put("AlarmComControllino_1","I2C_COMST");
+put("AlarmComControllino_1Str","I2C_COMST");
+put("AlarmComControllino_1Col","I2C_COMST");
+
 }};
 
 //

@@ -96,7 +96,7 @@ public class Main {
            }
 
            // Start GUI-only mode for development hosts without Pi4J hardware.
-           GlgGui mainGui = new GlgGui(deviceManager,"TUBE 600 WEST");
+           GlgGui mainGui = new GlgGui(deviceManager,"TUBE 900 NORTH");
            Signal.handle(new Signal("INT"), new SignalHandler () {
               public void handle(Signal sig) {
                  logger.finer("Main: Interrupt received, Exiting program");
@@ -110,7 +110,7 @@ public class Main {
         // Create MaxiGauge device
         Device mg = new MaxiGauge("MG",
                                   0, // Modbus start offset (MaxiGauge is the first device created)
-                                  "/dev/serial/by-id/usb-FTDI_USB-COM232_Plus4_FT2AWG94-if00-port0",
+                                  "/dev/serial/by-id/usb-FTDI_USB-COM485_Plus2_FTAFXJQZ-if01-port0",
                                   Baud._9600,
                                   DataBits._8,
                                   Parity.NONE,
@@ -120,10 +120,11 @@ public class Main {
         // Add MaxiGauge to DeviceManager
         deviceManager.addDevice(mg);
         /**********************************************************************************************/
-        // Create IonicAgilentDual device
-        Device dual = new IonicAgilentDual("DUAL",
+        // Create IonicAgilentIPCMini device (keeps the DUAL name and Modbus layout of IonicAgilentDual)
+        Device dual = new IonicAgilentIPCMini("DUAL",
                                           mg.mbRegisterEnd, // Modbus start offset
-                                          "/dev/serial/by-id/usb-FTDI_USB-COM232_Plus4_FT2AWG94-if02-port0",
+                                          "/dev/serial/by-id/usb-FTDI_USB-COM485_Plus2_FTAFXJQZ-if00-port0",
+                                          0, // RS485 address (IPCMini window 503)
                                           Baud._9600,
                                           DataBits._8,
                                           Parity.NONE,
@@ -154,7 +155,7 @@ public class Main {
         modbusSlaveThread.doStart();
         /**********************************************************************************************/
         // Start Glg GUI
-        GlgGui mainGui = new GlgGui(deviceManager,"TUBE 600 WEST");
+        GlgGui mainGui = new GlgGui(deviceManager,"TUBE 900 NORTH");
 
         // Handle CTRL-C interrupt to end cleanly the program
         Signal.handle(new Signal("INT"), new SignalHandler () {

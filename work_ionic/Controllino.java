@@ -25,6 +25,8 @@ public class Controllino extends Device {
    private static final int V31_CLOSE_STATUS_BIT   = 5;   // V31ST Close Status bit
    private static final int V32_OPEN_STATUS_BIT    = 6;   // V32ST Open Status bit
    private static final int V32_CLOSE_STATUS_BIT   = 7;   // V32ST Close Status bit
+   private static final int VSPARE_OPEN_STATUS_BIT    = 8;   // VSPAREST Open Status bit
+   private static final int VSPARE_CLOSE_STATUS_BIT   = 9;   // VSPAREST Close Status bit
    private static final int ARD_RESET_BIT          = 31;  // Controllino Reset Bit
 
 
@@ -42,10 +44,12 @@ public class Controllino extends Device {
      // Valves
      addDataElement( new DataElement(name, "V31ST", DataType.READ_ONLY_STATUS,RegisterType.INT16,mbRegisterEnd));
      addDataElement( new DataElement(name, "V32ST", DataType.READ_ONLY_STATUS,RegisterType.INT16,mbRegisterEnd+=1));
+     addDataElement( new DataElement(name, "VSPAREST", DataType.READ_ONLY_STATUS,RegisterType.INT16,mbRegisterEnd+=1));
 
      // Commands (disabled: V31/V32 not operable for now)
      //addDataElement( new DataElement(name, "V31CMD", DataType.TRIGGER,RegisterType.INT16,mbRegisterEnd+=1));
      //addDataElement( new DataElement(name, "V32CMD", DataType.TRIGGER,RegisterType.INT16,mbRegisterEnd+=1));
+     
 
      // Controller Controllino comm
      addDataElement( new DataElement(name, "COMST", DataType.COM_STATUS,RegisterType.INT16,mbRegisterEnd+=1));
@@ -69,6 +73,7 @@ public class Controllino extends Device {
 
      DataElement v31 = getDataElement("V31ST");
      DataElement v32 = getDataElement("V32ST");
+     DataElement vspare = getDataElement("VSPAREST");
      DataElement dcom = getDataElement("COMST");
     
      try {
@@ -97,6 +102,13 @@ public class Controllino extends Device {
            v32.value = 1; // VALVE OPEN
         else
            v32.value = 0; // VALVE MOVING
+
+        if (bitRead(i2c_buffer,VSPARE_CLOSE_STATUS_BIT) == 0x01 && bitRead(i2c_buffer,VSPARE_OPEN_STATUS_BIT) == 0x00)
+           vspare.value = 2; // VALVE CLOSED
+        else if (bitRead(i2c_buffer,VSPARE_OPEN_STATUS_BIT) == 0x01 && bitRead(i2c_buffer,VSPARE_CLOSE_STATUS_BIT) == 0x00)
+           vspare.value = 1; // VALVE OPEN
+        else
+           vspare.value = 0; // VALVE MOVING
      }
      catch (Exception ex) {
         logger.log(Level.WARNING, "Controllino:updateDeviceData> Communication with " + name + " interrupted");

@@ -159,9 +159,16 @@ public class MaxiGauge extends Device {
                  if (i == 4) { d5.value = pressure_val; d5s.value = pressure_status;}
                  if (i == 5) { d6.value = pressure_val; d6s.value = pressure_status;}
               }
-              else if ( i == 6 ) { // 
+              else if ( i == 6 ) { //
+                 DataElement[] ps = { d1s, d2s, d3s, d4s, d5s, d6s };
                  for (int j = 0; j < 6 ; j++) {
                     int sensor_status = Integer.parseInt(serDataR.substring(2*j,2*j+1));
+                    // SEN 0 = sensor cannot be switched (e.g. TPR/PCR Pirani): derive On/Off from its pressure status
+                    if (sensor_status == 0) {
+                       int p = (int) ps[j].value;
+                       if (p >= 0 && p <= 3) sensor_status = 2;       // measuring (Ok/Underrange/Overrange/Error) -> Sensor On
+                       else if (p == 4) sensor_status = 1;            // Sensor Off
+                    }
                     if (j == 0) { d1ss.value = sensor_status;}
                     if (j == 1) { d2ss.value = sensor_status;}
                     if (j == 2) { d3ss.value = sensor_status;}
