@@ -1,6 +1,6 @@
 /*
   Modbus Server
- A modbus server to monitor the ionic pumping station (V31/V32 valves) using Controllino board
+ A modbus server to monitor the ionic pumping station (V31/V32/VSPARE valves) using Controllino board
  */
 #include <Wire.h> // I2C library
 #include <Controllino.h> // Controllino library
@@ -25,10 +25,11 @@ volatile boolean updateIOFromI2CBool = false;
 
 /*
  * The time for Check and Reset actions
- * (valve commands disabled: V31/V32 not operable for now)
+ * (valve commands disabled: V31/V32/SPARE not operable for now)
  */
 //unsigned long V31time = 0;
 //unsigned long V32time = 0;
+//unsigned long VSPAREtime = 0;
 unsigned long looptime = 0;
 
 
@@ -37,6 +38,7 @@ unsigned long looptime = 0;
  */
 //boolean V31_RESET = false;
 //boolean V32_RESET = false;
+//boolean VSPARE_RESET = false;
 
 /*
  *  The waiting time before ressetting switches command
@@ -48,6 +50,7 @@ long reset_wait = 2000;
  */
 //boolean V31_CHECK = false;
 //boolean V32_CHECK = false;
+//boolean VSPARE_CHECK = false;
 
 /*
  *  The waiting time before checking switches status
@@ -67,6 +70,8 @@ long reset_wait = 2000;
 #define V31_CLOSE_STATUS_BIT       5   // V31 Close Status bit
 #define V32_OPEN_STATUS_BIT        6   // V32 Open Status bit
 #define V32_CLOSE_STATUS_BIT       7   // V32 Close Status bit
+#define VSPARE_OPEN_STATUS_BIT        8   // VSPARE Open Status bit
+#define VSPARE_CLOSE_STATUS_BIT       9   // VSPARE Close Status bit
 
 #define ARD_RESET_BIT              31  // Controllino Reset Bit
 
@@ -74,18 +79,22 @@ long reset_wait = 2000;
  * CONTROLLINO I/O ASSIGNATION
  */
 // digital pins (OUTPUTS)
-// (valve commands disabled: V31/V32 not operable for now)
+// (valve commands disabled: V31/V32/VSPARE not operable for now)
 //#define V31_OPEN_CMD   CONTROLLINO_R0  //(Open Command V31)
 //#define V31_CLOSE_CMD  CONTROLLINO_R1  //(Close Command V31)
 //#define V32_OPEN_CMD   CONTROLLINO_R2  //(Open Command V32)
 //#define V32_CLOSE_CMD  CONTROLLINO_R3  //(Close Command V32)
+//#define VSPARE_OPEN_CMD   CONTROLLINO_R4  //(Open Command VSPARE)
+//#define VSPARE_CLOSE_CMD  CONTROLLINO_R5  //(Close Command VSPARE)
 
 
 // digital pins (INTPUTS)
-#define V31_OPEN_STATUS    CONTROLLINO_A0    // V31 OPEN STATUS
-#define V31_CLOSE_STATUS   CONTROLLINO_A1    // V31 CLOSE STATUS
-#define V32_OPEN_STATUS    CONTROLLINO_A2    // V32 OPEN STATUS
-#define V32_CLOSE_STATUS   CONTROLLINO_A3    // V32 CLOSE STATUS
+#define V31_OPEN_STATUS    CONTROLLINO_A2    // V31 OPEN STATUS
+#define V31_CLOSE_STATUS   CONTROLLINO_A3    // V31 CLOSE STATUS
+#define V32_OPEN_STATUS    CONTROLLINO_A0    // V32 OPEN STATUS
+#define V32_CLOSE_STATUS   CONTROLLINO_A1    // V32 CLOSE STATUS
+#define VSPARE_OPEN_STATUS    CONTROLLINO_IN0   // VSPARE OPEN STATUS (A4/A5 are analog-only on MINI)
+#define VSPARE_CLOSE_STATUS   CONTROLLINO_IN1   // VSPARE CLOSE STATUS
 
 void(*resetArd) (void) = 0; //declare reset function @ address 0
 
@@ -107,7 +116,7 @@ void loop() {
      looptime = millis();
   }
 
-  // Valve commands disabled: V31/V32 not operable for now
+  // Valve commands disabled: V31/V32/SPARE not operable for now
   /*if (updateIOFromI2CBool == true) {
     Serial.print("Received command; updated i2c_buffer =");
     Serial.println(i2c_buffer,BIN);
@@ -138,7 +147,7 @@ void InitializeI2C()
   Serial.println("InitializeIO...");
 
   // Digital OUTPUTS assignation & initialization
-  // (valve commands disabled: V31/V32 not operable for now)
+  // (valve commands disabled: V31/V32/VSPARE not operable for now)
   /*digitalWrite(V31_OPEN_CMD,LOW);                           // Set V31_OPEN_CMD LOW
   digitalWrite(V31_CLOSE_CMD,HIGH);                         // Set V31_CLOSE_CMD HIGH
   pinMode(V31_OPEN_CMD, OUTPUT);                            // Set the digital pin as output for Open Valve
@@ -157,7 +166,8 @@ void InitializeI2C()
   pinMode(V31_CLOSE_STATUS, INPUT);                           // sets the digital pin as input for Valve V31 CLOSE STATUS
   pinMode(V32_OPEN_STATUS, INPUT);                            // sets the digital pin as input for Valve V32 OPEN STATUS
   pinMode(V32_CLOSE_STATUS, INPUT);                           // sets the digital pin as input for Valve V32 CLOSE STATUS
-
+  pinMode(VSPARE_OPEN_STATUS, INPUT);                        // sets the digital pin as input for Valve VSPARE OPEN STATUS
+  pinMode(VSPARE_CLOSE_STATUS, INPUT);                       // sets the digital pin as input for Valve VSPARE CLOSE STATUS
   Serial.println("Done.");
 }
 
@@ -267,7 +277,7 @@ void ResetAndCheck() {
   }
   */
 /*
- * V32 Valve case (commands disabled: V31/V32 not operable for now)
+ * V32 Valve case (commands disabled: V31/V32/VSPARE not operable for now)
  */
   /*
   // Reset V32_CLOSE_CMD
@@ -306,7 +316,7 @@ void ResetAndCheck() {
     resetArd();
   /***********************************************************************************************************/
 }
-// Valve commands disabled: V31/V32 not operable for now
+// Valve commands disabled: V31/V32/VSPARE not operable for now
 /*void UpdateIOFromI2C()
 {
   /***********************************************************************************************************/
@@ -347,7 +357,7 @@ void UpdateI2CFromIO()
      I2CsetBit(V31_CLOSE_STATUS_BIT,0x00);  // UPDATE CLOSE VALVE BIT
   }
   else if (digitalRead(V31_CLOSE_STATUS) == HIGH && digitalRead(V31_OPEN_STATUS) == LOW) { // CLOSE VALVE STATUS
-     // (commands disabled: V31/V32 not operable for now)
+     // (commands disabled: V31/V32/VSPARE not operable for now)
      /*if (bitRead(i2c_buffer,V31_OPEN_STATUS_BIT) == 0x01 && bitRead(i2c_buffer,V31_CLOSE_STATUS_BIT) == 0x00) { // IF OPEN VALVE STATUS BIT
         // reset close command
         digitalWrite(V31_CLOSE_CMD,LOW);  // CLOSE VALVE
@@ -370,7 +380,7 @@ void UpdateI2CFromIO()
      I2CsetBit(V32_CLOSE_STATUS_BIT,0x00);  // UPDATE CLOSE VALVE BIT
   }
   else if (digitalRead(V32_CLOSE_STATUS) == HIGH && digitalRead(V32_OPEN_STATUS) == LOW) { // CLOSE VALVE STATUS
-     // (commands disabled: V31/V32 not operable for now)
+     // (commands disabled: V31/V32/VSPARE not operable for now)
      /*if (bitRead(i2c_buffer,V32_OPEN_STATUS_BIT) == 0x01 && bitRead(i2c_buffer,V32_CLOSE_STATUS_BIT) == 0x00) { // IF OPEN VALVE STATUS BIT
         // reset close command
         digitalWrite(V32_CLOSE_CMD,LOW);  // CLOSE VALVE
@@ -384,6 +394,30 @@ void UpdateI2CFromIO()
      // MOVING VALVE STATUS BIT
      I2CsetBit(V32_OPEN_STATUS_BIT,0x00);   // UPDATE OPEN VALVE BIT
      I2CsetBit(V32_CLOSE_STATUS_BIT,0x00);  // UPDATE CLOSE VALVE BIT
+  }
+
+   /***********************************************************************************************************/
+  /* Update VSPARE Valve position STATUS bit (Open/Close) */
+  /***********************************************************************************************************/
+  if (digitalRead(VSPARE_OPEN_STATUS) == HIGH && digitalRead(VSPARE_CLOSE_STATUS) == LOW) { // OPEN VALVE STATUS
+     I2CsetBit(VSPARE_OPEN_STATUS_BIT,0x01);   // UPDATE OPEN VALVE BIT
+     I2CsetBit(VSPARE_CLOSE_STATUS_BIT,0x00);  // UPDATE CLOSE VALVE BIT
+  }
+  else if (digitalRead(VSPARE_CLOSE_STATUS) == HIGH && digitalRead(VSPARE_OPEN_STATUS) == LOW) { // CLOSE VALVE STATUS
+     // (commands disabled: V31/V32/VSPARE not operable for now)
+     /*if (bitRead(i2c_buffer,VSPARE_OPEN_STATUS_BIT) == 0x01 && bitRead(i2c_buffer,VSPARE_CLOSE_STATUS_BIT) == 0x00) { // IF OPEN VALVE STATUS BIT
+        // reset close command
+        digitalWrite(VSPARE_CLOSE_CMD,LOW);  // CLOSE VALVE
+        VSPAREtime = millis();
+        VSPARE_RESET = true;
+     }*/
+     I2CsetBit(VSPARE_OPEN_STATUS_BIT,0x00);   // UPDATE OPEN VALVE BIT
+     I2CsetBit(VSPARE_CLOSE_STATUS_BIT,0x01);  // UPDATE CLOSE VALVE BIT
+  }
+  else {
+     // MOVING VALVE STATUS BIT
+     I2CsetBit(VSPARE_OPEN_STATUS_BIT,0x00);   // UPDATE OPEN VALVE BIT
+     I2CsetBit(VSPARE_CLOSE_STATUS_BIT,0x00);  // UPDATE CLOSE VALVE BIT
   }
 
 }
