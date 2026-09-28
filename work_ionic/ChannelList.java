@@ -71,13 +71,13 @@ put("IonicP33PressureValsub","DUAL_P33P");            // type 2 (READ_ONLY_VALUE
 put("IonicP33REmodesub","DUAL_P33REMOTEMODE");        // type 5 (READ_AND_WRITE_STATUS)
 put("IonicP33OPmodesub","DUAL_P33OPMODE");            // type 5 (READ_AND_WRITE_STATUS)
 put("IonicP33Vmodesub","DUAL_P33VOLTMODE");           // type 5 (READ_AND_WRITE_STATUS)
-put("IonicP33McurrentValsub","DUAL_P33MAXCUR");       // type 3 (READ_AND_WRITE_VALUE)
+put("IonicP33McurrentValsub","DUAL_P33ERR");          // type 0 (READ_ONLY_STATUS) IPCMini error code
 put("IonicP33MvoltageValsub","DUAL_P33MAXVOLT");      // type 3 (READ_AND_WRITE_VALUE)
 put("IonicP33MpowerValsub","DUAL_P33MAXW");           // type 3 (READ_AND_WRITE_VALUE)
-put("IonicP33FcurrentValsub","DUAL_P33STEP1CUR");     // type 3 (READ_AND_WRITE_VALUE)
-put("IonicP33FvoltageValsub","DUAL_P33STEP1VOLT");    // type 3 (READ_AND_WRITE_VALUE)
-put("IonicP33ScurrentValsub","DUAL_P33STEP2CUR");     // type 3 (READ_AND_WRITE_VALUE)
-put("IonicP33SvoltageValsub","DUAL_P33STEP2VOLT");    // type 3 (READ_AND_WRITE_VALUE)
+put("IonicP33FcurrentValsub","DUAL_P33SETPOINT");     // type 3 (READ_AND_WRITE_VALUE) IPCMini set point
+put("IonicP33FvoltageValsub","DUAL_P33TEMPPWR");      // type 2 (READ_ONLY_VALUE) IPCMini power section temperature
+put("IonicP33ScurrentValsub","DUAL_P33PUMPTYPE");     // type 2 (READ_ONLY_VALUE) IPCMini pump type (device number)
+put("IonicP33SvoltageValsub","DUAL_P33TEMPINT");      // type 2 (READ_ONLY_VALUE) IPCMini controller temperature
 put("IonicP33PcurrentValsub","DUAL_P33PRTCUR");       // type 3 (READ_AND_WRITE_VALUE)
 }};
 
@@ -223,6 +223,7 @@ Hashtable<Integer, String> IonicRemoteSTATUS = new Hashtable<Integer, String>(){
 put(0,"Local Status");
 put(1,"Remote I/O Status");
 put(2,"Serial Status");
+put(3,"LAN Status");
 put(255,"undefined");
 }};
 
@@ -230,12 +231,13 @@ Hashtable<Integer, GlgPoint> IonicRemoteColorSTATUS = new Hashtable<Integer, Glg
 put(0,new GlgPoint(1.,0.7,0.));
 put(1,new GlgPoint(0.,1.,0.));
 put(2,new GlgPoint(1.,1.,0.));
+put(3,new GlgPoint(1.,1.,0.));
 put(255,new GlgPoint(0.5,0.5,0.5));
 }};
 
 Hashtable<Integer, String> IonicOperatingModeSTATUS = new Hashtable<Integer, String>(){{ 
-put(0,"Started");
-put(1,"Protected");
+put(0,"Disabled");
+put(1,"Enabled");
 put(255,"undefined");
 }};
 
@@ -251,10 +253,35 @@ put(1,"Stepped");
 put(255,"undefined");
 }};
 
-Hashtable<Integer, GlgPoint> IonicVoltageModeColorSTATUS = new Hashtable<Integer, GlgPoint>(){{ 
+Hashtable<Integer, GlgPoint> IonicVoltageModeColorSTATUS = new Hashtable<Integer, GlgPoint>(){{
 put(0,new GlgPoint(1.,0.7,0.));
 put(1,new GlgPoint(0.,1.,0.));
 put(255,new GlgPoint(0.5,0.5,0.5));
+}};
+
+// IPCMini window 610 device number -> pump type (manual 87-900-153-01, Device Number)
+Hashtable<Integer, String> IonicPumpTypeSTATUS = new Hashtable<Integer, String>(){{
+put(0,"Spare");
+put(1,"500 StarCell");
+put(2,"300 StarCell");
+put(3,"150 StarCell");
+put(4,"75-55-40 StarCell");
+put(5,"20 StarCell");
+put(6,"500 Diode");
+put(7,"300 Diode");
+put(8,"150 Diode");
+put(9,"75-55-40 Diode");
+put(10,"20 Diode");
+put(11,"10 Diode");
+put(12,"75 Sem");
+put(13,"25 Sem");
+put(14,"10 Sem");
+put(15,"200 Diode");
+put(16,"200 StarCell");
+put(17,"2 Diode");
+put(18,"0.2 Diode 1250 G");
+put(19,"0.2 Diode 800 G");
+put(20,"20 NEXTorr-SC");
 }};
 
 Hashtable<Integer,GlgPoint> OkFailColorSTATUS = new Hashtable<Integer, GlgPoint>(){

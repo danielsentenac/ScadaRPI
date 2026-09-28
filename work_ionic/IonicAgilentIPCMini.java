@@ -5,9 +5,11 @@
  * Frame: <STX 0x02><ADDR 0x80+n><WIN 3 ascii><COM '0'=read,'1'=write><DATA><ETX 0x03><CRC 2 ascii hex>
  * CRC  : XOR of all bytes after STX up to and including ETX.
  *
- * Data elements keep the IonicAgilentDual names and Modbus layout so GUI and supervisor are unchanged.
- * Dual-only values (Max current, Step1/2 voltage and current) have no IPCMini window and stay at 0.
+ * Data elements keep the IonicAgilentDual Modbus layout (offsets and register types). The five Dual-only
+ * slots (Max current, Step1/2 voltage and current) are reused for IPCMini values: error code, power section
+ * and controller temperatures, set point and pump type.
  */
+import java.util.Locale;
 import java.util.*;
 import java.io.IOException;
 import java.io.ByteArrayOutputStream;
@@ -41,6 +43,10 @@ public class IonicAgilentIPCMini extends Device {
    private static final String WIN_VMEAS = "810";       // N  V
    private static final String WIN_IMEAS = "811";       // A  A (X.XXe-XX)
    private static final String WIN_PRESSURE = "812";    // A  X.XXe-XX (unit from window 600)
+   private static final String WIN_TEMP_PWR = "800";    // N  power section temperature, 0.1 C units
+   private static final String WIN_TEMP_INT = "801";    // N  internal controller temperature, 0.1 C units
+   private static final String WIN_PUMPTYPE = "610";    // N  device number (pump type)
+   private static final String WIN_SETPOINT = "615";    // A  set point [X.XE-XX]
 
    // Data field length of the last read of each window: 1=logic, 6=numeric, other=alphanumeric
    private final Map<String, Integer> dataLength = new HashMap<String, Integer>();
@@ -63,6 +69,7 @@ public class IonicAgilentIPCMini extends Device {
 
      // Data types from the manual windows table, refined by each read
      dataLength.put(WIN_HV, 1);
+     dataLength.put(WIN_SETPOINT, 7);
      for (String w : new String[] { WIN_MODE, WIN_MAXPOWER, WIN_VTARGET, WIN_IPROTECT })
         dataLength.put(w, 6);
 
@@ -86,13 +93,13 @@ public class IonicAgilentIPCMini extends Device {
      addDataElement( new DataElement(name, "P33OPMODE",DataType.READ_AND_WRITE_STATUS,RegisterType.INT16,mbRegisterEnd+=1));
      addDataElement( new DataElement(name, "P33VOLTMODE",DataType.READ_AND_WRITE_STATUS,RegisterType.INT16,mbRegisterEnd+=1));
      addDataElement( new DataElement(name, "P33PRTCUR",DataType.READ_AND_WRITE_VALUE,RegisterType.INT16,mbRegisterEnd+=1));
-     addDataElement( new DataElement(name, "P33MAXCUR",DataType.READ_AND_WRITE_VALUE,RegisterType.INT16,mbRegisterEnd+=1));
+     addDataElement( new DataElement(name, "P33ERR",DataType.READ_ONLY_STATUS,RegisterType.INT16,mbRegisterEnd+=1));      // was P33MAXCUR
      addDataElement( new DataElement(name, "P33MAXVOLT",DataType.READ_AND_WRITE_VALUE,RegisterType.INT16,mbRegisterEnd+=1));
      addDataElement( new DataElement(name, "P33MAXW",DataType.READ_AND_WRITE_VALUE,RegisterType.INT16,mbRegisterEnd+=1));
-     addDataElement( new DataElement(name, "P33STEP1VOLT",DataType.READ_AND_WRITE_VALUE,RegisterType.INT16,mbRegisterEnd+=1));
-     addDataElement( new DataElement(name, "P33STEP2VOLT",DataType.READ_AND_WRITE_VALUE,RegisterType.INT16,mbRegisterEnd+=1));
-     addDataElement( new DataElement(name, "P33STEP1CUR",DataType.READ_AND_WRITE_VALUE,RegisterType.FLOAT32,mbRegisterEnd+=1));
-     addDataElement( new DataElement(name, "P33STEP2CUR",DataType.READ_AND_WRITE_VALUE,RegisterType.FLOAT32,mbRegisterEnd+=2));
+     addDataElement( new DataElement(name, "P33TEMPPWR",DataType.READ_ONLY_VALUE,RegisterType.INT16,mbRegisterEnd+=1));   // was P33STEP1VOLT
+     addDataElement( new DataElement(name, "P33TEMPINT",DataType.READ_ONLY_VALUE,RegisterType.INT16,mbRegisterEnd+=1));   // was P33STEP2VOLT
+     addDataElement( new DataElement(name, "P33SETPOINT",DataType.READ_AND_WRITE_VALUE,RegisterType.FLOAT32,mbRegisterEnd+=1)); // was P33STEP1CUR
+     addDataElement( new DataElement(name, "P33PUMPTYPE",DataType.READ_ONLY_VALUE,RegisterType.FLOAT32,mbRegisterEnd+=2)); // was P33STEP2CUR
 
      // Com Status
      addDataElement( new DataElement(name, "P33COMST", DataType.COM_STATUS,RegisterType.INT16,mbRegisterEnd+=2));
@@ -122,7 +129,8 @@ public class IonicAgilentIPCMini extends Device {
 
      // Windows polled each cycle, in order
      final String[] windows = { WIN_HV, WIN_PROTECT, WIN_STEP, WIN_ERROR, WIN_MODE, WIN_IMEAS,
-                                WIN_VMEAS, WIN_IPROTECT, WIN_PRESSURE, WIN_VTARGET, WIN_MAXPOWER };
+                                WIN_VMEAS, WIN_IPROTECT, WIN_PRESSURE, WIN_VTARGET, WIN_MAXPOWER,
+                                WIN_TEMP_PWR, WIN_TEMP_INT, WIN_SETPOINT, WIN_PUMPTYPE };
      DataElement comst = getDataElement("P33COMST");
 
      try {
@@ -150,7 +158,8 @@ public class IonicAgilentIPCMini extends Device {
                  case WIN_ERROR:    int e = Integer.parseInt(data);
                                     if (e != error)
                                        logger.log(Level.WARNING, "IonicAgilentIPCMini:updateDeviceData> " + name + " error code " + e);
-                                    error = e; break;
+                                    error = e;
+                                    getDataElement("P33ERR").value = e; break;
                  case WIN_MODE:     getDataElement("P33REMOTEMODE").value = modeToRemoteStatus(Integer.parseInt(data)); break;
                  case WIN_IMEAS:    getDataElement("P33ABSCUR").value = Double.parseDouble(data); break;
                  case WIN_VMEAS:    getDataElement("P33ABSVOLT").value = Double.parseDouble(data); break;
@@ -158,6 +167,10 @@ public class IonicAgilentIPCMini extends Device {
                  case WIN_PRESSURE: getDataElement("P33P").value = Double.parseDouble(data); break;
                  case WIN_VTARGET:  getDataElement("P33MAXVOLT").value = Double.parseDouble(data); break;
                  case WIN_MAXPOWER: getDataElement("P33MAXW").value = Double.parseDouble(data); break;
+                 case WIN_TEMP_PWR: getDataElement("P33TEMPPWR").value = Double.parseDouble(data) / 10.; break;
+                 case WIN_TEMP_INT: getDataElement("P33TEMPINT").value = Double.parseDouble(data) / 10.; break;
+                 case WIN_SETPOINT: getDataElement("P33SETPOINT").value = Double.parseDouble(data); break;
+                 case WIN_PUMPTYPE: getDataElement("P33PUMPTYPE").value = Double.parseDouble(data); break;
               }
            }
            catch (NumberFormatException n) {
@@ -212,6 +225,10 @@ public class IonicAgilentIPCMini extends Device {
          win = WIN_MAXPOWER;
          if ( v >= 10 && v <= 40 ) data = Integer.toString(v);
       }
+      else if (e.name.contains("P33SETPOINT")) { // Set point [X.XE-XX]
+         win = WIN_SETPOINT;
+         if ( e.setvalue > 0 ) data = String.format(Locale.ROOT, "%.1E", e.setvalue);
+      }
       else {
          logger.log(Level.WARNING, "IonicAgilentIPCMini:executeCommand> " + e.name + " not supported by IPCMini");
          return;
@@ -256,6 +273,7 @@ public class IonicAgilentIPCMini extends Device {
          case 0: return 2;
          case 1: return 1;
          case 2: return 0;
+         case 3: return 3;   // LAN
          default: return 255;
       }
    }
@@ -279,10 +297,10 @@ public class IonicAgilentIPCMini extends Device {
    }
 
    private int writeWindow(String win, String value) throws Exception {
-      // Format the value like the last read of the window: logic 1 char, numeric 6 digits
+      // Format the value like the last read of the window: numeric windows are 6 digits
       Integer len = dataLength.get(win);
       String data = value;
-      if (len == null || len == 6)
+      if (len != null && len == 6)
          data = String.format("%06d", Integer.parseInt(value));
       byte[] reply = transact(frame(win, '1', data));
       if (reply == null || reply.length < 3) return -1;

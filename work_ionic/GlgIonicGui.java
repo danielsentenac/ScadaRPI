@@ -105,6 +105,12 @@ public class GlgIonicGui extends GlgChildGui {
         if ( origintag.equals("PVmodeStr") ) { // Str is a tag for object status (short type) string property
             glg_bean.SetSTag(origintag,  IonicVoltageModeSTATUS.get((int)dataElement.value), true);
         }
+        if ( origintag.equals("PScurrentVal") ) { // IPCMini pump type: Label/Value widget, device number as value, pump name as label
+            String type = IonicPumpTypeSTATUS.get((int)dataElement.value);
+            glg_bean.SetDResource("PScurrentVal/Value", dataElement.value, true);
+            glg_bean.SetSResource("PScurrentVal/LabelString", type != null ? type : "Unknown", true);
+            return;
+        }
         if ( origintag.contains("Val") )   // Val is a tag for object value (double type) property
             glg_bean.SetDTag(origintag, dataElement.value, true);    
     }
@@ -170,28 +176,19 @@ public class GlgIonicGui extends GlgChildGui {
               Device device = deviceManager.getDevice(deviceName);
               DataElement dataElement = device.getDataElement(cmdName.split("_")[1]);
               if (dataElement != null) {
+                 // IPCMini: Mcurrent (error code), Fvoltage/Svoltage (temperatures) and Scurrent (pump type) are read only
                  if (origintag.contains("Pcurrent") )
-                    new DialogSetPoint(parent, origintag, device, dataElement, "Protect Current",true);
-                 else if (origintag.contains("Mcurrent") )
-                    new DialogSetPoint(parent, origintag, device, dataElement, "Max Current",true);
+                    new DialogSetPoint(parent, origintag, device, dataElement, "Protect Current [1,10000] uA",true);
                  else if (origintag.contains("Fcurrent") )
-                    new DialogSetPoint(parent, origintag, device, dataElement, "First Step Current",true);
-                 else if (origintag.contains("Fcurrent") )
-                    new DialogSetPoint(parent, origintag, device, dataElement, "First Step Current",true);
-                 else if (origintag.contains("Scurrent") )
-                    new DialogSetPoint(parent, origintag, device, dataElement, "Second Step Current",true);
+                    new DialogSetPoint(parent, origintag, device, dataElement, "Set Point [X.XE-XX]",true);
                  else if (origintag.contains("Mvoltage") )
-                    new DialogSetPoint(parent, origintag, device, dataElement, "Max Voltage",true);
-                 else if (origintag.contains("Fvoltage") )
-                    new DialogSetPoint(parent, origintag, device, dataElement, "First Step Voltage",true);
-                 else if (origintag.contains("Svoltage") )
-                    new DialogSetPoint(parent, origintag, device, dataElement, "Second Step Voltage",true);
+                    new DialogSetPoint(parent, origintag, device, dataElement, "Target Voltage [3000,7000] V",true);
                  else if (origintag.contains("Mpower") )
-                    new DialogSetPoint(parent, origintag, device, dataElement, "Max Power",true);
-                 else if (origintag.contains("REmode") ) 
+                    new DialogSetPoint(parent, origintag, device, dataElement, "Max Power [10,40] W",true);
+                 else if (origintag.contains("REmode") )
                     new DialogSetPoint(parent, origintag, device, dataElement, "Local=0, Remote=1, Serial=2", true);
-                 else if (origintag.contains("OPmode") ) 
-                    new DialogSetPoint(parent, origintag, device, dataElement, "Start=1, Protect=2", true);
+                 else if (origintag.contains("OPmode") )
+                    new DialogSetPoint(parent, origintag, device, dataElement, "Protect: Disabled=1, Enabled=2", true);
                  else if (origintag.contains("Vmode") ) 
                     new DialogSetPoint(parent, origintag, device, dataElement, "Fixed=1, Step=2", true);
               }
