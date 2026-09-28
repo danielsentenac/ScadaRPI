@@ -76,6 +76,19 @@ public class GlgIonicGui extends GlgChildGui {
        STATUS.put("PScurrentVal", TUBESTATUS.get(origin + "ScurrentValsub"));
     }
 
+    // IPCMini window 206 error bits (manual Tab. 8)
+    private static String ipcMiniErrorText(int code) {
+        if (code == 0) return "No error";
+        StringBuilder s = new StringBuilder();
+        int known = 0;
+        int[] bits = { 4, 32, 64, 128 };
+        String[] names = { "Temp", "Cable", "Short", "Prot" };  // short: the label field fits ~11 chars
+        for (int i = 0; i < bits.length; i++)
+            if ((code & bits[i]) != 0) { s.append(s.length() > 0 ? "+" : "").append(names[i]); known |= bits[i]; }
+        if ((code & ~known) != 0) s.append(s.length() > 0 ? "+" : "").append("Unknown");
+        return s.toString();
+    }
+
     public void updateGuiFeatures(String origintag, DataElement dataElement) {
 
         // Ionic Pump Gui case
@@ -109,6 +122,11 @@ public class GlgIonicGui extends GlgChildGui {
             String type = IonicPumpTypeSTATUS.get((int)dataElement.value);
             glg_bean.SetDResource("PScurrentVal/Value", dataElement.value, true);
             glg_bean.SetSResource("PScurrentVal/LabelString", type != null ? type : "Unknown", true);
+            return;
+        }
+        if ( origintag.equals("PMcurrentVal") ) { // IPCMini error code: Label/Value widget, error code as value, decoded errors as label
+            glg_bean.SetDResource("PMcurrentVal/Value", dataElement.value, true);
+            glg_bean.SetSResource("PMcurrentVal/LabelString", ipcMiniErrorText((int)dataElement.value), true);
             return;
         }
         if ( origintag.contains("Val") )   // Val is a tag for object value (double type) property
