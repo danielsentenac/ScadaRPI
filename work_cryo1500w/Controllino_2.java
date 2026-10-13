@@ -165,7 +165,15 @@ public class Controllino_2 extends Device {
    }
    
    public void executeCommand( DataElement e ) {
-      
+
+      // CP900 relay command retired: CRYO 900 is now switched through CP900_ONOFF (CryomechCPA Modbus TCP)
+      if ( e.name.contains("CP900ONOFF") ) {
+         logger.warning("Controllino_2:executeCommand> CP900ONOFF ignored, use CP900_ONOFF");
+         e.value = 0;
+         try { holdingRegisters.setInt16At(e.mbRegisterOffset, 0); } catch (Exception ex) {}
+         return;
+      }
+
       try {
          // Read the (old) i2c buffer from the bus
          byte[] serDataR = i2c.Read4bytesPlusCRC32();
@@ -179,14 +187,7 @@ public class Controllino_2 extends Device {
                      String.format("%32s",Integer.toBinaryString(i2c_buffer)).replaceAll(" ", "0"));
  
         
-         if ( e.name.contains("CP900ONOFF") ) { // CP900 On/Off command
-            logger.finer("Controllino_2:executeCommand> set bit CP900 =" + e.value);
-            if ( e.value == 1 ) // Switch CP900 On
-              i2c_buffer = setBit(i2c_buffer,CP900_ON_CMD_BIT);
-            else if ( e.value == 2 ) // Switch CP900 Off
-              i2c_buffer = clearBit(i2c_buffer,CP900_OFF_CMD_BIT);
-         } 
-         else if ( e.name.contains("CP800ONOFF") ) { // CP800 On/Off command
+         if ( e.name.contains("CP800ONOFF") ) { // CP800 On/Off command
             logger.finer("Controllino_2:executeCommand> set bit CP800 =" + e.value);
             if ( e.value == 1 ) // Switch CP800 On
               i2c_buffer = setBit(i2c_buffer,CP800_ON_CMD_BIT);

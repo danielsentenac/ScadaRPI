@@ -190,8 +190,8 @@ private static final long serialVersionUID = 354054054090L;
 // 
 put("Cryo800ON","M2_CP800ONOFF");  // Visibility D Resource type
 put("Cryo800OFF","M2_CP800ONOFF");  // Visibility D Resource type
-put("Cryo900ON","M2_CP900ONOFF");  // Visibility D Resource type
-put("Cryo900OFF","M2_CP900ONOFF");  // Visibility D Resource type
+put("Cryo900ON","CP900_ONOFF");  // Visibility D Resource type
+put("Cryo900OFF","CP900_ONOFF");  // Visibility D Resource type
 put("ChillerON","M2_CHILLERONOFF");  // Visibility D Resource type
 put("ChillerOFF","M2_CHILLERONOFF");  // Visibility D Resource type
 put("WaterloopON","M2_PUMPONOFF");  // Visibility D Resource type
@@ -217,7 +217,7 @@ put("FluxCol","M2_FLUXST"); // Color G Resource type
 put("Pump","M2_PUMPST");    // Visibility D Resource type
 put("PumpCol","M2_PUMPST"); // Color G Resource type
 put("Cryo800STVal","M2_CP800ST");  // Visibility D Resource type
-put("Cryo900STVal","M2_CP900ST");  // Visibility D Resource type
+put("Cryo900STVal","CP900_RUNST");  // Visibility D Resource type
 put("ChillerSTVal","M2_CHILLERST");  // Visibility D Resource type
 put("WaterloopSTVal","M2_FLUXST");  // Visibility D Resource type
 
@@ -226,8 +226,8 @@ put("WaterloopSTVal","M2_FLUXST");  // Visibility D Resource type
 //
 put("Cryo800TGasVal","CHILLER_TCMUX_T1");  // Visibility D Resource type
 put("Cryo800TMotVal","CHILLER_TCMUX_T2");  // Visibility D Resource type
-put("Cryo900TGasVal","CHILLER_TCMUX_T3");  // Visibility D Resource type
-put("Cryo900TMotVal","CHILLER_TCMUX_T4");  // Visibility D Resource type
+put("Cryo900TGasVal","CP900_THELIUM");  // Visibility D Resource type
+put("Cryo900TMotVal","CP900_TOIL");  // Visibility D Resource type
 put("WaterloopTVal","CHILLER_TCMUX_T5");  // Visibility D Resource type
 //
 // Lakeshore Temperatures

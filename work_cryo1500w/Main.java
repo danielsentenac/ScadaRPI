@@ -39,6 +39,9 @@ public class Main {
     // Controllino_2 I2C address
     private static final int CONTROLLINO_2_ADDR = 0x09;
 
+    // Cryomech CPA (CRYO 900) compressor static IP address
+    private static final String CP900_IP_ADDR = "192.168.10.10";
+
     private static final Logger logger = Logger.getLogger("Main");
 
     private static boolean isPi4jHardwareHost() {
@@ -235,6 +238,16 @@ public class Main {
         // Add XGSGauge to DeviceManager
         deviceManager.addDevice(chiller);
         /**********************************************************************************************/
+        /**********************************************************************************************/
+        // Create Cryomech CPA compressor device (CRYO 900, PT410) on Ethernet/USB bridge
+        Device cp900 = new CryomechCPA("CP900",
+                                       CP900_IP_ADDR,
+                                       502, // Modbus TCP port
+                                       chiller.mbRegisterEnd); // Modbus start offset
+
+        // Add CryomechCPA to DeviceManager
+        deviceManager.addDevice(cp900);
+        /**********************************************************************************************/
         // Start ModbusSlave thread
         ModbusSlaveThread modbusSlaveThread = new ModbusSlaveThread(deviceManager);
         /**********************************************************************************************/
@@ -258,6 +271,8 @@ public class Main {
         tcmuxshield.doStart();
         // Start (Chiller) temperature device
         chiller.doStart();
+        // Start (CryomechCPA) CP900 compressor device
+        cp900.doStart();
         // Start modbusSlaveThread thread
         modbusSlaveThread.doStart();
         /**********************************************************************************************/
