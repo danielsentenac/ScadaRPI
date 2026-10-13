@@ -43,7 +43,7 @@ public class LakeShore extends Device {
      addDataElement( new DataElement(name, "T8", DataType.READ_ONLY_VALUE,RegisterType.FLOAT32,mbRegisterEnd+=2));
 
     // Controller Lakeshore comm
-    addDataElement( new DataElement(name, "COMST", DataType.COM_STATUS,RegisterType.INT16,mbRegisterEnd+=1));
+    addDataElement( new DataElement(name, "COMST", DataType.COM_STATUS,RegisterType.INT16,mbRegisterEnd+=2));
 
     mbRegisterEnd+=1;
 
