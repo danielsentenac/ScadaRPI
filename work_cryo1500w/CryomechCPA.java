@@ -111,6 +111,10 @@ public class CryomechCPA extends Device {
      catch(Exception e) {
         logger.log(Level.SEVERE, "CryomechCPA:CryomechCPA>" + e.getMessage());
      }
+
+     // No communication until first successful read
+     setErrorComStatus();
+     hasWarned = false;
    }
 
    // Cryomech floats are sent low word first
@@ -137,9 +141,11 @@ public class CryomechCPA extends Device {
    public void updateDeviceData() {
 
      DataElement dcom = getDataElement("COMST");
+     boolean linkUp = false; // Connection already established at cycle start
 
      try {
-        if (!m.isConnected()) {
+        linkUp = m.isConnected();
+        if (!linkUp) {
            m.connect();
         }
 
@@ -182,7 +188,8 @@ public class CryomechCPA extends Device {
            logger.log(Level.SEVERE, "CryomechCPA:updateDeviceData>" + ex.getMessage());
         }
         try { m.disconnect(); } catch (Exception e) {} // Force reconnection on next cycle
-        if (++comm_cnt_failure > comm_max_failure) setErrorComStatus();
+        // Connection failure is reported at once, read failures on an established link after comm_max_failure
+        if (!linkUp || ++comm_cnt_failure > comm_max_failure) setErrorComStatus();
      }
    }
 
