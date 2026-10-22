@@ -11,3 +11,4 @@ work_1500wpanel/*.log
 work_caos/*.log
 *.orig
 work_ionic/*.log
+work_vacsupervisor/*.log
