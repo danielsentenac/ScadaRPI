@@ -44,6 +44,7 @@ public class ViewData extends View implements Runnable, DataTypes {
     public boolean isStarted = true;
     public boolean connectionError = false;
     public boolean serverError = false;
+    private long lastTraceTime = 0;
     public String fxml = "";
     public String name = "";
     // Optional GPS label living outside this view's own scene-graph (e.g. the
@@ -634,6 +635,7 @@ public class ViewData extends View implements Runnable, DataTypes {
                setMouseTransparent(false);
             });
             connectionError = false;
+            System.err.println(fxml + " " + name + ": network connection restored");
          }
          if (serverError == true) {
             Platform.runLater(() -> {
@@ -643,11 +645,13 @@ public class ViewData extends View implements Runnable, DataTypes {
                setMouseTransparent(false);
             });
             serverError = false;
+            System.err.println(fxml + " " + name + ": server connection restored");
          }
          isStarted = false;
       }
       catch (ConnectException e) {
-         e.printStackTrace();
+         // Log once per outage: this runs every second while the server is down
+         if (!serverError) System.err.println(fxml + " " + name + ": server KO: " + e);
          Platform.runLater(() -> {
             MobileApplication.getInstance().showLayer("SERVER_KO");
             setMouseTransparent(true);
@@ -655,14 +659,22 @@ public class ViewData extends View implements Runnable, DataTypes {
          serverError = true;
       }
       catch (IOException e) {
-         e.printStackTrace();
+         // Log once per outage: this runs every second while the network is down
+         if (!connectionError) System.err.println(fxml + " " + name + ": network error: " + e);
          Platform.runLater(() -> {
             MobileApplication.getInstance().showLayer("NETWORK_ERROR");
             setMouseTransparent(true);
          });
          connectionError = true;
       }
-      catch (Exception e) {e.printStackTrace();}
+      catch (Exception e) {
+         // Full trace at most once a minute so a recurring error cannot fill the disk
+         long now = System.currentTimeMillis();
+         if (now - lastTraceTime > 60000) {
+            lastTraceTime = now;
+            e.printStackTrace();
+         }
+      }
     }
 
     public void run() {

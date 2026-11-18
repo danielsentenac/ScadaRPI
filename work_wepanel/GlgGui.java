@@ -492,6 +492,23 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
        this.doStop();*/
        System.exit(0);
     }
+    // Status values already reported as having no color mapping (logged once each)
+    private final Set<String> unmappedColors = new HashSet<String>();
+
+    // Set a color tag from a status->color table. A status value missing from
+    // the table falls back to the "unknown" grey (entry 255) instead of passing
+    // null to SetGTag, which throws a NullPointerException on every update cycle.
+    private void setColorTag(String glgName, Hashtable<Integer,GlgPoint> colors, double value) {
+       GlgPoint color = colors.get((int)value);
+       if (color == null) {
+          if (unmappedColors.add(glgName + "=" + (int)value))
+             logger.warning("GlgGui:setColorTag> No color for glgName=" + glgName + " value=" + (int)value + ", using grey");
+          color = colors.get(255);
+          if (color == null) color = new GlgPoint(0.5,0.5,0.5);
+       }
+       glg_bean1.SetGTag(glgName, color, true);
+    }
+
     public void updateGui() {
     
        //
@@ -528,13 +545,13 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
                glgNameTmp = glgNameTmp.replace(deviceName,""); // Remove device name in glgNameTmp String
                if (!glgName.contains("sub")) {
                   if ( glgName.contains("Running")  )// Instrument Running flag
-                     glg_bean1.SetGTag(glgName, PCounterColorSTATUS.get((int)dataElement.value), true);
+                     setColorTag(glgName, PCounterColorSTATUS, dataElement.value);
                   if ( glgName.contains("Error") )// Instrument Error flag
-                     glg_bean1.SetGTag(glgName, PCounterColorINSTRSTATUS.get((int)dataElement.value), true);
+                     setColorTag(glgName, PCounterColorINSTRSTATUS, dataElement.value);
                   if ( glgName.contains("Com") )  // Instrument Com flag
-                     glg_bean1.SetGTag(glgName, PCounterColorCOMSTATUS.get((int)dataElement.value), true);
+                     setColorTag(glgName, PCounterColorCOMSTATUS, dataElement.value);
                   if ( glgName.contains("Status") )  // Instrument Channel flag
-                     glg_bean1.SetGTag(glgName, PCounterColorFLAGSTATUS.get((int)dataElement.value), true);
+                     setColorTag(glgName, PCounterColorFLAGSTATUS, dataElement.value);
                }
                if ( glgName.contains("Val") && // Val is a tag for object value (double type) property
                    !glgName.contains("sub")) {  // sub is reserved for childGui only
