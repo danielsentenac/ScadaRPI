@@ -30,6 +30,13 @@ put("G21","MG_PR2ONOFF");        // Type 2 (TRIGGER)
 put("Ga4","MG_PR3ONOFF");       // Type 2 (TRIGGER)
 put("Ga2","XGS_PR7ONOFF");       // Type 2 (TRIGGER)
 
+//
+// RGA (Leybold LEYSPEC)
+//
+put("RGAGa3running","LEYSPEC_RUNNINGONOFF");   // Type 2 (TRIGGER) Scan START/STOP
+put("RGAGa3emission","LEYSPEC_EMISSIONONOFF"); // Type 2 (TRIGGER) Filament ON/OFF
+put("RGAGa3SEM","LEYSPEC_SEMONOFF");           // Type 2 (TRIGGER) Detector SEM/FARADAY
+
 
 //
 // Valves
@@ -129,6 +136,7 @@ put("XGSGa2FColsub","XGS_PR7FST");
 put("ROTGa5","ROT_PR1ST");
 put("ROTGa5Val","ROT_PR1");
 put("ROTGa5Col","ROT_PR1ST");
+put("ROTGa5Col","ROT_PR1ST");
 //
 // SICEM & TCMUX Temperatures (Collected by SICEM module)
 //
@@ -199,8 +207,13 @@ put("SICEMSTVal","M2_SICEM_ALRM_ST");
 //
 // RGA
 //
-put("RGAGa3","MKS_COMST");
-put("RGAGa3Col","MKS_COMST");
+put("RGAGa3","LEYSPEC_COMST");     // D resource type (visibility)
+put("RGAGa3Col","LEYSPEC_COMST");  // G resource type
+put("RGAGa3runningsub","LEYSPEC_RUNNING");
+put("RGAGa3emissionsub","LEYSPEC_EMISSION");
+put("RGAGa3modesub","LEYSPEC_MODE");
+put("RGAGa3filamentsub","LEYSPEC_FILAMENT");
+put("RGAGa3tpsub","LEYSPEC_TP");
 
 }};
 
@@ -218,6 +231,12 @@ put("AlarmComMaxigaugeCol","MG_COMST");
 put("AlarmComXGSgauge","XGS_GA4COMST");
 put("AlarmComXGSgaugeStr","XGS_GA4COMST");
 put("AlarmComXGSgaugeCol","XGS_GA4COMST");
+put("AlarmComRotorgauge","ROT_GA5COMST");
+put("AlarmComRotorgaugeStr","ROT_GA5COMST");
+put("AlarmComRotorgaugeCol","ROT_GA5COMST");
+put("AlarmComLeyspec","LEYSPEC_COMST");
+put("AlarmComLeyspecStr","LEYSPEC_COMST");
+put("AlarmComLeyspecCol","LEYSPEC_COMST");
 put("AlarmComTurboP21","DCU_P21COMST");
 put("AlarmComTurboP21Str","DCU_P21COMST");
 put("AlarmComTurboP21Col","DCU_P21COMST");

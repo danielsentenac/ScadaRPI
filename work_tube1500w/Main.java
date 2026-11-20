@@ -213,6 +213,19 @@ public class Main {
         // Add Controllino_3 to DeviceManager
         deviceManager.addDevice(rgamks);*/
         /**********************************************************************************************/
+        // Create Leybold LEYSPEC RGA device (TCP/IP through the USB-Ethernet bridge)
+        Device leyspec = new RgaLeyspec("LEYSPEC",
+                                        rot.mbRegisterEnd, // Modbus start offset
+                                        "192.168.250.11",  // Fixed IP address (DIP switch 5-8 of the RGA electronics unit)
+                                        1024,              // TCP port
+                                        1,                 // RGA address number (01 for 192.168.250.11)
+                                        199,               // Last mass of the step scan (limited to the RGA mass range)
+                                        3,                 // Measurement speed (3 = 200 ms/mass)
+                                        "EE50");           // Ion source recipe (LEYSPEC view series)
+
+        // Add LEYSPEC to DeviceManager
+        deviceManager.addDevice(leyspec);
+        /**********************************************************************************************/
         // Create Operation instance
         Operation op = new Operation(deviceManager, 5);
         /**********************************************************************************************/
@@ -237,6 +250,8 @@ public class Main {
         rot.doStart();
         // Start (RGAMKS) temperature device
         //rgamks.doStart();
+        // Start (RgaLeyspec) LEYSPEC RGA device
+        leyspec.doStart();
         // Start modbusSlaveThread thread
         modbusSlaveThread.doStart();
         /**********************************************************************************************/

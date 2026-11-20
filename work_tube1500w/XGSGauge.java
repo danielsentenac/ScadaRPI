@@ -14,6 +14,9 @@ public class XGSGauge extends Device {
 
    private Serial_Comm rs232;
    private static final Logger logger = Logger.getLogger("Main");
+   private static final int REPLY_TIMEOUT_MS = 1000; // Max wait for the '\r' terminated reply
+   private static final int REPLY_POLL_MS = 20;      // Polling period while waiting for the reply
+   private String lastReply = "";                    // Last raw reply (for diagnostics)
 
    public XGSGauge (String _name,
                     int _mbRegisterStart, 
@@ -70,6 +73,47 @@ public class XGSGauge extends Device {
 
    }
    
+   // Send a command and wait for the '\r' terminated reply (up to REPLY_TIMEOUT_MS).
+   // Returns the reply without its terminator, or "" if nothing complete came in time.
+   private String query(String serDataW) throws Exception {
+
+      // Drop anything left over from a previous (late) reply so answers cannot get mixed
+      java.io.ByteArrayOutputStream stale = new java.io.ByteArrayOutputStream();
+      while (rs232.BytesAvailable() > 0)
+         stale.write(rs232.Read());
+      if (stale.size() > 0)
+         logger.fine("XGSGauge:query> " + name + " dropped late reply [" + printable(stale.toString("UTF-8")) + "]");
+
+      rs232.Write(serDataW);
+
+      java.io.ByteArrayOutputStream reply = new java.io.ByteArrayOutputStream();
+      long start = System.currentTimeMillis();
+      while (System.currentTimeMillis() - start < REPLY_TIMEOUT_MS) {
+         Thread.sleep(REPLY_POLL_MS);
+         while (rs232.BytesAvailable() > 0)
+            reply.write(rs232.Read());
+         String r = reply.toString("UTF-8");
+         int end = r.indexOf('\r');
+         if (end >= 0)
+            return r.substring(0, end);
+      }
+      if (reply.size() > 0)
+         logger.fine("XGSGauge:query> " + name + " incomplete reply [" + printable(reply.toString("UTF-8")) + "]");
+      return "";
+   }
+
+   // Make control characters visible in log messages
+   private static String printable(String str) {
+      StringBuilder sb = new StringBuilder();
+      for (char c : str.toCharArray()) {
+         if (c == '\r') sb.append("\\r");
+         else if (c == '\n') sb.append("\\n");
+         else if (c < 32 || c > 126) sb.append(String.format("\\x%02X", (int) c));
+         else sb.append(c);
+      }
+      return sb.toString();
+   }
+
    public void updateDeviceData() {
    
      // Get monitoring data from device using RS232 Comm
@@ -95,13 +139,8 @@ public class XGSGauge extends Device {
              break;
            }
            logger.finer("XGSGauge:updateDeviceData> serDataW=" + serDataW);
-           rs232.Write(serDataW);
-           Thread.sleep(200); // Essential to get good timing through communication channel
-           byte [] answer = null;
-           while  (rs232.BytesAvailable() > 0 )
-             answer = rs232.Read();
-           if ( answer != null) 
-              serDataR = new String(answer, "UTF-8");
+           serDataR = query(serDataW);
+           lastReply = serDataR;
            logger.finer("XGSGauge:updateDeviceData> serDataR=" + serDataR);
            if (serDataR.length() == 0 ) {// Com Status Error - reset all values -
               if ( hasWarned == false) 
@@ -132,7 +171,7 @@ public class XGSGauge extends Device {
         }
      }
      catch (NumberFormatException ex) {
-        logger.log(Level.WARNING, "XGSGauge:updateDeviceData> Format exception with " + name );
+        logger.log(Level.WARNING, "XGSGauge:updateDeviceData> Format exception with " + name + " reply=[" + printable(lastReply) + "]");
      }
      catch (Exception ex) {
         if ( hasWarned == false ) {
@@ -161,11 +200,7 @@ public class XGSGauge extends Device {
          serDataW = "#0040UHFIG1\r";
  
       try {
-         rs232.Write(serDataW);
-         Thread.sleep(200); // Essential to get good timing through communication channel
-         byte [] answer = null;
-         while  (rs232.BytesAvailable() > 0 )
-            answer = rs232.Read();
+         query(serDataW);
          Thread.sleep(2000); // Wait before resetting
          // Reset & Update modbus register
          e.value = 0;

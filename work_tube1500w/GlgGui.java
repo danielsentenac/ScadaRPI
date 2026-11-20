@@ -236,6 +236,8 @@ public class GlgGui extends JFrame implements ChannelList, DataTypes, Runnable  
                           child = new GlgGaugeGui(parent, deviceManager, title, origin);
                        else if ( origin.startsWith("XGS") && !origin.contains("Val") )
                           child = new GlgXGSGaugeGui(parent, deviceManager, title, origin);
+                       else if ( origin.startsWith("ROT") && !origin.contains("Val") )
+                          child = new GlgROTGaugeGui(parent, deviceManager, title, origin);
                        else if ( origin.startsWith("V") )                          
                           child = new GlgValveGui(parent, deviceManager, title, origin);
                        else if ( origin.equals("TurboP21"))
@@ -249,7 +251,7 @@ public class GlgGui extends JFrame implements ChannelList, DataTypes, Runnable  
                        else if ( origin.startsWith("Dry") )
                           child = new GlgDryGui(parent, deviceManager, title, origin);
                        else if ( origin.startsWith("RGAGa3") )
-                          child = new GlgRGA3Gui(parent, deviceManager, title, origin);
+                          child = new GlgRGALeyspecGui(parent, deviceManager, title, origin);
                        else if (action.equals("MouseClick") && origin.contains("Setpoint") ) { // SetPoint fields
                            System.out.println("GlgGui::InputListener> Open Dialog command for " + origin );
                            String cmdName =  TUBE1500WSTATUS.get(origin);
