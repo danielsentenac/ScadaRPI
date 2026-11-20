@@ -1,0 +1,56 @@
+prefix,description,unit
+MG_PR1,Pfeiffer MaxiGauge gauge G22 pressure,mbar
+MG_PR2,Pfeiffer MaxiGauge gauge G21 pressure,mbar
+MG_PR3,Pfeiffer MaxiGauge gauge Ga4 pressure,mbar
+MG_PR4,Pfeiffer MaxiGauge channel 4 pressure,mbar
+MG_PR5,Pfeiffer MaxiGauge channel 5 pressure,mbar
+MG_PR6,Pfeiffer MaxiGauge channel 6 pressure,mbar
+MG_COMST,MaxiGauge communication,
+XGS_PR7,XGS-600 gauge Ga2 pressure,mbar
+XGS_GA4COMST,XGS-600 communication,
+SICEM_TCMUX_T,Sicem bake-out controller multiplexed thermocouple,degC
+SICEM_T,Sicem bake-out channel temperature,degC
+SICEM_SETP,Sicem bake-out channel temperature setpoint,degC
+SICEM_TEMPSTEP,Sicem temperature step,degC
+SICEM_TEMPMAX,Sicem maximum temperature,degC
+SICEM_TIMEINTER,Sicem time interval,
+SICEM_TIME,Sicem time,
+SICEM_COMST,Sicem communication,
+DCU_P21SPEED,Turbo pump P21 rotation speed,Hz
+DCU_P21FSPEED,Turbo pump P21 set rotation speed,Hz
+DCU_P21HR,Turbo pump P21 operating hours,h
+DCU_P21PWR,Turbo pump P21 drive power,W
+DCU_P21BTPST,Turbo pump P21 bearing temperature status,
+DCU_P21TPST,Turbo pump P21 temperature status,
+DCU_P21ST,Turbo pump P21 status,
+DCU_P21STYST,Turbo pump P21 standby status,
+DCU_P21BERR,Turbo pump P21 error status,
+DCU_P21COMST,Turbo pump P21 controller communication,
+M1_V21ST,Valve V21 status,
+M1_V22ST,Valve V22 status,
+M1_V23ST,Valve V23 status,
+M1_V1ST,Valve V1 status,
+M1_BYPASSST,Bypass status,
+M1_COMPRESSAIRST,Compressed air status,
+M1_P22ST,Dry pump P22 status,
+M1_COMST,Pumping module M1 communication,
+M2_CHANNEL_1_ONOFF_ST,Sicem module channel 1 on/off status,
+M2_CHANNEL_2_ONOFF_ST,Sicem module channel 2 on/off status,
+M2_SICEM_ALRM_ST,Sicem alarm status,
+M2_SICEM_COMERR_ST,Sicem communication error status,
+M2_MUXSHIELD_COMERR_ST,Thermocouple multiplexer communication error status,
+M2_COMST,Sicem module M2 communication,
+TCMUX_TEMP,Thermocouple multiplexer temperature,degC
+TCMUX_COMST,Thermocouple multiplexer communication,
+ROT_PR1,MKS spinning rotor gauge Ga5 pressure,mbar
+ROT_GA5COMST,Spinning rotor gauge communication,
+LEYSPEC_TP,Leybold LEYSPEC RGA (Ga3) total pressure,mbar
+LEYSPEC_RUNNING,RGA scan running (1 = yes),
+LEYSPEC_EMISSION,RGA filament emission (1 = on),
+LEYSPEC_SEMHV,RGA SEM high voltage (1 = on),
+LEYSPEC_RF,RGA RF generator (1 = on),
+LEYSPEC_ERROR,RGA error flag,
+LEYSPEC_ERRORCODE,RGA error code,
+LEYSPEC_FILAMENT,RGA selected filament (1 or 2),
+LEYSPEC_MODE,RGA detector (0 = Faraday; 1 = SEM),
+LEYSPEC_COMST,RGA communication,

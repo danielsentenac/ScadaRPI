@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vacuum assistant — tube 1500 W</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 0; background: #f4f5f7; color: #1c2430; }
+  header { background: #1c2430; color: #fff; padding: 12px 20px; display: flex; gap: 16px; align-items: baseline; flex-wrap: wrap; }
+  header h1 { font-size: 18px; margin: 0; }
+  #link { font-size: 13px; padding: 2px 10px; border-radius: 10px; background: #666; }
+  #link.ok { background: #1f8f4e; } #link.bad { background: #b3261e; }
+  main { max-width: 1000px; margin: 0 auto; padding: 16px; }
+  .card { background: #fff; border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+  form { display: flex; gap: 8px; }
+  input[type=text] { flex: 1; font-size: 16px; padding: 10px; border: 1px solid #b8c0cc; border-radius: 6px; }
+  button { font-size: 16px; padding: 10px 18px; border: 0; border-radius: 6px; background: #1c5fd6; color: #fff; cursor: pointer; }
+  button:disabled { background: #9aa7ba; cursor: wait; }
+  #answer { white-space: pre-wrap; margin-top: 12px; line-height: 1.45; }
+  #meta { color: #5c6878; font-size: 13px; margin-top: 8px; }
+  .note { color: #5c6878; font-size: 13px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { text-align: left; padding: 3px 8px; border-bottom: 1px solid #e3e7ee; }
+  td.v { font-family: ui-monospace, monospace; white-space: nowrap; }
+  tr.cmd td { color: #9aa7ba; }
+  details summary { cursor: pointer; font-weight: 600; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Vacuum assistant — tube 1500 W</h1>
+  <span id="link">panel: …</span>
+  <span class="note" style="color:#c9d2e0">read-only: this assistant cannot send commands</span>
+</header>
+<main>
+  <div class="card">
+    <form id="f">
+      <input type="text" id="q" placeholder="Ask about the current state, e.g. What are the pressures?" autocomplete="off">
+      <button id="b" type="submit">Ask</button>
+    </form>
+    <div id="answer"></div>
+    <div id="meta"></div>
+  </div>
+  <div class="card">
+    <details open>
+      <summary>Live values <span class="note" id="age"></span></summary>
+      <table><thead><tr><th>Channel</th><th>Description</th><th>Value</th></tr></thead><tbody id="rows"></tbody></table>
+    </details>
+  </div>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+async function refresh() {
+  try {
+    const s = await (await fetch('state')).json();
+    const ok = !s.error && s.age_seconds !== null && s.age_seconds < 15;
+    $('link').className = ok ? 'ok' : 'bad';
+    $('link').textContent = (s.label ? s.label + ' — ' : '') + 'panel ' + s.panel + (ok ? ': connected' : ': ' + (s.error || 'no data'));
+    $('age').textContent = s.age_seconds === null ? '' : '(read ' + s.age_seconds + ' s ago)';
+    $('rows').innerHTML = s.rows.map(r => '<tr class="' + (r.access === 'TRIGGER' ? 'cmd' : '') + '"><td>' + r.channel +
+      '</td><td>' + r.description + (r.access === 'TRIGGER' ? ' (command register, not used)' : '') + '</td><td class="v">' + r.value + '</td></tr>').join('');
+  } catch (e) { $('link').className = 'bad'; $('link').textContent = 'assistant not reachable'; }
+}
+$('f').addEventListener('submit', async ev => {
+  ev.preventDefault();
+  const q = $('q').value.trim(); if (!q) return;
+  $('b').disabled = true; $('answer').textContent = 'Thinking…'; $('meta').textContent = '';
+  try {
+    const r = await (await fetch('ask?q=' + encodeURIComponent(q))).json();
+    $('answer').textContent = r.error ? 'Error: ' + r.error : r.answer;
+    if (!r.error) $('meta').textContent = 'answered in ' + r.seconds + ' s by the local model, from the values shown below';
+  } catch (e) { $('answer').textContent = 'Error: ' + e; }
+  $('b').disabled = false;
+});
+refresh(); setInterval(refresh, 3000);
+</script>
+</body>
+</html>

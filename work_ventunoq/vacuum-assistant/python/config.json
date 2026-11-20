@@ -1,0 +1,7 @@
+{
+  "panel_host": "192.168.251.1",
+  "panel_port": 1288,
+  "panel_label": "",
+  "poll_seconds": 2.0,
+  "register_count": 583
+}

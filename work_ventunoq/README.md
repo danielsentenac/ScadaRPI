@@ -202,6 +202,8 @@ procedure has been tried.
 | `~/pi4j2-test` | Pi4J 2.8.0 jars + probes + workaround |
 | `~/pi4j4-test` | Pi4J 4.0.2 jars (`pi4j-core`, `pi4j-plugin-ffm`), slf4j 2.0.12, probes, the two scripts |
 | `~/ArduinoApps/llm-test` | LLM test app |
+| `~/ArduinoApps/vacuum-assistant` | read-only assistant app (running, against the simulator) |
+| `~/panelsim` | panel simulator (running on port 1288) |
 | `~/qwen3_install.log` | model download log |
 | `/etc/udev/rules.d/99-pi4j.rules`, groups `gpio` `i2c` `spi` | from `setup-pi4j-groups.sh` |
 
@@ -215,6 +217,7 @@ README.md
 docs/ventuno-q-user-manual.md            Arduino user manual (reference copy)
 docs/arduino-automation-hat-overlay.dts  decoded Arduino HAT overlay
 llm-test/                                first local-LLM test app (LLM brick)
+vacuum-assistant/                        read-only LLM assistant for the panel (see its README)
 pi4j2-test/                              Pi4J 2.8.0 probes + GpioChipOpener workaround
 pi4j4-test/                              Pi4J 4.0.2 probes (input, output)
 scripts/setup-pi4j-groups.sh             root setup for Pi4J 4 (applied)
@@ -222,7 +225,27 @@ scripts/try-enable-i2c.sh, .log          dry run of Arduino's HAT tool (fails)
 scripts/drmstate.py                      read current HDMI timing without root
 ```
 
+## Read-only assistant (`vacuum-assistant/`) — working against a simulated panel
+
+Decision of 2026-11-20: architecture A (Pi 4 as control layer, VENTUNO as AI
+supervisor over a direct Ethernet cable), **read-only first, no commands**.
+
+The app `vacuum-assistant` polls the panel's Modbus TCP server, and the local
+model answers questions from the live values through a web page on port 7000.
+It has no write function. Details, limits and test results:
+`vacuum-assistant/README.md`.
+
+- The panel's Modbus server accepts several masters at once (DAQ + VENTUNO):
+  checked with the same library and settings, not yet on the running panel.
+- On the board the app is running against a simulator (`~/panelsim`), with the
+  page labelled `SIMULATED VALUES`.
+
 ## Where we are — next steps
+
+0. **Assistant:** connect to the real panel once the Pi 4 is up (set
+   `panel_host` to `192.168.251.1`, remove the label, stop the simulator); add
+   the meaning of the status codes to `channel_notes.csv`; have the channel
+   descriptions reviewed.
 
 1. **Decide the architecture** (A: Pi + VENTUNO over a cable, or B: VENTUNO only).
 2. **Java 25 check of the existing panel** (GLG, `MainApp.jar`, jlibmodbus) on the
