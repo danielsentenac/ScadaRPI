@@ -275,8 +275,8 @@ public class SupervisorClient extends Device {
         }
      }
      catch (Exception ex) {
-        ex.printStackTrace();
         if ( hasWarned == false ) {
+           ex.printStackTrace(); // once per outage, not on every poll (fills the session log)
            logger.log(Level.WARNING, "SupervisorClient:updateDeviceData> Communication with " + name + " interrupted");
            logger.log(Level.SEVERE, "SupervisorClient:updateDeviceData>" + ex.getMessage());
         }

@@ -179,7 +179,15 @@ public class GlgGui extends JFrame implements ChannelList, Runnable  {
                 ViewData global = new ViewGlobal("GLOBAL", "GLOBAL");
                 global.isSuspended = false; // always displayed: keep polling (as in the other station panels)
                 new Thread(global).start();
-                Scene sceneVac = new Scene(global);
+                // Title in the empty 48 px strip at the top of the local GLOBAL.fxml,
+                // styled like the titles of the two GLG panels beside it.
+                javafx.scene.control.Label vacTitle = new javafx.scene.control.Label("VACUUM MONITORING");
+                vacTitle.setPrefHeight(40);
+                vacTitle.setStyle("-fx-text-fill: AQUA; -fx-font-size: 19;");
+                javafx.scene.layout.StackPane vacRoot = new javafx.scene.layout.StackPane(global, vacTitle);
+                javafx.scene.layout.StackPane.setAlignment(vacTitle, javafx.geometry.Pos.TOP_CENTER);
+                javafx.scene.layout.StackPane.setMargin(vacTitle, new javafx.geometry.Insets(4, 0, 0, 0));
+                Scene sceneVac = new Scene(vacRoot);
                 jfxPanel3.setScene(sceneVac);
                 }
           });
