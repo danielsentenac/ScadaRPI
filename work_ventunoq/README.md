@@ -84,7 +84,7 @@ Reference: `docs/ventuno-q-user-manual.md` (copy of Arduino's manual, from
 - Keyboard layout: Italian (`arduino-app-cli system keyboard it`).
 - HDMI: the board outputs standard 1920x1080@60 (148.5 MHz). A "timing not
   supported" message on the Dell U2312HM was caused by a **too long cable**,
-  not by the mode. `scripts/drmstate.py` reads the current video timing without root.
+  not by the mode. `board-scripts/drmstate.py` reads the current video timing without root.
 
 ### Network
 - **Wi-Fi `EGO`** (WPA2-Enterprise, PEAP/MSCHAPv2, no CA check). The board's
@@ -158,7 +158,7 @@ offset = the `MD_GPIO_n` number.
 ### Pi4J 4.0.2 (Java 25) — works with a one-time system setup — **recommended**
 - No Raspberry check; the GPIO chip is selected in the API (`bus(2)`).
 - It insists on Raspberry-OS-style groups (`gpio`, `i2c`, `spi`, `dialout`) on
-  the user and on the device files. `scripts/setup-pi4j-groups.sh` creates them
+  the user and on the device files. `board-scripts/setup-pi4j-groups.sh` creates them
   (run once as root: `sudo bash setup-pi4j-groups.sh`; undo commands inside).
   **Already applied on `ventunoq1`.** Arduino services still run normally after it.
 - Tests passed: `Probe4` (six inputs), `Out4` (pin 13 toggled as output).
@@ -181,7 +181,7 @@ cd ~/pi4j4-test
 - Arduino's tool `arduino-linux-config hw enable automation` is the intended
   route (it applies a HAT overlay), but in release 0.3.0 it answers
   `unsupported overlay for automation` even as root
-  (`scripts/try-enable-i2c.sh`, output in `scripts/try-enable-i2c.log`).
+  (`board-scripts/try-enable-i2c.sh`, output in `board-scripts/try-enable-i2c.log`).
 - Arduino's `automation` overlay (`docs/arduino-automation-hat-overlay.dts`)
   only adds two chips under `i2c0`; it does not set `status = "okay"`. So HAT
   support on the header looks unfinished in this release.
@@ -220,9 +220,9 @@ llm-test/                                first local-LLM test app (LLM brick)
 vacuum-assistant/                        read-only LLM assistant for the panel (see its README)
 pi4j2-test/                              Pi4J 2.8.0 probes + GpioChipOpener workaround
 pi4j4-test/                              Pi4J 4.0.2 probes (input, output)
-scripts/setup-pi4j-groups.sh             root setup for Pi4J 4 (applied)
-scripts/try-enable-i2c.sh, .log          dry run of Arduino's HAT tool (fails)
-scripts/drmstate.py                      read current HDMI timing without root
+board-scripts/setup-pi4j-groups.sh             root setup for Pi4J 4 (applied)
+board-scripts/try-enable-i2c.sh, .log          dry run of Arduino's HAT tool (fails)
+board-scripts/drmstate.py                      read current HDMI timing without root
 ```
 
 ## Read-only assistant (`vacuum-assistant/`) — working against a simulated panel

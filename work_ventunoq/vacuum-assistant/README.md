@@ -23,7 +23,7 @@ the real Pi (offline during the Pi 3 → Pi 4 swap).
 | `python/config.json` | Panel address, poll period, optional page label |
 | `assets/index.html` | Web page: question box, answer, live value table |
 | `sim/PanelSim.java` | Stand-in for the panel: same Modbus library and settings, plausible values |
-| `tools/RegDump.java` | Regenerates `registers.csv` from the panel source |
+| `regdump/RegDump.java` | Regenerates `registers.csv` from the panel source |
 
 ## How it works
 
@@ -91,7 +91,7 @@ From `work_tube1500w` on the development PC (Java 8), after any change to the
 device list in `Main.java` (the dump tool repeats that list — keep them in step):
 
 ```
-javac -cp ".:classes:../lib/*" -d /tmp/regdump ../work_ventunoq/vacuum-assistant/tools/RegDump.java
+javac -cp ".:classes:../lib/*" -d /tmp/regdump ../work_ventunoq/vacuum-assistant/regdump/RegDump.java
 java  -cp "/tmp/regdump:.:classes:../lib/*" RegDump 8 9 > registers.csv   # 8, 9 = Controllino I2C addresses
 ```
 (A pi4j "wrong ELF class" message on a PC is harmless.)

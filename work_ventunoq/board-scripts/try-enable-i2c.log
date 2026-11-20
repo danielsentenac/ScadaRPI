@@ -1,0 +1,9 @@
+=== Fri Nov 20 15:55:45 UTC 2026 ===
+--- hw show
+hat  audio-codec-zero  [current: disabled]  [next: disabled]
+hat  automation        [current: disabled]  [next: disabled]
+
+--- hw list
+--- hw enable automation --dry-run
+unsupported overlay for automation
+exit code: 7
