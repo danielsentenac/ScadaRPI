@@ -1,0 +1,62 @@
+/dts-v1/;
+
+/ {
+
+	fragment@0 {
+		target = <0xffffffff>;
+
+		__overlay__ {
+			clock-frequency = <0x61a80>;
+			#address-cells = <0x01>;
+			#size-cells = <0x00>;
+
+			adc@48 {
+				compatible = "ti,ads1015";
+				reg = <0x48>;
+				#address-cells = <0x01>;
+				#size-cells = <0x00>;
+
+				channel@4 {
+					reg = <0x04>;
+					ti,gain = <0x01>;
+				};
+
+				channel@5 {
+					reg = <0x05>;
+					ti,gain = <0x01>;
+				};
+
+				channel@6 {
+					reg = <0x06>;
+					ti,gain = <0x01>;
+				};
+			};
+
+			led-controller@54 {
+				compatible = "si-en,sn3218";
+				reg = <0x54>;
+				#address-cells = <0x01>;
+				#size-cells = <0x00>;
+
+				led@16 {
+					reg = <0x10>;
+					label = "automation-hat:red:warn";
+				};
+
+				led@17 {
+					reg = <0x11>;
+					label = "automation-hat:green:comms";
+				};
+
+				led@18 {
+					reg = <0x12>;
+					label = "automation-hat:blue:power";
+				};
+			};
+		};
+	};
+
+	__fixups__ {
+		i2c0 = "/fragment@0:target:0";
+	};
+};
