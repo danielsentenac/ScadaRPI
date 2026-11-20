@@ -21,6 +21,40 @@ Two architectures are under discussion (no decision yet):
 For B (and for a future Raspberry Pi 5), the idea is to move the panel to
 **Pi4J 4.x**, which runs on 64-bit boards through standard Linux interfaces.
 
+## Alternative considered: running the model on the Raspberry Pi itself
+
+Discussed on 2026-11-20, with the VENTUNO set aside for the moment. The Pi
+speed figures are **estimates** from general experience (CPU-only llama.cpp);
+only the VENTUNO figure was measured. Nothing was tested on a Pi.
+
+| | Model speed (4B model) | Panel software | Extra hardware |
+|---|---|---|---|
+| Pi 3 B+ (1 GB) | Not feasible | Runs as is | None |
+| Pi 4 (8 GB) | About 1 word/s | Runs as is (32-bit system; 64-bit kernel to test) | None |
+| Pi 5 (8–16 GB) | About 3–5 words/s | Needs the Pi4J 4 port | Cooler, 5 V / 5 A supply |
+| Pi 3 or 4 + VENTUNO | 12 words/s (measured) | Runs as is | Ethernet link between the two |
+
+- **Pi 3 B+:** 1 GB of RAM in total. Even a 1B model (about 1 GB) does not fit
+  beside the panel; only tiny models would, and they are too unreliable to
+  summarise a vacuum state.
+- **Pi 4:** no AI accelerator, four Cortex-A72 cores. A 1B model (Gemma 3 1B,
+  Qwen 3.5 0.8B) should give a few words per second; a 4B model needs the 8 GB
+  board and is only usable for slow background tasks. The current SD card is
+  32-bit Raspbian (32-bit Java 8, pi4j 1.2) while model runtimes need 64-bit:
+  the least disruptive route is the 64-bit kernel with the 32-bit system, the
+  model running as a self-contained 64-bit program. pi4j 1.2 under the 64-bit
+  kernel is untested. The model must be limited (cores, priority) because the
+  panel's serial polling and bit-banged thermocouple reads are delay-sensitive.
+- **Pi 5:** cores two to three times faster than the Pi 4, 8 or 16 GB, still
+  CPU only. wiringPi / pi4j 1.2 do not work on it (RP1 GPIO chip), so the panel
+  needs the same port as for the VENTUNO (Pi4J 4, `jSerialComm`, recent 64-bit
+  Java). Unlike the VENTUNO, the Pi 5 is Pi4J's officially supported platform
+  and its header I2C bus works out of the box.
+
+Summary: for a single board doing both jobs, the Pi 5 is the better target and
+the Pi4J 4 port becomes the main work. For the best model with the least change
+to the control side, a Pi plus the VENTUNO remains the stronger combination.
+
 ## The board
 
 - Arduino VENTUNO Q, name `ventunoq1`, USB serial `2177781137`.
