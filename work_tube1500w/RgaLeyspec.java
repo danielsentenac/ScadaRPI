@@ -87,6 +87,11 @@ public class RgaLeyspec extends Device {
      logger.finer("RgaLeyspec:RgaLeyspec> " + name + " Modbus registers starts at offset " + mbRegisterStart);
 
      mbRegisterEnd = mbRegisterStart;
+     // The two-register values start on an even register (one register is left unused if needed):
+     // the DAQ Modbus master reads the panel in blocks of fixed size, and a block boundary
+     // must never fall inside a value (boundaries are even for the values before this device).
+     if ( mbRegisterEnd % 2 != 0 )
+        mbRegisterEnd++;
 
      // RGA data (partial pressures in mbar)
      addDataElement( new DataElement(name, massName(1), DataType.READ_ONLY_VALUE,RegisterType.FLOAT32,mbRegisterEnd));
