@@ -35,7 +35,7 @@ public class PanelSim {
         System.out.println("PanelSim listening on port " + port + " with " + rows.size() + " channels");
 
         Map<String, Double> base = new HashMap<String, Double>();
-        base.put("MG_PR1", 2.1e-2); base.put("MG_PR2", 4.5e-7); base.put("MG_PR3", 3.1e-7); base.put("MG_PR5", 1.2e-3); base.put("MG_PR6", 2.3e+1);
+        base.put("MG_PR1", 2.1e-2); base.put("MG_PR2", 4.5e-7); base.put("MG_PR3", 3.1e-7); base.put("MG_PR4", 3.0e-6); base.put("MG_PR5", 2.3e+1);
         base.put("XGS_PR7", 2.8e-7); base.put("ROT_PR1", 3.0e-7); base.put("LEYSPEC_TP", 3.0e-7);
         base.put("DCU_P21SPEED", 1000.0); base.put("DCU_P21FSPEED", 1000.0); base.put("DCU_P21HR", 12345.0); base.put("DCU_P21PWR", 18.0);
         base.put("LEYSPEC_002", 1.0e-8); base.put("LEYSPEC_017", 5.0e-8); base.put("LEYSPEC_018", 2.0e-7);
@@ -43,11 +43,11 @@ public class PanelSim {
         base.put("LEYSPEC_ERROR", 0.0); base.put("LEYSPEC_ERRORCODE", 0.0); base.put("LEYSPEC_SEMHV", 0.0); base.put("LEYSPEC_MODE", 0.0);
         base.put("LEYSPEC_RUNNING", 1.0); base.put("LEYSPEC_EMISSION", 1.0); base.put("LEYSPEC_RF", 1.0); base.put("LEYSPEC_FILAMENT", 1.0);
         // States of a normal pumped-down situation (codes as in channel_notes.csv)
-        for (String g : new String[]{"MG_PR1", "MG_PR2", "MG_PR3", "MG_PR5", "MG_PR6"}) { base.put(g + "ST", 0.0); base.put(g + "SST", 2.0); }
-        for (String g : new String[]{"MG_PR4"}) { base.put(g + "ST", 5.0); base.put(g + "SST", 0.0); }
+        for (String g : new String[]{"MG_PR1", "MG_PR2", "MG_PR3", "MG_PR4", "MG_PR5"}) { base.put(g + "ST", 0.0); base.put(g + "SST", 2.0); }
+        for (String g : new String[]{"MG_PR6"}) { base.put(g + "ST", 5.0); base.put(g + "SST", 0.0); }
         base.put("XGS_PR7ST", 1.0); base.put("XGS_PR7DST", 0.0); base.put("XGS_PR7FST", 1.0); base.put("ROT_PR1ST", 1.0);
         base.put("DCU_P21ST", 1.0); base.put("DCU_P21STYST", 0.0); base.put("DCU_P21TPST", 0.0); base.put("DCU_P21BTPST", 0.0); base.put("DCU_P21BERR", 0.0);
-        base.put("M1_V21ST", 1.0); base.put("M1_V22ST", 1.0); base.put("M1_V23ST", 2.0); base.put("M1_V1ST", 1.0);
+        base.put("M1_V21ST", 1.0); base.put("M1_V22ST", 1.0); base.put("M1_V23ST", 2.0); base.put("M1_V1ST", 2.0);
         base.put("M1_BYPASSST", 2.0); base.put("M1_COMPRESSAIRST", 0.0); base.put("M1_P22ST", 1.0);
         base.put("M2_CHANNEL_1_ONOFF_ST", 2.0); base.put("M2_CHANNEL_2_ONOFF_ST", 2.0);
         base.put("M2_SICEM_ALRM_ST", 0.0); base.put("M2_SICEM_COMERR_ST", 0.0); base.put("M2_MUXSHIELD_COMERR_ST", 0.0);

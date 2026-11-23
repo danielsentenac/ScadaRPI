@@ -17,6 +17,7 @@ from arduino.app_bricks.web_ui import WebUI
 from arduino.app_utils import App
 
 from modbus_ro import ModbusReadOnlyClient
+import rules
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -25,6 +26,9 @@ with open(os.path.join(HERE, "config.json")) as f:
 
 
 # ---------------------------------------------------------------- register map
+HEATING_CHANNELS = CONFIG.get("heating_channels", 9)  # Sicem channels CH1..CH9 heat the system
+
+
 def parse_codes(text):
     codes = {}
     for item in filter(None, (text or "").split("|")):
@@ -58,11 +62,15 @@ def load_channels():
                 c.update(name=name, description=n["description"], unit=n["unit"],
                          codes=parse_codes(n["codes"]), overview=n["overview"] == "1")
             elif suffix.isdigit():
-                c.update(description="%s %s" % (n["description"], suffix), unit=n["unit"],
+                d = n["description"]
+                c["family_desc"] = d
+                c.update(description=d.replace("<n>", suffix) if "<n>" in d else "%s %s" % (d, suffix), unit=n["unit"],
                          family=n["prefix"], number=int(suffix), codes=parse_codes(n["codes"]))
             else:  # e.g. a command register next to a described value
                 c.update(name=name, description="%s, register %s" % (n["description"], suffix))
             break
+        if c["family"] in ("SICEM_T", "SICEM_SETP") and c["number"] > HEATING_CHANNELS:
+            c["hidden"] = True  # Sicem channels beyond CH9 are not used
         c["label"] = ("%s %s" % (c["name"], c["description"])).strip()
     return channels, titles
 
@@ -153,7 +161,7 @@ KEYWORDS = {
     "MG": "gauge gauges pressure pressures maxigauge vacuum",
         "SICEM": "bake bakeout bake-out temperature temperatures sicem setpoint setpoints heating heater ramp",
     "DCU": "turbo pump pumps pumping speed rotation power hours standby",
-    "M1": "valve valves air compressed dry pump pumps pumping open closed",
+    "M1": "valve valves bypass interlock interlocks air compressed dry pump pumps pumping open closed",
     "M2": "sicem alarm alarms channel heating bake bakeout bake-out",
     "TCMUX": "thermocouple thermocouples temperature temperatures rack multiplexer",
     "ROT": "rotor spinning gauge gauges pressure pressures vacuum",
@@ -166,7 +174,7 @@ def shown(c):
     return c["access"] not in ("TRIGGER", "COM_STATUS") and not c["hidden"]
 
 
-def device_sections(values):
+def device_sections(values, words=()):
     """One compact block of text per device. A described channel gets one line,
     'panel name, what it is [CHANNEL] = value (meaning of the code)'; numbered families
     (SICEM_T1..12, TCMUX_TEMP0..8) are folded into one line."""
@@ -190,13 +198,19 @@ def device_sections(values):
                     lines.append(families[c["family"]])  # placeholder, filled below
                 families[c["family"]].append(c)
             else:
-                lines.append(" %s [%s] = %s" % (c["label"] or "?", c["channel"], fmt(c, values[c["channel"]])))
+                lines.append(" %s [%s] = %s%s" % (c["label"] or "?", c["channel"], fmt(c, values[c["channel"]]),
+                                                 rules.gauge_note(c["channel"], values[c["channel"]])))
         for i, item in enumerate(lines):
             if isinstance(item, list):
                 c0 = item[0]
-                what = c0["description"].rsplit(" ", 1)[0]
+                what = c0["family_desc"]
                 vals = ", ".join("%d:%s" % (c["number"], fmt(c, values[c["channel"]]).replace(" " + c["unit"], "")) for c in item)
                 lines[i] = " %s [%s<n>]%s, as n:value = %s" % (what, c0["family"], " in " + c0["unit"] if c0["unit"] else "", vals)
+        if dev == "M1":
+            lines.extend(rules.interlock_lines(values, lambda ch: not device_down(BY_NAME[ch]["device"], values),
+                                               [v for v in rules.INTERLOCKS if v.lower() in words]))
+        if dev == "SICEM":
+            lines.append(" Heaters: CH1-CH7 around the tube, CH8 around valve VM3, CH9 around valve V21.")
         if dev == "LEYSPEC":
             masses = [(values[c["channel"]], int(c["element"])) for c in CHANNELS if c["device"] == dev and c["element"].isdigit()]
             masses.sort(reverse=True)
@@ -228,6 +242,36 @@ def device_vocabulary(dev):
 VOCABULARY = {dev: device_vocabulary(dev) for dev in dict.fromkeys(c["device"] for c in CHANNELS)}
 
 
+def heating_lines(values, down, bad):
+    """Operating rules of the heating, checked here so that the model only has to report them:
+    - the setpoints of CH1..CH9 must all be the same;
+    - if a problem occurs while the heating is on, the system must be put in safety mode:
+      the operator presses CH1 OFF and CH2 OFF, which switches off the current in the Sicem."""
+    lines = []
+    if "SICEM" not in down:
+        sp = [values["SICEM_SETP%d" % n] for n in range(1, HEATING_CHANNELS + 1)]
+        if max(sp) - min(sp) <= 0.5:
+            lines.append("Heating setpoints CH1-CH%d: all equal (%.1f degC), as required." % (HEATING_CHANNELS, sp[0]))
+        else:
+            lines.append("PROBLEM: heating setpoints CH1-CH%d are NOT all equal (they must be): %s degC."
+                         % (HEATING_CHANNELS, ", ".join("%d:%.1f" % (n + 1, v) for n, v in enumerate(sp))))
+    if "M2" in down:
+        lines.append("Heating state: UNKNOWN (bake-out module M2 not communicating).")
+        return lines
+    on = [n for n in (1, 2) if values["M2_CHANNEL_%d_ONOFF_ST" % n] == 1]
+    if not on:
+        lines.append("Heating: OFF (CH1 and CH2 off).")
+        return lines
+    causes = list(bad) + ["%s not communicating" % DEVICE_TITLES.get(d, d) for d in down]
+    state = "Heating: ON (%s on)." % " and ".join("CH%d" % n for n in on)
+    if causes:
+        lines.append("%s SAFETY MODE REQUIRED because: %s. The operator must press CH1 OFF and CH2 OFF now "
+                     "(this switches off the heating current in the Sicem controller)." % (state, "; ".join(causes)))
+    else:
+        lines.append("%s No safety condition present." % state)
+    return lines
+
+
 def snapshot_text(question=""):
     """Text given to the model: a short overview (all pressures, main states, devices not
     communicating), then the full blocks of the devices most relevant to the question,
@@ -235,7 +279,8 @@ def snapshot_text(question=""):
     values, updated, error = STATE.get()
     if not values:
         return "NO DATA: the panel has not been read yet (%s)." % error
-    sections = device_sections(values)
+    words = set(re.findall(r"[a-z0-9-]{2,}", question.lower()))
+    sections = device_sections(values, words)
     head = ["Values read %.0f s ago." % (time.time() - updated)]
     if error:
         head.append("WARNING: last read failed (%s); values may be stale." % error)
@@ -251,12 +296,24 @@ def snapshot_text(question=""):
            and PROBLEM.search(c["codes"].get(int(values[c["channel"]]), "unknown"))]
     head.append("States meaning a problem (fail, error, alarm, excess, out of range), over ALL devices: %s"
                 % ("; ".join(bad) if bad else "none."))
+    ok = lambda ch: BY_NAME[ch]["device"] not in down
+    met, not_met, unknown = rules.regime(values, ok)
+    if not_met or unknown:
+        head.append("Normal regime: NOT MET. %s%s%s" % ("; ".join(not_met) + "." if not_met else "",
+                    " Cannot be checked: %s." % "; ".join(unknown) if unknown else "",
+                    " Met: %s." % "; ".join(met) if met else ""))
+    else:
+        head.append("Normal regime: MET, all conditions are satisfied: %s." % "; ".join(met))
+    unreliable = [c["name"] for c in CHANNELS if c["channel"] in rules.GAUGE_RANGES and ok(c["channel"]) and shown(c)
+                  and "OUTSIDE" in rules.gauge_note(c["channel"], values[c["channel"]])]
+    if unreliable:
+        head.append("Gauges reading outside their measuring range (value not reliable): %s." % ", ".join(unreliable))
+    head.extend(heating_lines(values, down, bad + not_met))
     over = [c for c in CHANNELS if c["overview"] and c["device"] not in down]
     head.append("Pressures (mbar): %s" % ", ".join(
         "%s=%s" % (c["name"], fmt(c, values[c["channel"]]).replace(" mbar", "")) for c in over if c["unit"] == "mbar"))
     head.append("Main states: %s" % ", ".join(
         "%s=%s" % (c["label"], fmt(c, values[c["channel"]])) for c in over if c["unit"] != "mbar"))
-    words = set(re.findall(r"[a-z0-9-]{2,}", question.lower()))
     scores = {}
     words |= set(w[:-1] for w in words if w.endswith("s"))
     for i, dev in enumerate(sections):
@@ -280,28 +337,31 @@ def snapshot_text(question=""):
 SYSTEM_PROMPT = (
     "You are the read-only assistant of a vacuum system, the tube 1500 West. "
     "With each question you receive the values just read from its control panel.\n"
-    "How to read them: each line is 'name on the panel, what it is [CHANNEL] = value'. "
-    "For a state, the value is a code followed by its meaning in brackets, e.g. '1 (open)'. "
-    "Gauges are G21, G22, G4, G5, Ga4, Ga5; Ga3 is the residual gas analyser (RGA); "
-    "valves are V1, V21, V22; P21 is the turbo pump, P22 the dry pump.\n"
-    "Rules:\n"
-    "1. Answer only from these values. If they do not contain the answer, say so.\n"
-    "2. Find the item by the name the operator uses (e.g. Ga4), never by a similar channel number.\n"
-    "3. Quote the panel name, the value and its unit; for a state give the meaning in brackets, not only the code.\n"
-    "4. For any question about alarms, faults or problems, use the line 'States meaning a problem': it covers "
-    "all devices. Never invent a meaning, a limit or a cause. You may call something a problem only if its meaning says so "
-    "(fail, error, alarm, excess) or a device is NOT COMMUNICATING. No limits are given for pressures and "
-    "temperatures: report them without judging them.\n"
-    "5. You cannot send commands. If the operator asks you to open, close, start, stop, switch or set "
-    "something, your answer must begin with 'I am read-only and cannot send commands.' and then give the "
-    "current state of that item.\n"
-    "6. Be brief: answer the question and stop. No summary, no conclusion, no repetition."
+    "Reading them: each line is 'name on the panel, what it is [CHANNEL] = value'; a state is a code "
+    "followed by its meaning, e.g. '1 (open)'. Gauges: G21, G22, G4, G5, Ga4, Ga5; Ga3 is the RGA; "
+    "valves: V1, V21, V22; P21 turbo pump, P22 dry pump; CH1-CH9 heating channels (Sicem).\n"
+    "You also receive the OPERATING RULES of the system: they are the only procedures and limits you may give.\n"
+    "Rules for your answers:\n"
+    "1. Answer only from the values and the operating rules. If they do not contain the answer, say so.\n"
+    "2. Find the item by the name the operator uses, never by a similar channel number.\n"
+    "3. Quote the panel name, the value and its unit; for a state give the meaning, not only the code.\n"
+    "4. If a line says SAFETY MODE REQUIRED or PROBLEM, say it first, whatever the question.\n"
+    "5. For questions about alarms, faults, problems or whether things are normal, use the lines 'States meaning a "
+    "problem', 'Normal regime' and 'Heating': they cover all devices. Never invent a meaning, a limit or a cause; "
+    "never compare numbers yourself: the lines already say whether each value is inside or outside its range, "
+    "repeat that verdict.\n"
+    "6. You cannot send commands or press buttons. If asked to act, say that you are read-only, then give "
+    "the current state of that item.\n"
+    "7. Be brief: at most three sentences, or a plain list when a list is asked. No explanation of your reasoning."
 )
 
 # Low temperature: the answers must repeat measured values, not be creative.
 llm = LargeLanguageModel(system_prompt=SYSTEM_PROMPT, temperature=CONFIG.get("temperature", 0.2))
 llm_lock = threading.Lock()
 
+
+OPERATING_RULES = rules.OPERATING_RULES
+PROCEDURE = re.compile(r"what (should|must|to|do|shall|can)|how (should|do|to)|procedure|safety mode|in case of|what if|what is the normal|interlock|why |protect", re.I)
 
 # A request to act gets a fixed first sentence, whatever the model writes.
 COMMAND = re.compile(r"^\s*(please\s+|can you\s+|could you\s+|will you\s+|now\s+)*"
@@ -319,9 +379,15 @@ def ask(q: str = ""):
         # Do not let the model discuss the action: it only reports the item concerned.
         task = ('The operator asked: "%s". This cannot be done from here. In one sentence, give only the '
                 'current state of the item concerned, with its panel name.' % q)
+    elif PROCEDURE.search(q):
+        # Procedures come from the operating rules only: the model must not make up steps.
+        task = ("%s\nAnswer with the matching operating rule, word for word as far as possible. Do not add any "
+                "other step or advice.%s" % (q, " Then say in one sentence whether that situation is present now."
+                                             if re.search(r"\b(if|in case|fails?|failure|problem|alarm)\b", q, re.I)
+                                             else " Do not add any comment."))
     else:
         task = q
-    prompt = "CURRENT VALUES\n%s\n\nQUESTION\n%s" % (snap, task)
+    prompt = "CURRENT VALUES\n%s\n\nOPERATING RULES\n%s\n\nQUESTION\n%s" % (snap, OPERATING_RULES, task)
     t0 = time.time()
     with llm_lock:
         answer, last = None, None

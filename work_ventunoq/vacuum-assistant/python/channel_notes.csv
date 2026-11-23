@@ -8,31 +8,31 @@ prefix,name,description,unit,codes,overview
 @M2,,Bake-out module M2 (Sicem heating channels and alarms),,,
 @TCMUX,,Rack thermocouple multiplexer,,,
 @LEYSPEC,,Leybold LEYSPEC residual gas analyser (RGA),,,
-MG_PR1,G22,pressure,mbar,,1
-MG_PR2,G21,pressure,mbar,,1
-MG_PR3,Ga4,pressure,mbar,,1
+MG_PR1,G22,fore-vacuum pressure (between V22 and dry pump P22),mbar,,1
+MG_PR2,G21,pressure in the tube (low-pressure gauge),mbar,,1
+MG_PR3,Ga4,pressure at the NEG pump (behind manual valve VM3),mbar,,1
 MG_PR1ST,G22,reading status,,0=pressure OK|1=underrange|2=overrange|3=sensor error|4=sensor off|5=no sensor|6=sensor identification error,
 MG_PR2ST,G21,reading status,,0=pressure OK|1=underrange|2=overrange|3=sensor error|4=sensor off|5=no sensor|6=sensor identification error,
 MG_PR3ST,Ga4,reading status,,0=pressure OK|1=underrange|2=overrange|3=sensor error|4=sensor off|5=no sensor|6=sensor identification error,
 MG_PR1SST,G22,sensor switch,,0=not switchable|1=switched off|2=switched on,
 MG_PR2SST,G21,sensor switch,,0=not switchable|1=switched off|2=switched on,
 MG_PR3SST,Ga4,sensor switch,,0=not switchable|1=switched off|2=switched on,
-MG_PR4,-,unused MaxiGauge channel 4,mbar,,
-MG_PR5,G4,pressure (H2O vapour line),mbar,,1
-MG_PR6,G5,pressure (H2O reservoir),mbar,,1
-MG_PR5ST,G4,reading status,,0=pressure OK|1=underrange|2=overrange|3=sensor error|4=sensor off|5=no sensor|6=sensor identification error,
-MG_PR6ST,G5,reading status,,0=pressure OK|1=underrange|2=overrange|3=sensor error|4=sensor off|5=no sensor|6=sensor identification error,
-MG_PR5SST,G4,sensor switch,,0=not switchable|1=switched off|2=switched on,
-MG_PR6SST,G5,sensor switch,,0=not switchable|1=switched off|2=switched on,
+MG_PR4,G4,pressure in the H2O vapour line (below conductance 2),mbar,,1
+MG_PR5,G5,pressure in the H2O reservoir,mbar,,1
+MG_PR4ST,G4,reading status,,0=pressure OK|1=underrange|2=overrange|3=sensor error|4=sensor off|5=no sensor|6=sensor identification error,
+MG_PR5ST,G5,reading status,,0=pressure OK|1=underrange|2=overrange|3=sensor error|4=sensor off|5=no sensor|6=sensor identification error,
+MG_PR4SST,G4,sensor switch,,0=not switchable|1=switched off|2=switched on,
+MG_PR5SST,G5,sensor switch,,0=not switchable|1=switched off|2=switched on,
+MG_PR6,-,unused MaxiGauge channel 6,mbar,,
 MG_COMST,,MaxiGauge communication,,0=OK|1=FAIL,
 XGS_PR7,-,Ga2 gauge (not installed; not given to the model),mbar,,
 XGS_GA4COMST,,XGS-600 communication,,0=OK|1=FAIL,
-ROT_PR1,Ga5,pressure,mbar,,1
+ROT_PR1,Ga5,pressure in the tube (high-pressure gauge),mbar,,1
 ROT_PR1ST,Ga5,reading status,,0=no valid reading|1=reading valid,
 ROT_GA5COMST,,Spinning rotor gauge communication,,0=OK|1=FAIL,
 SICEM_TCMUX_T,,bake-out thermocouple read through the multiplexer,degC,,
-SICEM_T,,bake-out channel temperature,degC,,
-SICEM_SETP,,bake-out channel temperature setpoint,degC,,
+SICEM_T,,heating channel CH<n> temperature,degC,,
+SICEM_SETP,,heating channel CH<n> setpoint,degC,,
 SICEM_TEMPSTEP,,bake-out ramp temperature step,degC,,
 SICEM_TEMPMAX,,bake-out ramp maximum temperature,degC,,
 SICEM_TIMEINTER,,bake-out ramp time interval,,,
@@ -48,23 +48,23 @@ DCU_P21ST,P21,turbo pump,,0=pump off|1=pump on,1
 DCU_P21STYST,P21,turbo pump standby,,0=standby off|1=standby on,
 DCU_P21BERR,P21,turbo pump error code,,0=no error|1=excess rotation speed|2=overvoltage|6=run-up time error|8=connection to electronic drive unit failed|10=internal device fault|21=drive unit does not recognise the pump|41=excess motor current|43=data storage malfunction,
 DCU_P21COMST,,Turbo pump controller communication,,0=OK|1=FAIL,
-M1_V21ST,V21,valve,,0=moving|1=open|2=closed|3=limit switch error|4=moving (discordance)|5=open (discordance)|6=closed (discordance)|7=limit switch error (discordance),1
-M1_V22ST,V22,valve,,0=moving|1=open|2=closed|3=limit switch error|4=moving (discordance)|5=open (discordance)|6=closed (discordance)|7=limit switch error (discordance),1
+M1_V21ST,V21,valve (tube to turbo pump P21),,0=moving|1=open|2=closed|3=limit switch error|4=moving (discordance)|5=open (discordance)|6=closed (discordance)|7=limit switch error (discordance),1
+M1_V22ST,V22,valve (turbo pump P21 to dry pump P22),,0=moving|1=open|2=closed|3=limit switch error|4=moving (discordance)|5=open (discordance)|6=closed (discordance)|7=limit switch error (discordance),1
 M1_V23ST,-,valve V23 (manual; not given to the model),,,
-M1_V1ST,V1,valve,,0=moving|1=open|2=closed|3=limit switch error|4=moving (discordance)|5=open (discordance)|6=closed (discordance)|7=limit switch error (discordance),1
-M1_BYPASSST,-,bypass (not used any more),,,
+M1_V1ST,V1,valve (tube to H2O vapour line),,0=moving|1=open|2=closed|3=limit switch error|4=moving (discordance)|5=open (discordance)|6=closed (discordance)|7=limit switch error (discordance),1
+M1_BYPASSST,Bypass,(when on: switches off the G22 safety of V22 only; needed to open V1),,0=bypass error|1=bypass on|2=bypass off,
 M1_COMPRESSAIRST,Compressed air,supply,,0=OK|1=FAIL,
 M1_P22ST,P22,dry pump,,0=pump off|1=pump on,1
 M1_COMST,,Pumping module M1 communication,,0=OK|1=FAIL,
-M2_CHANNEL_1_ONOFF_ST,CH1,Sicem heating channel 1,,0=error|1=on|2=off,
-M2_CHANNEL_2_ONOFF_ST,CH2,Sicem heating channel 2,,0=error|1=on|2=off,
-M2_SICEM_ALRM_ST,Sicem,global alarm,,0=no alarm|1=ALARM,
+M2_CHANNEL_1_ONOFF_ST,CH1,heating switch (CH1 ON / CH1 OFF buttons),,0=error|1=on|2=off,
+M2_CHANNEL_2_ONOFF_ST,CH2,heating switch (CH2 ON / CH2 OFF buttons),,0=error|1=on|2=off,
+M2_SICEM_ALRM_ST,Sicem,global alarm (failure of the Sicem controller; not wired to any interlock),,0=no alarm|1=ALARM,
 M2_SICEM_COMERR_ST,Sicem,link between module M2 and the Sicem instrument,,0=OK|1=FAIL,
 M2_MUXSHIELD_COMERR_ST,Sicem,link between module M2 and its thermocouple multiplexer,,0=OK|1=FAIL,
 M2_COMST,,Bake-out module M2 communication,,0=OK|1=FAIL,
 TCMUX_TEMP,,rack thermocouple temperature,degC,,
 TCMUX_COMST,,Thermocouple multiplexer communication,,0=OK|1=FAIL,
-LEYSPEC_TP,Ga3,RGA total pressure,mbar,,1
+LEYSPEC_TP,Ga3,RGA total pressure in the tube,mbar,,1
 LEYSPEC_RUNNING,Ga3,RGA scan,,0=stopped|1=running,
 LEYSPEC_EMISSION,Ga3,RGA filament emission,,0=off|1=on,
 LEYSPEC_SEMHV,Ga3,RGA SEM high voltage,,0=off|1=on,

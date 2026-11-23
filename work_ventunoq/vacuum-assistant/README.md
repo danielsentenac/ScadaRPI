@@ -47,6 +47,30 @@ the real Pi (offline during the Pi 3 → Pi 4 swap).
    asked for the current state of the item, and the answer always starts with
    "I am read-only and cannot send commands."
 
+6. **Operating knowledge** is in `python/rules.py` (from the operators'
+   instruction sheet "FILE ISTRUZIONI PER TUBO 1500W" and what they said). The
+   app checks it on the values and writes the verdicts in the header:
+   - **gauge measuring ranges** (Pirani 800 to 5E-4 mbar, cold cathode 5E-5 to
+     5E-11, spinning rotor 1 to 5E-6): a reading outside is marked not reliable;
+   - **normal regime**: P22 on; G22 0.5 to 5E-4 mbar; V22 open; P21 on above
+     900 Hz; V21 open; G21 1E-5 to 5E-11 mbar - each condition stated as met or not;
+   - **interlocks of V22, V21 and V1**, each with the conditions present now and
+     a verdict (can / cannot be opened now). G22 acts through two MaxiGauge
+     relays (LOW 1.0 mbar, HIGH 5.0 mbar): V21 and V22 cannot be opened unless
+     G22 is below 1.0 mbar and are closed above 5.0 mbar. The bypass, when on,
+     switches off this G22 safety for V22; V1 (H2O line) opens only with P22 on
+     and the bypass on. All close if the compressed air is below 5 bar;
+   - **where each gauge and valve sits** (in `channel_notes.csv`): G21 and Ga5
+     in the tube (Ga5 for high pressure only, not below 5E-6 mbar), G22 fore
+     vacuum, Ga4 at the NEG, G4 (cold cathode, MaxiGauge 4) in the H2O line,
+     G5 (Pirani, MaxiGauge 5) in the H2O reservoir;
+   - **heating**: CH1-CH9 must have the same setpoint; if the heating is on
+     while a problem is present (state meaning fail/error/alarm, device not
+     communicating, normal regime not met), the header says
+     `SAFETY MODE REQUIRED`: the operator must press CH1 OFF and CH2 OFF.
+   The short text `OPERATING_RULES` is given to the model with every question; a
+   question about a procedure is answered from it only.
+
 Whatever must be exact (ranking, searching all devices for a fault, refusing
 commands) is done by the app; the model only words the answer.
 
@@ -68,11 +92,18 @@ Conventions taken from the panel source: `*_COMST` = 0 means communication OK,
   the Sicem ramp values (units unknown), `SICEM_TCMUX_T<n>`, `ROT_PR1ST`.
 - **Not given to the model** (marked `-` in `channel_notes.csv`): gauge Ga2 (XGS
   controller present, gauge not installed; the whole XGS device is left out,
-  including its communication state), valve V23, the bypass, and the unused
-  MaxiGauge channel 4. G4 and G5 (Pirani gauges of the H2O vapour line) are
-  MaxiGauge channels 5 and 6.
-- **Still to give to the model:** ranges and normal regime per gauge, and which
-  heater each Sicem channel is (CH8 around VM3, CH9 around V21).
+  including its communication state), valve V23 and the unused
+  MaxiGauge channel 6.
+- **Confirmed by the operators (2026-11-23):** Ga5 is reliable from 1 mbar
+  down to 5E-6 mbar; the bypass must be ON (red on the panel) to allow opening
+  V1; the two G22 relays work with hysteresis (opening allowed below 1.0 mbar,
+  forced closed above 5.0 mbar); this G22 interlock is what protects P21 from
+  high pressure.
+- **Sicem global alarm** (confirmed 2026-11-23): a failure of the Sicem controller
+  itself, not wired to any interlock; if in alarm the operator presses CH1 OFF
+  and CH2 OFF. "Interlock" in the safety rule means the valve interlocks.
+- **The model is wordy** and ignores the three-sentence limit; its verdicts are
+  right because they are copied from the header.
 - Answers take 1–15 s depending on length.
 
 ## Test results (simulated panel, 2026-11-23)
