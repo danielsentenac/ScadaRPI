@@ -12,3 +12,5 @@ work_caos/*.log
 *.orig
 work_ionic/*.log
 work_vacsupervisor/*.log
+__pycache__/
+*Rack_*.log
