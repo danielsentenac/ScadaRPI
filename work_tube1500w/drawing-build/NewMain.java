@@ -90,7 +90,7 @@ public class NewMain {
     vpipe(X2, 296, 312); manualValve(X2, 327, true, "VM1"); vpipe(X2, 343, 358);
     box(X2 - 30, 356, X2 + 30, 426); text("COND. 2", X2 + 36, 381); vpipe(X2, 368, 414);
     vpipe(X2, 426, 464); hpipe(450, X2 - 62, X2);
-    GlgObject g4 = gauge("G22", "G4"); fit(g4, X2 - 127, 426, X2 - 61, 474); text("G4", X2 - 103, 476);
+    GlgObject g4 = gauge("Ga4", "G4"); fit(g4, X2 - 126, 427, X2 - 61, 473); text("G4", X2 - 103, 476);
     GlgObject g4v = gauge("Ga4Val", "G4Val"); fit(g4v, X2 - 300, 434, X2 - 132, 467);
     hpipe(450, X2, 1292);
     box(1290, 422, 1420, 482); text("H2O", 1338, 442);

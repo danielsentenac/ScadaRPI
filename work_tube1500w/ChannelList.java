@@ -28,8 +28,8 @@ Hashtable<String, String> TUBE1500WCMD = new Hashtable<String, String>(){
 put("G22","MG_PR1ONOFF");        // Type 2 (TRIGGER)
 put("G21","MG_PR2ONOFF");        // Type 2 (TRIGGER)
 put("Ga4","MG_PR3ONOFF");       // Type 2 (TRIGGER)
-put("G4","MG_PR5ONOFF");        // Type 2 (TRIGGER) H2O vapour line
-put("G5","MG_PR6ONOFF");        // Type 2 (TRIGGER) H2O reservoir
+put("G4","MG_PR4ONOFF");        // Type 2 (TRIGGER) H2O vapour line (cold cathode)
+put("G5","MG_PR5ONOFF");        // Type 2 (TRIGGER) H2O reservoir (Pirani)
 put("Ga2","XGS_PR7ONOFF");       // Type 2 (TRIGGER)
 
 //
@@ -118,16 +118,16 @@ put("Ga4Psub","MG_PR3ST");     // D resource type (visibility)
 put("Ga4Val","MG_PR3");    // D resource type
 put("Ga4Col","MG_PR3SST");  // G resource type
 put("Ga4PColsub","MG_PR3ST");  // G resource type
-put("G4","MG_PR5SST");     // D resource type (visibility)  H2O vapour line gauge
-put("G4Psub","MG_PR5ST");     // D resource type (visibility)
-put("G4Val","MG_PR5");    // D resource type
-put("G4Col","MG_PR5SST");  // G resource type
-put("G4PColsub","MG_PR5ST");  // G resource type
-put("G5","MG_PR6SST");     // D resource type (visibility)  H2O reservoir gauge
-put("G5Psub","MG_PR6ST");     // D resource type (visibility)
-put("G5Val","MG_PR6");    // D resource type
-put("G5Col","MG_PR6SST");  // G resource type
-put("G5PColsub","MG_PR6ST");  // G resource type
+put("G4","MG_PR4SST");     // D resource type (visibility)  H2O vapour line gauge
+put("G4Psub","MG_PR4ST");     // D resource type (visibility)
+put("G4Val","MG_PR4");    // D resource type
+put("G4Col","MG_PR4SST");  // G resource type
+put("G4PColsub","MG_PR4ST");  // G resource type
+put("G5","MG_PR5SST");     // D resource type (visibility)  H2O reservoir gauge
+put("G5Psub","MG_PR5ST");     // D resource type (visibility)
+put("G5Val","MG_PR5");    // D resource type
+put("G5Col","MG_PR5SST");  // G resource type
+put("G5PColsub","MG_PR5ST");  // G resource type
 
 //
 // XGS Gauge
