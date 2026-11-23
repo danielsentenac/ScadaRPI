@@ -12,8 +12,6 @@ import re
 import threading
 import time
 
-import json
-
 import report
 import rules
 from modbus_cmd import ModbusCommandClient
@@ -104,7 +102,7 @@ def parse_experiment(text, heating_channels, max_setpoint):
 
 STABILITY_MASSES = (2, 18, 28, 32)       # the recording stops when these masses are stable
 TREND_MASSES = (2, 18, 28, 32, 44)       # masses plotted against time in the report
-REPORT_NAME = re.compile(r"vacuum_report_\d{8}_\d{6}")
+REPORT_NAME = re.compile(r"[A-Za-z0-9]+_report_\d{4}-\d{2}-\d{2}_\d{6}")
 
 
 def stability(samples, masses, cycles, tolerance, floor):
@@ -140,6 +138,8 @@ class Controller:
     def __init__(self, config, by_name, get_values, device_down, data_dir, fmt=None):
         self.fmt = fmt
         self.reports_dir = os.path.join(data_dir, "reports")
+        self.credentials_path = os.path.join(data_dir, "netdisk.credentials")
+        self.sync_now, self.netdisk_state = threading.Event(), "not tried yet"
         os.makedirs(self.reports_dir, exist_ok=True)
         self.config, self.by_name, self.get_values, self.device_down = config, by_name, get_values, device_down
         self.enabled = bool(config.get("commands_enabled", False))
@@ -157,6 +157,8 @@ class Controller:
         self.job, self.job_lock, self.abort = None, threading.Lock(), threading.Event()
         self.supervising = False          # heating was switched on by the assistant: watch the regime
         threading.Thread(target=self._supervise, daemon=True).start()
+        threading.Thread(target=self._sync_loop, daemon=True).start()
+        self.sync_now.set()
         self.log("Assistant started. Commands to the panel are %s."
                  % ("ENABLED" if self.enabled else "DISABLED (dry run: steps are only logged)"))
 
@@ -346,6 +348,7 @@ class Controller:
                      "(at most %g min)" % (cycle, ", ".join(map(str, STABILITY_MASSES)), 100 * tolerance, cycles,
                                            longest / 60))
             t0, t_text = time.time(), time.strftime("%Y-%m-%d %H:%M:%S")
+            first = report.status(self.values(), self.by_name, self.fmt, self.ok, self.heating_channels)
             times, samples, gauges, stable, lines = [], [], [], False, []
             skip = 1 if started else 0          # the first spectrum after a start may be incomplete
             while True:
@@ -371,6 +374,7 @@ class Controller:
                 "title": c.get("report_title", "TUBE 1500 WEST"), "label": c.get("panel_label", ""),
                 "started": t_text, "stopped": time.strftime("%Y-%m-%d %H:%M:%S"),
                 "status": report.status(v, self.by_name, self.fmt, self.ok, self.heating_channels),
+                "status_start": {"pressures": first["pressures"], "temperatures": first["temperatures"]},
                 "last_mass": last_mass, "spectrum": samples[-1], "times": times,
                 "trend": {m: [s[m] for s in samples] for m in TREND_MASSES},
                 "gauges": {g[0]: [s[g[0]] for s in gauges] for g in report.GAUGE_TREND},
@@ -383,20 +387,47 @@ class Controller:
                 self.trigger("stop the RGA scan", "LEYSPEC_RUNNINGONOFF", OFF, even_if_stopped=True)
                 if not was_emission:
                     self.trigger("RGA filament off", "LEYSPEC_EMISSIONONOFF", OFF, even_if_stopped=True)
-        name = "vacuum_report_" + time.strftime("%Y%m%d_%H%M%S")
+        name = "%s_report_%s" % (c.get("report_prefix", "TUBE1500W"), time.strftime("%Y-%m-%d_%H%M%S"))
         base = os.path.join(self.reports_dir, name)
-        report.render(rep, base + ".png", base + ".pdf")
-        with open(base + ".json", "w") as f:
-            json.dump(rep, f, indent=1)
-        self.log("  report saved: %s (.png, .pdf, .json)" % name)
+        report.render(rep, base + ".png")             # the page shown on the HMI
+        import report_xlsx                            # needs openpyxl (requirements.txt)
+        report_xlsx.write(rep, base + ".xlsx")
+        self.log("  report saved: %s.xlsx (and .png for the HMI)" % name)
+        self.sync_now.set()
+
+    # ------------------------------------------------ copy to the network share
+    def _sync_loop(self):
+        """Uploads the reports missing on the share: after each report, and every 10 minutes
+        (so that a report made while the share was unreachable is sent later)."""
+        import netdisk
+        last = None
+        while True:
+            self.sync_now.wait(600)
+            self.sync_now.clear()
+            target = self.config.get("netdisk")
+            if not target or not target.get("server"):
+                continue
+            where = "smb://%s/%s/%s" % (target["server"], target["share"], target.get("folder", ""))
+            try:
+                done = netdisk.sync(target, self.credentials_path, self.reports_dir)
+                message = "ok"
+                for name in done:
+                    self.log("Report %s copied to %s" % (name, where))
+            except Exception as e:
+                message = "Reports NOT copied to %s: %s: %s" % (where, type(e).__name__, str(e)[:200])
+            self.netdisk_state = message
+            if message != last and (message != "ok" or last is not None):
+                self.log(message if message != "ok" else "Copy to %s works again" % where)
+            last = message
 
     def reports(self):
-        names = sorted((n[:-4] for n in os.listdir(self.reports_dir) if n.endswith(".png")), reverse=True)
+        names = sorted((n[:-4] for n in os.listdir(self.reports_dir)
+                        if n.endswith(".png") and REPORT_NAME.fullmatch(n[:-4])), reverse=True)
         return {"reports": names}
 
     def report_path(self, name, kind):
         """File of a saved report, or None. `name` is checked: it never leaves the reports folder."""
-        if not REPORT_NAME.fullmatch(name or "") or kind not in ("png", "pdf", "json"):
+        if not REPORT_NAME.fullmatch(name or "") or kind not in ("png", "xlsx"):
             return None
         path = os.path.join(self.reports_dir, "%s.%s" % (name, kind))
         return path if os.path.exists(path) else None

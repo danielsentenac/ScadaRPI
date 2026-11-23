@@ -339,7 +339,7 @@ public class AssistantGui extends JFrame {
         new Thread(new Runnable() { public void run() {
             final java.util.List<String> names = new java.util.ArrayList<String>();
             try {
-                java.util.regex.Matcher m = java.util.regex.Pattern.compile("vacuum_report_\\d{8}_\\d{6}")
+                java.util.regex.Matcher m = java.util.regex.Pattern.compile("[A-Za-z0-9]+_report_\\d{4}-\\d{2}-\\d{2}_\\d{6}")
                         .matcher(http("GET", base + "/reports", null, 10000));
                 while (m.find()) names.add(m.group());
             } catch (Exception ex) { say("\n[REPORTS] the assistant cannot be reached (" + ex.getMessage() + ")"); return; }
@@ -379,7 +379,7 @@ public class AssistantGui extends JFrame {
                 scroll.getVerticalScrollBar().setUnitIncrement(40);
                 scroll.getVerticalScrollBar().setPreferredSize(new Dimension(28, 0));  // wide enough for a finger
                 JOptionPane.showMessageDialog(AssistantGui.this, scroll,
-                        name + "   (PDF: " + base + "/report?name=" + name + "&format=pdf)", JOptionPane.PLAIN_MESSAGE);
+                        name + ".xlsx   (Excel file: " + base + "/report?name=" + name + "&format=xlsx)", JOptionPane.PLAIN_MESSAGE);
             } });
         } }, "assistant-report").start();
     }

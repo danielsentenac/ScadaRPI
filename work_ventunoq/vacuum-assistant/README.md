@@ -29,7 +29,10 @@ the real Pi (offline during the Pi 3 → Pi 4 swap).
 | `python/actions.py` | The sequences (Safety, Background baking), the experiment-file interpreter, the action log |
 | `python/modbus_cmd.py` | Modbus write client used by `actions.py` only |
 | `data/assistant.log`, `data/instructions.exp` | On the board: action log and last experiment file loaded |
-| `python/report.py` | Draws the vacuum status report (Pillow) |
+| `python/report.py` | Status data of the vacuum report and its PNG page (Pillow) |
+| `python/report_xlsx.py` | The vacuum report as an Excel workbook (openpyxl) |
+| `python/netdisk.py` | Upload of the reports to the network share (smbprotocol) |
+| `python/requirements.txt` | Packages installed by App Lab at the first start (needs internet once): openpyxl, smbprotocol |
 | `examples/bake-150.exp` | Example experiment file (experiment files must end with `.exp`) |
 | `assets/index.html` | Web page: question box, answer, live value table |
 | `sim/PanelSim.java` | Stand-in for the panel: same Modbus library and settings, plausible values |
@@ -93,7 +96,7 @@ The Pi HMI has an AI ASSISTANT window (`work_tube1500w/AssistantGui.java`,
 opened by the AI ASSISTANT button of the synoptic). It calls this app over
 HTTP: `/ask` (chat), `/action?name=safety|baking|report|stop`, `/play` (POST
 `{"name", "text"}`), `/log?since=n`, `/file?name=instructions|log`, `/status`,
-`/reports` (names, newest first), `/report?name=<name>&format=png|pdf|json`.
+`/reports` (names, newest first), `/report?name=<name>&format=png|xlsx`.
 
 - **SAFETY**: CH1 OFF, CH2 OFF, setpoints CH1-CH9 to 0, close V1, close V21,
   stop P21, close V22, stop P22. It preempts anything running. No confirmation.
@@ -128,18 +131,35 @@ HTTP: `/ask` (chat), `/action?name=safety|baking|report|stop`, `/play` (POST
   4. The scan and the filament are put back as they were before the report
      (the panel clears the spectrum when the scan stops, so the last spectrum is
      taken before).
-  5. One page is saved in `data/reports/` as `vacuum_report_<date>_<time>` in
-     `.png`, `.pdf` and `.json` (all the data): regime verdict, valves, pumps,
-     heating, pressures (with out-of-range warnings), temperatures CH1-CH9, the
-     last spectrum, the trend of masses 2, 18, 28, 32, 44 from start to stop,
-     the stabilization result per mass, and two pressure trends over the same
-     time: the cold cathodes G21, Ga4 and G4 inside their range (5E-11 to
-     5E-5 mbar), joined by the spinning rotor gauge Ga5 only at 5E-6 mbar and
-     above; and the Pirani gauges G22 and G5 (5E-4 to 800 mbar). Ga3 is the
-     RGA, not a pressure gauge: its total pressure is given with the spectrum.
+  5. The report is saved in `data/reports/` as
+     `TUBE1500W_report_<YYYY-MM-DD>_<HHMMSS>.xlsx` (local time, `timezone` in
+     `config.json`), with a `.png` page of the same name for the HMI. Content:
+     regime verdict, valves, pumps, heating, pressures and temperatures CH1-CH9
+     at the start and at the stop of the recording (with out-of-range
+     warnings), the last spectrum, the trend of masses 2, 18, 28, 32, 44 from
+     start to stop, the stabilization result per mass, and two pressure trends
+     over the same time: the cold cathodes G21, Ga4 and G4 inside their range
+     (5E-11 to 5E-5 mbar), joined by the spinning rotor gauge Ga5 only at
+     5E-6 mbar and above; and the Pirani gauges G22 and G5 (5E-4 to 800 mbar).
+     Ga3 is the RGA, not a pressure gauge: its total pressure is given with
+     the spectrum. The workbook has the sheets Report (tables and the four
+     charts), RGA spectrum, RGA trend and Gauges (the numbers behind them).
+  6. The `.xlsx` files missing on the network share
+     `smb://netdisk.virgo.infn.it/vacuum/TUBE1500W` (`netdisk` in
+     `config.json`) are uploaded after each report and every 10 minutes, so a
+     report made while the share was unreachable is sent later. Nothing is
+     ever deleted on either side. The account is read from
+     `data/netdisk.credentials` on the board (never in the repository):
+
+     ```
+     username=<account>
+     password=<password>
+     domain=<domain>        (optional)
+     ```
+     Without this file the reports stay on the board and the log says so.
   The decision to stop is this numeric criterion computed by the app, not a
   judgement of the language model. The REPORTS button of the HMI lists and
-  shows the reports; the PDF is at `/report?name=<name>&format=pdf`.
+  shows the reports; the workbook is at `/report?name=<name>&format=xlsx`.
 - **STOP EXPERIMENT**: stops the running sequence; the system is left as it is.
 - After each command the app waits for the panel's status to confirm it; a step
   that is not confirmed, or a failed check, stops the sequence.

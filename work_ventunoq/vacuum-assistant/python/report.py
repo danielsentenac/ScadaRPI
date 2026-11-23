@@ -1,4 +1,4 @@
-"""Vacuum status report: one page (PNG and PDF) with the state of the tube, the last RGA
+"""Vacuum status report: one page (PNG, shown on the HMI; the Excel workbook is in report_xlsx.py) with the state of the tube, the last RGA
 spectrum and the trend of the characteristic masses during the recording.
 
 Everything on the page is computed here from the values read on the panel; the language model
@@ -40,10 +40,10 @@ def gauge_sample(values, ok):
         out[name] = values[channel] if good and low <= values[channel] <= high else 0.0
     return out
 
-PRESSURES = [("MG_PR2", "MG_PR2ST", "G21", "tube, low-pressure gauge"),
-             ("ROT_PR1", None, "Ga5", "tube, high-pressure gauge"),
-             ("MG_PR3", "MG_PR3ST", "Ga4", "NEG pump, behind VM3"),
-             ("MG_PR1", "MG_PR1ST", "G22", "fore-vacuum, V22 to P22"),
+PRESSURES = [("MG_PR2", "MG_PR2ST", "G21", "tube, low pressure"),
+             ("ROT_PR1", None, "Ga5", "tube, high pressure"),
+             ("MG_PR3", "MG_PR3ST", "Ga4", "NEG pump"),
+             ("MG_PR1", "MG_PR1ST", "G22", "fore-vacuum"),
              ("MG_PR4", "MG_PR4ST", "G4", "H2O vapour line"),
              ("MG_PR5", "MG_PR5ST", "G5", "H2O reservoir")]
 STATES = [("M1_V21ST", "V21", "tube to turbo"), ("M1_V22ST", "V22", "turbo to dry pump"),
@@ -81,7 +81,7 @@ def status(values, by_name, fmt, ok, heating_channels):
             elif channel in rules.GAUGE_RANGES:
                 kind, low, high, _ = rules.GAUGE_RANGES[channel]
                 if not low <= values[channel] <= high:
-                    note = "outside the gauge range, not reliable"
+                    note = "outside the gauge range"
         pressures.append({"name": name, "where": where, "value": value, "note": note})
     met, not_met, unknown = rules.regime(values, ok)
     return {
@@ -172,8 +172,8 @@ def trend_plot(d, box, times, series, labels, colours):
 
 
 # ----------------------------------------------------------------------------- page
-def render(rep, png_path, pdf_path):
-    """Draw the report `rep` (see Controller.seq_report) and save it as PNG and PDF."""
+def render(rep, png_path):
+    """Draw the report `rep` (see Controller.seq_report) and save it as a PNG page."""
     im = Image.new("RGB", (W, H), "white")
     d = ImageDraw.Draw(im)
     f, fb, small = font(17), font(17, True), font(14)
@@ -209,25 +209,33 @@ def render(rep, png_path, pdf_path):
             d.text((M + 290, y + 2), row["where"], font=small, fill=GREY)
     bottom = y
     y = top
-    d.text((mid, y), "PRESSURES", font=fb, fill=BLUE)
-    for row in st["pressures"]:
+    first = rep.get("status_start", st)             # values at the start of the recording
+    d.text((mid, y), "PRESSURES (mbar)", font=fb, fill=BLUE)
+    d.text((mid + 215, y + 3), "START", font=small, fill=GREY)
+    d.text((mid + 335, y + 3), "STOP", font=small, fill=GREY)
+    for row, row0 in zip(st["pressures"], first["pressures"]):
         y += 24
+        note = row["note"] or row0["note"]
         d.text((mid, y), row["name"], font=fb, fill=BLACK)
-        d.text((mid + 60, y), row["value"], font=f, fill=RED if row["note"] else BLACK)
-        d.text((mid + 215, y + 2), row["note"] or row["where"], font=small, fill=RED if row["note"] else GREY)
-    y += 44
+        d.text((mid + 50, y + 2), row["where"], font=small, fill=GREY)
+        d.text((mid + 215, y), row0["value"].replace(" mbar", ""), font=f, fill=RED if row0["note"] else BLACK)
+        d.text((mid + 335, y), row["value"].replace(" mbar", ""), font=f, fill=RED if row["note"] else BLACK)
+        if note:
+            d.text((mid + 450, y + 2), note, font=small, fill=RED)
+    y += 40
     d.text((mid, y), "TEMPERATURES (degC)", font=fb, fill=BLUE)
     y += 26
     cols = st["temperatures"]
-    cw = (W - M - mid - 50) / float(max(len(cols), 1))
-    d.text((mid, y + 22), "SET", font=small, fill=GREY)
-    d.text((mid, y + 44), "T", font=small, fill=GREY)
-    for i, c in enumerate(cols):
-        x = mid + 50 + i * cw
+    cw = (W - M - mid - 70) / float(max(len(cols), 1))
+    for k, label in enumerate(("SET", "T start", "T stop"), 1):
+        d.text((mid, y + 22 * k), label, font=small, fill=GREY)
+    for i, (c, c0) in enumerate(zip(cols, first["temperatures"])):
+        x = mid + 70 + i * cw
         d.text((x, y), c["channel"], font=small, fill=BLACK)
         d.text((x, y + 22), c["setpoint"].replace(" degC", "")[:7], font=small, fill=BLACK)
-        d.text((x, y + 44), c["temperature"].replace(" degC", "")[:7], font=small, fill=BLACK)
-    y = max(bottom, y + 44) + 44
+        d.text((x, y + 44), c0["temperature"].replace(" degC", "")[:7], font=small, fill=BLACK)
+        d.text((x, y + 66), c["temperature"].replace(" degC", "")[:7], font=small, fill=BLACK)
+    y = max(bottom, y + 66) + 34
 
     # ---- last RGA spectrum
     d.text((M, y), "LAST RGA SPECTRUM, masses 1 to %d  (%s)" % (rep["last_mass"], rep["stopped"]), font=fb, fill=BLUE)
@@ -263,4 +271,3 @@ def render(rep, png_path, pdf_path):
     d.text((M, H - 40), "Generated by the vacuum assistant on %s from the values read on the panel."
            % time.strftime("%Y-%m-%d %H:%M:%S"), font=small, fill=GREY)
     im.save(png_path)
-    im.save(pdf_path, resolution=150.0)

@@ -27,6 +27,9 @@ with open(os.path.join(HERE, "config.json")) as f:
 
 
 # ---------------------------------------------------------------- register map
+if CONFIG.get("timezone"):              # the container runs in UTC: dates of the log and the reports
+    os.environ["TZ"] = CONFIG["timezone"]
+    time.tzset()
 HEATING_CHANNELS = CONFIG.get("heating_channels", 9)  # Sicem channels CH1..CH9 heat the system
 
 
@@ -465,7 +468,7 @@ def reports():
 
 
 def report_file(name: str = "", format: str = "png"):
-    """One saved report, as an image (png), a document (pdf) or its data (json)."""
+    """One saved report: the page shown on the HMI (png) or the Excel workbook (xlsx)."""
     from fastapi.responses import FileResponse, JSONResponse
     path = CONTROL.report_path(name, format)
     if not path:
@@ -474,7 +477,8 @@ def report_file(name: str = "", format: str = "png"):
 
 
 def status():
-    return {"job": CONTROL.job or "", "commands_enabled": CONTROL.enabled, "supervising": CONTROL.supervising}
+    return {"job": CONTROL.job or "", "commands_enabled": CONTROL.enabled, "supervising": CONTROL.supervising,
+            "netdisk": CONTROL.netdisk_state}
 
 
 web_ui = WebUI()

@@ -15,5 +15,12 @@
   "rga_noise_floor_mbar": 1e-11,
   "rga_max_minutes": 30.0,
   "rga_last_mass": 100,
-  "rga_max_pressure_mbar": 1e-05
+  "rga_max_pressure_mbar": 1e-05,
+  "report_prefix": "TUBE1500W",
+  "netdisk": {
+    "server": "netdisk.virgo.infn.it",
+    "share": "vacuum",
+    "folder": "TUBE1500W"
+  },
+  "timezone": "Europe/Rome"
 }
