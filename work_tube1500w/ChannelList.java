@@ -28,6 +28,8 @@ Hashtable<String, String> TUBE1500WCMD = new Hashtable<String, String>(){
 put("G22","MG_PR1ONOFF");        // Type 2 (TRIGGER)
 put("G21","MG_PR2ONOFF");        // Type 2 (TRIGGER)
 put("Ga4","MG_PR3ONOFF");       // Type 2 (TRIGGER)
+put("G4","MG_PR5ONOFF");        // Type 2 (TRIGGER) H2O vapour line
+put("G5","MG_PR6ONOFF");        // Type 2 (TRIGGER) H2O reservoir
 put("Ga2","XGS_PR7ONOFF");       // Type 2 (TRIGGER)
 
 //
@@ -116,20 +118,21 @@ put("Ga4Psub","MG_PR3ST");     // D resource type (visibility)
 put("Ga4Val","MG_PR3");    // D resource type
 put("Ga4Col","MG_PR3SST");  // G resource type
 put("Ga4PColsub","MG_PR3ST");  // G resource type
+put("G4","MG_PR5SST");     // D resource type (visibility)  H2O vapour line gauge
+put("G4Psub","MG_PR5ST");     // D resource type (visibility)
+put("G4Val","MG_PR5");    // D resource type
+put("G4Col","MG_PR5SST");  // G resource type
+put("G4PColsub","MG_PR5ST");  // G resource type
+put("G5","MG_PR6SST");     // D resource type (visibility)  H2O reservoir gauge
+put("G5Psub","MG_PR6ST");     // D resource type (visibility)
+put("G5Val","MG_PR6");    // D resource type
+put("G5Col","MG_PR6SST");  // G resource type
+put("G5PColsub","MG_PR6ST");  // G resource type
 
 //
 // XGS Gauge
 //
-put("XGSGa2","XGS_PR7ST");
-put("XGSGa2Val","XGS_PR7");
-put("XGSGa2Col","XGS_PR7ST");
-put("XGSGa2Esub","XGS_PR7ST");
-put("XGSGa2EColsub","XGS_PR7ST");
-put("XGSGa2Dsub","XGS_PR7DST");
-put("XGSGa2DColsub","XGS_PR7DST");
-put("XGSGa2Fsub","XGS_PR7FST");
-put("XGSGa2FColsub","XGS_PR7FST");
-
+// Ga2 (XGS gauge) is no longer on the synoptic (2026-11-23); the XGS device is still read
 //
 // MksRotor Gauge
 //
@@ -154,6 +157,10 @@ put("Temp6Val","SICEM_T6");
 put("Setpoint6Val","SICEM_SETP6");
 put("Temp7Val","SICEM_T7");
 put("Setpoint7Val","SICEM_SETP7");
+put("Temp8Val","SICEM_T8");          // heater around VM3
+put("Setpoint8Val","SICEM_SETP8");
+put("Temp9Val","SICEM_T9");          // heater around V21
+put("Setpoint9Val","SICEM_SETP9");
 put("Temp1mVal","SICEM_TCMUX_T1");
 put("Temp2mVal","SICEM_TCMUX_T2");
 put("Temp3mVal","SICEM_TCMUX_T3");
@@ -322,7 +329,7 @@ private static final long serialVersionUID = 354054054061L;
 put(0,new GlgPoint(0.5,0.7,0.5));
 put(1,new GlgPoint(1.,0.7,0.));
 put(2,new GlgPoint(0.,1.,0.));
-put(255,new GlgPoint(0.5,0.5,0.5));
+put(255,new GlgPoint(0.62,0.73,0.93));
 }};
 
 Hashtable<Integer,GlgPoint> GaugePressureColorSTATUS = new Hashtable<Integer, GlgPoint>(){
@@ -336,7 +343,7 @@ put(3,new GlgPoint(1.,0.,0.));
 put(4,new GlgPoint(1.,0.7,0.));
 put(5,new GlgPoint(1.,0.7,0.));
 put(6,new GlgPoint(1.,0.,0.));
-put(255,new GlgPoint(0.5,0.5,0.5));
+put(255,new GlgPoint(0.62,0.73,0.93));
 }};
 
 //
@@ -350,7 +357,7 @@ put(255,"?");
 Hashtable<Integer,GlgPoint> XGSGaugeDegasColorSTATUS = new Hashtable<Integer, GlgPoint>(){{ 
 put(0,new GlgPoint(1.,0.7,0.));
 put(1,new GlgPoint(0.,1.,0.));
-put(255,new GlgPoint(0.5,0.5,0.5));
+put(255,new GlgPoint(0.62,0.73,0.93));
 }};
 //
 // XGS Gauge Emission status
@@ -363,7 +370,7 @@ put(255,"?");
 Hashtable<Integer,GlgPoint> XGSGaugeEmissionColorSTATUS = new Hashtable<Integer, GlgPoint>(){{ 
 put(0,new GlgPoint(1.,0.7,0.));
 put(1,new GlgPoint(0.,1.,0.));
-put(255,new GlgPoint(0.5,0.5,0.5));
+put(255,new GlgPoint(0.62,0.73,0.93));
 }};
 //
 // MKS ROTOR Gauge Emission status
@@ -376,7 +383,7 @@ put(255,"?");
 Hashtable<Integer,GlgPoint> ROTGaugeEmissionColorSTATUS = new Hashtable<Integer, GlgPoint>(){{ 
 put(0,new GlgPoint(1.,0.7,0.));
 put(1,new GlgPoint(0.,1.,0.));
-put(255,new GlgPoint(0.5,0.5,0.5));
+put(255,new GlgPoint(0.62,0.73,0.93));
 }};
 //
 // XGS Gauge Filament status
@@ -391,7 +398,7 @@ Hashtable<Integer,GlgPoint> XGSGaugeFilamentColorSTATUS = new Hashtable<Integer,
 put(0,new GlgPoint(0.5,0.5,0.5));
 put(1,new GlgPoint(1.,1.,0.));
 put(2,new GlgPoint(0.,0.7,0.));
-put(255,new GlgPoint(0.5,0.5,0.5));
+put(255,new GlgPoint(0.62,0.73,0.93));
 }};
 
 //
@@ -423,7 +430,7 @@ put(4,new GlgPoint(1.,0.,0.));
 put(5,new GlgPoint(1.,0.1,0.));
 put(6,new GlgPoint(1.,0.2,0.));
 put(7,new GlgPoint(1.,0.3,0.));
-put(255,new GlgPoint(0.5,0.5,0.5));
+put(255,new GlgPoint(0.62,0.73,0.93));
 }};
 
 //
@@ -445,7 +452,7 @@ private static final long serialVersionUID = 354054054064L;
 put(0,new GlgPoint(0.5,0.5,0.5));
 put(1,new GlgPoint(1.,0.,0.));
 put(2,new GlgPoint(0.,1.,0.));
-put(255,new GlgPoint(0.5,0.5,0.5));
+put(255,new GlgPoint(0.62,0.73,0.93));
 }};
 
 //
@@ -467,7 +474,7 @@ private static final long serialVersionUID = 354054054066L;
 put(0,new GlgPoint(1.,1.,0.1));
 put(1,new GlgPoint(1.,0.7,0.));
 put(2,new GlgPoint(0.,1.,0.));
-put(255,new GlgPoint(0.5,0.5,0.5));
+put(255,new GlgPoint(0.62,0.73,0.93));
 }};
 
 //
@@ -489,7 +496,7 @@ private static final long serialVersionUID = 354054054067L;
 put(0,new GlgPoint(1.,0.,0.));
 put(1,new GlgPoint(0.,1.,0.));
 put(2,new GlgPoint(1.,0.7,0.));
-put(255,new GlgPoint(0.5,0.5,0.5));
+put(255,new GlgPoint(0.62,0.73,0.93));
 }};
 
 
@@ -506,7 +513,7 @@ Hashtable<Integer, GlgPoint> TurboONOFFColorSTATUS = new Hashtable<Integer, GlgP
 put(0,new GlgPoint(1.,0.7,0.));
 put(1,new GlgPoint(0.,1.,0.));
 put(2,new GlgPoint(1.,0.,0.));
-put(255,new GlgPoint(0.5,0.5,0.5));
+put(255,new GlgPoint(0.62,0.73,0.93));
 }};
 
 Hashtable<Integer, String> TurboStandbySTATUS = new Hashtable<Integer, String>(){{ 
@@ -518,7 +525,7 @@ put(255,"?");
 Hashtable<Integer, GlgPoint> TurboStandbyColorSTATUS = new Hashtable<Integer, GlgPoint>(){{ 
 put(0,new GlgPoint(1.,0.7,0.));
 put(1,new GlgPoint(0.,1.,0.));
-put(255,new GlgPoint(0.5,0.5,0.5));
+put(255,new GlgPoint(0.62,0.73,0.93));
 }};
 Hashtable<Integer, String> TurboTemperatureSTATUS = new Hashtable<Integer, String>(){{ 
 put(0,"Temperature OK");
@@ -529,7 +536,7 @@ put(255,"?");
 Hashtable<Integer, GlgPoint> TurboTemperatureColorSTATUS = new Hashtable<Integer, GlgPoint>(){{ 
 put(0,new GlgPoint(0.,1.,0.));
 put(1,new GlgPoint(1.,0.,0.));
-put(255,new GlgPoint(0.5,0.5,0.5));
+put(255,new GlgPoint(0.62,0.73,0.93));
 }};
 
 Hashtable<Integer, String> TurboTemperatureBoxSTATUS = new Hashtable<Integer, String>(){{ 
@@ -541,7 +548,7 @@ put(255,"?");
 Hashtable<Integer, GlgPoint> TurboTemperatureBoxColorSTATUS = new Hashtable<Integer, GlgPoint>(){{ 
 put(0,new GlgPoint(0.,1.,0.));
 put(1,new GlgPoint(1.,0.,0.));
-put(255,new GlgPoint(0.5,0.5,0.5));
+put(255,new GlgPoint(0.62,0.73,0.93));
 }};
 
 Hashtable<Integer, String> Turbo1ErrorSTATUS = new Hashtable<Integer, String>(){{ 
@@ -617,7 +624,7 @@ put(810,new GlgPoint(1.,0.,0.));
 put(815,new GlgPoint(1.,0.,0.));
 put(890,new GlgPoint(1.,0.,0.));
 put(891,new GlgPoint(1.,0.,0.));
-put(255,new GlgPoint(0.5,0.5,0.5));
+put(255,new GlgPoint(0.62,0.73,0.93));
 }};
 
 Hashtable<Integer, String> Turbo2ErrorSTATUS = new Hashtable<Integer, String>(){{
@@ -719,7 +726,7 @@ put(102,new GlgPoint(1.,0.,0.));
 put(103,new GlgPoint(1.,0.,0.));  
 put(104,new GlgPoint(1.,0.,0.));
 put(105,new GlgPoint(1.,0.,0.));
-put(255,new GlgPoint(0.5,0.5,0.5));
+put(255,new GlgPoint(0.62,0.73,0.93));
 }};
 
 //
@@ -750,7 +757,7 @@ put(-4,new GlgPoint(1.,0.,0.));
 put(-5,new GlgPoint(1.,0.,0.));
 put(-7,new GlgPoint(1.,0.,0.));
 put(-8,new GlgPoint(1.,0.,0.));
-put(255,new GlgPoint(0.5,0.5,0.5));
+put(255,new GlgPoint(0.62,0.73,0.93));
 }};
 
 Hashtable<Integer, String> IonicRemoteSTATUS = new Hashtable<Integer, String>(){{ 
@@ -764,7 +771,7 @@ Hashtable<Integer, GlgPoint> IonicRemoteColorSTATUS = new Hashtable<Integer, Glg
 put(0,new GlgPoint(1.,0.7,0.));
 put(1,new GlgPoint(0.,1.,0.));
 put(2,new GlgPoint(1.,1.,0.));
-put(255,new GlgPoint(0.5,0.5,0.5));
+put(255,new GlgPoint(0.62,0.73,0.93));
 }};
 
 Hashtable<Integer, String> IonicOperatingModeSTATUS = new Hashtable<Integer, String>(){{ 
@@ -776,7 +783,7 @@ put(255,"?");
 Hashtable<Integer, GlgPoint> IonicOperatingModeColorSTATUS = new Hashtable<Integer, GlgPoint>(){{ 
 put(0,new GlgPoint(1.,0.7,0.));
 put(1,new GlgPoint(0.,1.,0.));
-put(255,new GlgPoint(0.5,0.5,0.5));
+put(255,new GlgPoint(0.62,0.73,0.93));
 }};
 
 Hashtable<Integer, String> IonicVoltageModeSTATUS = new Hashtable<Integer, String>(){{ 
@@ -788,7 +795,7 @@ put(255,"?");
 Hashtable<Integer, GlgPoint> IonicVoltageModeColorSTATUS = new Hashtable<Integer, GlgPoint>(){{ 
 put(0,new GlgPoint(1.,0.7,0.));
 put(1,new GlgPoint(0.,1.,0.));
-put(255,new GlgPoint(0.5,0.5,0.5));
+put(255,new GlgPoint(0.62,0.73,0.93));
 }};
 
 //
@@ -804,7 +811,7 @@ Hashtable<Integer, GlgPoint> TitaneStartColorSTATUS = new Hashtable<Integer, Glg
 put(0,new GlgPoint(1.,0.7,0.));
 put(1,new GlgPoint(0.,1.,0.));
 put(2,new GlgPoint(1.,1.,0.));
-put(255,new GlgPoint(0.5,0.5,0.5));
+put(255,new GlgPoint(0.62,0.73,0.93));
 }};
 
 Hashtable<Integer, String> TitaneRemoteSTATUS = new Hashtable<Integer, String>(){{ 
@@ -816,7 +823,7 @@ put(255,"?");
 Hashtable<Integer, GlgPoint> TitaneRemoteColorSTATUS = new Hashtable<Integer, GlgPoint>(){{ 
 put(0,new GlgPoint(1.,1.,0.));
 put(1,new GlgPoint(0.,1.,0.));
-put(255,new GlgPoint(0.5,0.5,0.5));
+put(255,new GlgPoint(0.62,0.73,0.93));
 }};
 
 Hashtable<Integer, String> TitaneControllerSTATUS = new Hashtable<Integer, String>(){{ 
@@ -836,7 +843,7 @@ put(2,new GlgPoint(1.,0.4,0.));
 put(3,new GlgPoint(1.,1.,0.));
 put(4,new GlgPoint(1.,0.4,0.));
 put(5,new GlgPoint(0.,1.,0.));
-put(255,new GlgPoint(0.5,0.5,0.5));
+put(255,new GlgPoint(0.62,0.73,0.93));
 }};
 
 Hashtable<Integer, String> TitaneErrorSTATUS = new Hashtable<Integer, String>(){{ 
@@ -856,7 +863,7 @@ put(2,new GlgPoint(1.,0.,0.));
 put(3,new GlgPoint(1.,0.,0.));
 put(4,new GlgPoint(1.,0.,0.));
 put(5,new GlgPoint(1.,0.,0.));
-put(255,new GlgPoint(0.5,0.5,0.5));
+put(255,new GlgPoint(0.62,0.73,0.93));
 }};
 
 
@@ -873,7 +880,7 @@ put(0,new GlgPoint(0.,1.,0.));
 put(1,new GlgPoint(1.,0.7,0.));
 put(2,new GlgPoint(1.,1.,0.));
 put(3,new GlgPoint(1.,0.4,0.));
-put(255,new GlgPoint(0.5,0.5,0.5));
+put(255,new GlgPoint(0.62,0.73,0.93));
 }};
 
 Hashtable<Integer, String> TitaneAutoStartModeSTATUS = new Hashtable<Integer, String>(){{
@@ -885,7 +892,7 @@ put(255,"?");
 Hashtable<Integer, GlgPoint> TitaneAutoStartModeColorSTATUS = new Hashtable<Integer, GlgPoint>(){{ 
 put(0,new GlgPoint(0.,1.,0.));
 put(1,new GlgPoint(1.,0.7,0.));
-put(255,new GlgPoint(0.5,0.5,0.5));
+put(255,new GlgPoint(0.62,0.73,0.93));
 }};
 
 Hashtable<Integer, String> TitaneRecoverModeSTATUS = new Hashtable<Integer, String>(){{
@@ -897,7 +904,7 @@ put(255,"?");
 Hashtable<Integer, GlgPoint> TitaneRecoverModeColorSTATUS = new Hashtable<Integer, GlgPoint>(){{ 
 put(0,new GlgPoint(0.,1.,0.));
 put(1,new GlgPoint(1.,0.7,0.));
-put(255,new GlgPoint(0.5,0.5,0.5));
+put(255,new GlgPoint(0.62,0.73,0.93));
 }};
 
 Hashtable<Integer, String> TitaneControllerOperatingModeSTATUS = new Hashtable<Integer, String>(){{ 
@@ -913,7 +920,7 @@ put(0,new GlgPoint(1.,0.7,0.));
 put(1,new GlgPoint(0.,1.,0.));
 put(2,new GlgPoint(0.,1.,0.1));
 put(3,new GlgPoint(0.,1.,0.2));
-put(255,new GlgPoint(0.5,0.5,0.5));
+put(255,new GlgPoint(0.62,0.73,0.93));
 }};
 
 Hashtable<Integer, String> TitaneFilamentSTATUS = new Hashtable<Integer, String>(){{ 
@@ -929,7 +936,7 @@ put(0,new GlgPoint(0.,1.,0.));
 put(1,new GlgPoint(1.,0.1,0.));
 put(2,new GlgPoint(1.,0.2,0.));
 put(3,new GlgPoint(1.,0.3,0.));
-put(255,new GlgPoint(0.5,0.5,0.5));
+put(255,new GlgPoint(0.62,0.73,0.93));
 }};
 
 //
@@ -968,7 +975,7 @@ put(255,"?");
 Hashtable<Integer, GlgPoint> RGAONOFFColorSTATUS = new Hashtable<Integer, GlgPoint>(){{ 
 put(0,new GlgPoint(0.,1.,0.));
 put(1,new GlgPoint(1.,0.7,0.));
-put(255,new GlgPoint(0.5,0.5,0.5));
+put(255,new GlgPoint(0.62,0.73,0.93));
 }};
 
 Hashtable<Integer, String> RGAFilamentSTATUS = new Hashtable<Integer, String>(){{ 
@@ -982,7 +989,7 @@ Hashtable<Integer, GlgPoint> RGAFilamentColorSTATUS = new Hashtable<Integer, Glg
 put(0,new GlgPoint(1.,0.7,0.));
 put(1,new GlgPoint(0.,1.,0.));
 put(2,new GlgPoint(1.,1.,0.));
-put(255,new GlgPoint(0.5,0.5,0.5));
+put(255,new GlgPoint(0.62,0.73,0.93));
 }};
 
 //
@@ -997,13 +1004,13 @@ put(255,"?");
 Hashtable<Integer, GlgPoint> RelayGeneralColorSTATUS = new Hashtable<Integer, GlgPoint>(){{ 
 put(1,new GlgPoint(0.,1.,0.));
 put(0,new GlgPoint(1.,0.7,0.));
-put(255,new GlgPoint(0.5,0.5,0.5));
+put(255,new GlgPoint(0.62,0.73,0.93));
 }};
 
 Hashtable<Integer,GlgPoint> FailOkColorSTATUS = new Hashtable<Integer, GlgPoint>(){{ 
 put(0,new GlgPoint(1.,0.,0.));
 put(1,new GlgPoint(0.,1.,0.));
-put(255,new GlgPoint(0.5,0.5,0.5));
+put(255,new GlgPoint(0.62,0.73,0.93));
 }};
 
 Hashtable<Integer,String> FailOkSTATUS = new Hashtable<Integer, String>(){{ 
@@ -1018,7 +1025,7 @@ private static final long serialVersionUID = 354054054065L;
 {
 put(0,new GlgPoint(0.,1.,0.));
 put(1,new GlgPoint(1.,0.,0.));
-put(255,new GlgPoint(0.5,0.5,0.5));
+put(255,new GlgPoint(0.62,0.73,0.93));
 }};
 
 Hashtable<Integer,String> OkFailSTATUS = new Hashtable<Integer, String>(){
