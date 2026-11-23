@@ -18,6 +18,7 @@ from arduino.app_utils import App
 
 from modbus_ro import ModbusReadOnlyClient
 import rules
+from actions import Controller
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -335,7 +336,7 @@ def snapshot_text(question=""):
 
 
 SYSTEM_PROMPT = (
-    "You are the read-only assistant of a vacuum system, the tube 1500 West. "
+    "You are the assistant of a vacuum system, the tube 1500 West. "
     "With each question you receive the values just read from its control panel.\n"
     "Reading them: each line is 'name on the panel, what it is [CHANNEL] = value'; a state is a code "
     "followed by its meaning, e.g. '1 (open)'. Gauges: G21, G22, G4, G5, Ga4, Ga5; Ga3 is the RGA; "
@@ -350,8 +351,8 @@ SYSTEM_PROMPT = (
     "problem', 'Normal regime' and 'Heating': they cover all devices. Never invent a meaning, a limit or a cause; "
     "never compare numbers yourself: the lines already say whether each value is inside or outside its range, "
     "repeat that verdict.\n"
-    "6. You cannot send commands or press buttons. If asked to act, say that you are read-only, then give "
-    "the current state of that item.\n"
+    "6. You do not send commands from this chat. Actions are done only with the buttons of the panel (SAFETY, "
+    "BACKGROUND BAKING, PLAY). If asked to act, say so, then give the current state of that item.\n"
     "7. Be brief: at most three sentences, or a plain list when a list is asked. No explanation of your reasoning."
 )
 
@@ -366,7 +367,7 @@ PROCEDURE = re.compile(r"what (should|must|to|do|shall|can)|how (should|do|to)|p
 # A request to act gets a fixed first sentence, whatever the model writes.
 COMMAND = re.compile(r"^\s*(please\s+|can you\s+|could you\s+|will you\s+|now\s+)*"
                      r"(open|close|shut|start|stop|switch|turn|set|enable|disable|vent|pump|bake|heat|reset|degas|run)\b", re.I)
-READ_ONLY = "I am read-only and cannot send commands."
+READ_ONLY = "I do not act from the chat: use the SAFETY, BACKGROUND BAKING or PLAY buttons."
 
 
 def ask(q: str = ""):
@@ -387,7 +388,10 @@ def ask(q: str = ""):
                                              else " Do not add any comment."))
     else:
         task = q
-    prompt = "CURRENT VALUES\n%s\n\nOPERATING RULES\n%s\n\nQUESTION\n%s" % (snap, OPERATING_RULES, task)
+    recent = ""
+    if re.search(r"\b(log|action|actions|did|done|doing|experiment|baking|running|happened)\b", q, re.I):
+        recent = "\n\nRECENT ACTIONS OF THE ASSISTANT (newest last)\n%s" % "\n".join(CONTROL.lines[-8:])
+    prompt = "CURRENT VALUES\n%s\n\nOPERATING RULES\n%s%s\n\nQUESTION\n%s" % (snap, OPERATING_RULES, recent, task)
     t0 = time.time()
     with llm_lock:
         answer, last = None, None
@@ -404,7 +408,7 @@ def ask(q: str = ""):
                 time.sleep(10)
         if answer is None:
             return {"error": "model error: %s" % last}
-    if command and "read-only" not in answer.lower():
+    if command and READ_ONLY not in answer:
         answer = "%s %s" % (READ_ONLY, answer)
     return {"question": q, "answer": answer, "seconds": round(time.time() - t0, 1), "snapshot": snap}
 
@@ -424,7 +428,45 @@ def state():
             "error": error, "rows": rows}
 
 
+# ----------------------------------------------------------- actions and their log
+CONTROL = Controller(CONFIG, BY_NAME, STATE.get, device_down, os.path.join(os.path.dirname(HERE), "data"))
+
+
+def log(since: int = -1):
+    """Action log from line `since` on (-1: the last 200 lines)."""
+    return CONTROL.log_since(since)
+
+
+def action(name: str = ""):
+    """Preset buttons of the HMI."""
+    if name == "safety":
+        return CONTROL.start("SAFETY", CONTROL.seq_safety, preempt=True)
+    if name == "baking":
+        return CONTROL.start("BACKGROUND BAKING", CONTROL.seq_baking)
+    if name == "stop":
+        return CONTROL.stop()
+    return {"ok": False, "message": "unknown action"}
+
+
+def play(payload: dict):
+    """Load an experiment file ({"name": ..., "text": ...}) and execute it."""
+    return CONTROL.play(str(payload.get("name", "experiment")), str(payload.get("text", "")))
+
+
+def file(name: str = ""):
+    return CONTROL.read_file(name)
+
+
+def status():
+    return {"job": CONTROL.job or "", "commands_enabled": CONTROL.enabled, "supervising": CONTROL.supervising}
+
+
 web_ui = WebUI()
+web_ui.expose_api("GET", "/log", log)
+web_ui.expose_api("GET", "/action", action)
+web_ui.expose_api("POST", "/play", play)
+web_ui.expose_api("GET", "/file", file)
+web_ui.expose_api("GET", "/status", status)
 web_ui.expose_api("GET", "/state", state)
 web_ui.expose_api("GET", "/ask", ask)
 

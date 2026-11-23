@@ -5,8 +5,12 @@ over Modbus TCP, keeps the latest values, and lets the local model
 (`arduino:llm` brick; Qwen 3 4B Instruct, see the model comparison below) answer questions about them through a
 web page (`arduino:web_ui` brick, port 7000).
 
-**It cannot send commands.** `python/modbus_ro.py` implements Modbus function 3
-(read holding registers) only; there is no write function in the app.
+**Commands.** The language model never sends a command. Actions are fixed
+sequences in `python/actions.py`, started from the HMI panel on the Pi (buttons
+SAFETY, BACKGROUND BAKING, PLAY) and written to the panel's Modbus server by
+`python/modbus_cmd.py`. They are **disabled by default**: with
+`"commands_enabled": false` in `config.json` every step is only logged as
+`DRY RUN`. Reading (`python/modbus_ro.py`, function 3) is separate.
 
 Status (2026-11-20): works against a **simulated panel**. Not yet tested against
 the real Pi (offline during the Pi 3 → Pi 4 swap).
@@ -20,7 +24,12 @@ the real Pi (offline during the Pi 3 → Pi 4 swap).
 | `python/modbus_ro.py` | Read-only Modbus TCP client (raw sockets, no dependency) |
 | `python/registers.csv` | Register map of the panel: 329 channels, offsets 0–582 (generated, see below) |
 | `python/channel_notes.csv` | Per channel: panel name (G21, V21, P21...), what it is, unit, meaning of each status code — **to be reviewed** |
-| `python/config.json` | Panel address, poll period, optional page label |
+| `python/config.json` | Panel address, poll period, optional page label, `commands_enabled` (default false), `baking_setpoint_degC` (150), `max_setpoint_degC` (150) |
+| `python/rules.py` | Operating knowledge: gauge ranges, normal regime, interlocks, heating rules |
+| `python/actions.py` | The sequences (Safety, Background baking), the experiment-file interpreter, the action log |
+| `python/modbus_cmd.py` | Modbus write client used by `actions.py` only |
+| `data/assistant.log`, `data/instructions.txt` | On the board: action log and last experiment file loaded |
+| `examples/bake-150.txt` | Example experiment file |
 | `assets/index.html` | Web page: question box, answer, live value table |
 | `sim/PanelSim.java` | Stand-in for the panel: same Modbus library and settings, plausible values |
 | `regdump/RegDump.java` | Regenerates `registers.csv` from the panel source |
@@ -76,6 +85,44 @@ commands) is done by the app; the model only words the answer.
 
 Conventions taken from the panel source: `*_COMST` = 0 means communication OK,
 1 means failure; on failure the panel sets values to 0 and status words to 255.
+
+## Actions (HMI panel on the Pi)
+
+The Pi HMI has an AI ASSISTANT window (`work_tube1500w/AssistantGui.java`,
+opened by the AI ASSISTANT button of the synoptic). It calls this app over
+HTTP: `/ask` (chat), `/action?name=safety|baking|stop`, `/play` (POST
+`{"name", "text"}`), `/log?since=n`, `/file?name=instructions|log`, `/status`.
+
+- **SAFETY**: CH1 OFF, CH2 OFF, setpoints CH1-CH9 to 0, close V1, close V21,
+  stop P21, close V22, stop P22. It preempts anything running. No confirmation.
+- **BACKGROUND BAKING**: refused unless the normal regime is met; then setpoints
+  CH1-CH9 to 150 degC, CH1 ON, CH2 ON.
+- **PLAY**: an experiment file, one instruction per line (`#` = comment). The
+  whole file is checked before anything runs; a bad line refuses the file.
+
+  ```
+  CHECK REGIME                     stop unless the normal regime is met
+  SETPOINT <degC>                  same setpoint on CH1-CH9 (0 to 150)
+  HEATING ON | HEATING OFF         ON only if the normal regime is met
+  OPEN <valve> | CLOSE <valve>     V1, V21, V22 (open refused if an interlock condition is present)
+  START <pump> | STOP <pump>       P21, P22
+  BYPASS ON | BYPASS OFF
+  WAIT <duration>                  30, 30s, 10min, 2h
+  WAIT UNTIL <name> < <value> [TIMEOUT <duration>]    or >; names G21 G22 G4 G5 GA4 GA5 P21SPEED TEMP
+  LOG <text>
+  SAFETY
+  ```
+- **STOP EXPERIMENT**: stops the running sequence; the system is left as it is.
+- After each command the app waits for the panel's status to confirm it; a step
+  that is not confirmed, or a failed check, stops the sequence.
+- While heating switched on by the assistant is running, it watches the normal
+  regime and the Sicem alarm, and switches CH1 and CH2 off if a problem appears.
+- Every step goes to the action log, shown live on the HMI.
+
+**Not yet approved by the operators:** the order of the SAFETY sequence, how the
+baking setpoint is reached (directly or by ramp), the experiment-file language.
+Commands stay disabled until then. Tested only in dry run against the simulator,
+and the panel's write path with a fake device (see `work_tube1500w`).
 
 ## Limits found
 
