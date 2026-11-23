@@ -96,10 +96,10 @@ Reference: `docs/ventuno-q-user-manual.md` (copy of Arduino's manual, from
     802-1x.identity <user> 802-1x.anonymous-identity <user> 802-1x.system-ca-certs no
   nmcli --ask con up EGO        # asks for the password and stores it
   ```
-- **Ethernet `rpi-link`** (prepared for architecture A): fixed `192.168.251.2/24`
-  on `end0`, never the default route, autoconnect priority 10. Planned peer:
-  the Pi at `192.168.251.1` on an extra USB-Ethernet dongle (not done; the RGA
-  already uses `192.168.250.x` on the Pi's `eth1`).
+- **Ethernet `rpi-link`** (architecture A, in service since 2026-11-23): fixed
+  `192.168.251.2/24` on `end0`, never the default route, autoconnect priority 10.
+  Peer: the Pi at `192.168.251.1` on a TP-Link USB-Ethernet adapter (interface
+  `ventuno0`; set-up in `pi-link/`). The RGA uses `192.168.250.x` on the Pi's `eth1`.
 
 ### Local AI model
 - Installed: **Qwen 3 4B Instruct** (`genie:qwen3_4b_instruct_2507`, Apache-2.0),
@@ -237,13 +237,14 @@ It has no write function. Details, limits and test results:
 
 - The panel's Modbus server accepts several masters at once (DAQ + VENTUNO):
   checked with the same library and settings, not yet on the running panel.
-- On the board the app is running against a simulator (`~/panelsim`), with the
-  page labelled `SIMULATED VALUES`.
+- Since 2026-11-23 the app on the board reads the real panel over the cable
+  (`192.168.251.1:1288`), commands disabled, and starts at boot as the default
+  app. The simulator settings are kept on the board in `python/config.json.sim`.
 
 ## Where we are — next steps
 
-0. **Assistant:** connect to the real panel once the Pi 4 is up (set
-   `panel_host` to `192.168.251.1`, remove the label, stop the simulator); add
+0. **Assistant:** connected to the real panel since 2026-11-23 (Pi 4 installed,
+   new HMI deployed); most devices were not yet answering on the panel. Add
    the meaning of the status codes to `channel_notes.csv`; have the channel
    descriptions reviewed.
 
@@ -254,8 +255,8 @@ It has no write function. Details, limits and test results:
 3. **I2C bench test** with a spare slave module, through a USB-to-I2C adapter
    (or the header bus if it becomes available).
 4. **Serial test** with `jSerialComm` and one USB-RS232 adapter.
-5. For A: USB-Ethernet dongle on the Pi 4, `192.168.251.1`, then a first
-   read-only Modbus connection from the board, then a restricted tool layer
+5. For A: the cable link and the read-only Modbus connection are done
+   (`pi-link/`). Then a restricted tool layer
    (MCP) for the model. Commands to valves and pumps must be limited by that
    layer, not by the model.
 6. Fixed address for the board (the ssh entry currently uses a DHCP Wi-Fi address).

@@ -1,0 +1,7 @@
+# /etc/udev/rules.d/70-ventuno-link.rules on the Pi (vactube1500w)
+# TP-Link UE300 USB Ethernet adapter = direct link to the Arduino VENTUNO Q (192.168.251.2).
+# It powers up as a driver CD-ROM (2357:8151): switch it to Ethernet mode (2357:0601).
+# A plain eject (or usb_modeswitch -K) does not switch it.
+ACTION=="add", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ATTR{idVendor}=="2357", ATTR{idProduct}=="8151", RUN+="/usr/sbin/usb_modeswitch -v 2357 -p 8151 -M 555342430860d9a9c0000000800006e0000000000000000000000000000000"
+# Fixed interface name, whatever the detection order of the USB adapters (address of this adapter).
+ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="34:60:f9:55:c2:a9", NAME="ventuno0"

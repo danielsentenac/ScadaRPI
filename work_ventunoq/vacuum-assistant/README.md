@@ -223,8 +223,11 @@ arduino-app-cli app logs  user:vacuum-assistant
 Page: `http://<board address>:7000`.
 
 `config.json` in this repository points at the real panel over the direct
-cable (`192.168.251.1:1288`). On the board it currently points at the simulator
-(`172.17.0.1`, the Docker host address) with the label `SIMULATED VALUES`.
+cable (`192.168.251.1:1288`), and since 2026-11-23 so does the board (set-up of
+the cable in `../pi-link/`). To go back to the simulator on the board, set
+`panel_host` to `172.17.0.1` (the Docker host address) and a `panel_label` such
+as `SIMULATED VALUES`; a copy of those settings is in `python/config.json.sim`
+on the board. The app starts at boot as the board's default app.
 
 ## Simulator (on the board)
 
