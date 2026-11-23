@@ -25,32 +25,49 @@ with open(os.path.join(HERE, "config.json")) as f:
 
 
 # ---------------------------------------------------------------- register map
+def parse_codes(text):
+    codes = {}
+    for item in filter(None, (text or "").split("|")):
+        k, _, v = item.partition("=")
+        codes[int(k)] = v
+    return codes
+
+
 def load_channels():
+    """registers.csv gives the register of each channel; channel_notes.csv gives, per channel
+    or per numbered family (prefix), the name used on the panel (G21, V21, P21...), what the
+    value is, its unit, and the meaning of its status codes (taken from the panel source)."""
     with open(os.path.join(HERE, "registers.csv")) as f:
         channels = list(csv.DictReader(f))
     with open(os.path.join(HERE, "channel_notes.csv")) as f:
         notes = list(csv.DictReader(f))
+    titles = {n["prefix"][1:]: n["description"] for n in notes if n["prefix"].startswith("@")}
+    notes = [n for n in notes if not n["prefix"].startswith("@")]
     notes.sort(key=lambda n: -len(n["prefix"]))
     for c in channels:
         c["offset"] = int(c["offset"])
         c["length"] = int(c["length"])
-        c["description"], c["unit"], c["family"] = "", "", c["channel"]
+        c.update(name="", description="", unit="", codes={}, overview=False, family="", number=None, hidden=False)
         for n in notes:
-            if c["channel"].startswith(n["prefix"]):
-                suffix = c["channel"][len(n["prefix"]):]
-                c["unit"] = n["unit"] if (suffix == "" or suffix.isdigit()) else ""
-                if suffix == "":
-                    c["description"] = n["description"]
-                elif suffix.isdigit():
-                    c["description"] = "%s %s" % (n["description"], suffix)
-                    c["family"] = n["prefix"]
-                else:
-                    c["description"] = "%s, status word %s" % (n["description"], suffix)
-                break
-    return channels
+            if not c["channel"].startswith(n["prefix"]):
+                continue
+            suffix = c["channel"][len(n["prefix"]):]
+            c["hidden"] = n["name"] == "-"
+            name = "" if c["hidden"] else n["name"]
+            if suffix == "":
+                c.update(name=name, description=n["description"], unit=n["unit"],
+                         codes=parse_codes(n["codes"]), overview=n["overview"] == "1")
+            elif suffix.isdigit():
+                c.update(description="%s %s" % (n["description"], suffix), unit=n["unit"],
+                         family=n["prefix"], number=int(suffix), codes=parse_codes(n["codes"]))
+            else:  # e.g. a command register next to a described value
+                c.update(name=name, description="%s, register %s" % (n["description"], suffix))
+            break
+        c["label"] = ("%s %s" % (c["name"], c["description"])).strip()
+    return channels, titles
 
 
-CHANNELS = load_channels()
+CHANNELS, DEVICE_TITLES = load_channels()
 BY_NAME = {c["channel"]: c for c in CHANNELS}
 
 
@@ -101,7 +118,13 @@ def poll_loop():
 
 
 # ------------------------------------------------------- text for the model
-MAX_SNAPSHOT_CHARS = 2500  # the Genie model service fails on prompts much longer than ~3000 characters
+# The Genie model service (4096-token context) fails on prompts much longer than ~3000
+# characters, hence the default. A llama.cpp model with a larger context can take more.
+MAX_SNAPSHOT_CHARS = CONFIG.get("max_snapshot_chars", 2500)
+
+# Usual residual-gas assignment of the main masses, given to the model with the RGA peaks.
+GASES = {1: "H", 2: "H2", 4: "He", 12: "C", 14: "N", 15: "CH3", 16: "CH4/O", 17: "OH", 18: "H2O", 20: "Ne/Ar++",
+         28: "N2/CO", 32: "O2", 40: "Ar", 44: "CO2"}
 
 
 def fmt(c, v):
@@ -112,6 +135,9 @@ def fmt(c, v):
             text = "%.1f" % v
     else:
         text = "%d" % v
+        if c["codes"]:
+            # the number, then its meaning as shown on the panel
+            text += " (%s)" % c["codes"].get(int(v), "no valid value" if int(v) == 255 else "unknown code")
     return text + (" " + c["unit"] if c["unit"] else "")
 
 
@@ -123,73 +149,89 @@ def device_down(device, values):
     return False
 
 
-NUMBERED = re.compile(r"^(.*?)(\d+)([A-Z_]*)$")
-
-
 KEYWORDS = {
-    "MG": "gauge gauges pressure pressures maxigauge vacuum g21 g22 ga4",
-    "XGS": "gauge gauges pressure pressures xgs vacuum ga2 degas",
-    "SICEM": "bake bakeout bake-out temperature temperatures sicem setpoint setpoints heating heater",
-    "DCU": "turbo p21 pump pumps pumping speed rotation power hours",
-    "M1": "valve valves v21 v22 v23 v1 bypass air compressed dry p22 pump pumps pumping open closed",
-    "M2": "sicem alarm alarms channel module",
-    "TCMUX": "thermocouple thermocouples temperature temperatures tcmux multiplexer",
-    "ROT": "rotor spinning ga5 gauge gauges pressure pressures vacuum",
-    "LEYSPEC": "rga gas gases mass masses spectrum filament leyspec ga3 residual partial water hydrogen nitrogen leak sem faraday scan",
+    "MG": "gauge gauges pressure pressures maxigauge vacuum",
+        "SICEM": "bake bakeout bake-out temperature temperatures sicem setpoint setpoints heating heater ramp",
+    "DCU": "turbo pump pumps pumping speed rotation power hours standby",
+    "M1": "valve valves air compressed dry pump pumps pumping open closed",
+    "M2": "sicem alarm alarms channel heating bake bakeout bake-out",
+    "TCMUX": "thermocouple thermocouples temperature temperatures rack multiplexer",
+    "ROT": "rotor spinning gauge gauges pressure pressures vacuum",
+    "LEYSPEC": "rga gas gases mass masses spectrum filament leyspec residual partial water hydrogen nitrogen leak sem faraday scan",
 }
 
 
+def shown(c):
+    """Channels given to the model: no command registers, no unused channels."""
+    return c["access"] not in ("TRIGGER", "COM_STATUS") and not c["hidden"]
+
+
 def device_sections(values):
-    """One compact block of text per device. Channels with their own description get one
-    line each; numbered families (SICEM_T1..12, MG_PR1ST..6ST, ...) are folded into one line."""
+    """One compact block of text per device. A described channel gets one line,
+    'panel name, what it is [CHANNEL] = value (meaning of the code)'; numbered families
+    (SICEM_T1..12, TCMUX_TEMP0..8) are folded into one line."""
     sections = {}
-    devices = []
     for c in CHANNELS:
-        if c["device"] not in devices:
-            devices.append(c["device"])
-    for dev in devices:
-        lines = sections.setdefault(dev, [])
+        if shown(c):  # a device with nothing to show (e.g. the XGS controller, gauge not installed) is left out
+            sections.setdefault(c["device"], [])
+    for dev, lines in sections.items():
+        title = DEVICE_TITLES.get(dev, dev)
         if device_down(dev, values):
-            lines.append("[%s] NOT COMMUNICATING: no valid values." % dev)
+            lines.append("[%s] NOT COMMUNICATING: no valid values." % title)
             continue
-        lines.append("[%s] communicating" % dev)
-        groups, order = {}, []
+        lines.append("[%s] communicating" % title)
+        families = {}
         for c in CHANNELS:
-            if c["device"] != dev or c["access"] in ("TRIGGER", "COM_STATUS"):
+            if c["device"] != dev or not shown(c) or (dev == "LEYSPEC" and c["element"].isdigit()):
                 continue
-            if dev == "LEYSPEC" and c["element"].isdigit():
-                continue
-            m = NUMBERED.match(c["channel"])
-            own_note = c["family"] == c["channel"] and c["description"] and "status word" not in c["description"]
-            if m and not own_note:
-                key = "%s<n>%s" % (m.group(1), m.group(3))
-                if key not in groups:
-                    groups[key] = []
-                    order.append(("group", key))
-                groups[key].append((int(m.group(2)), c))
+            if c["family"]:
+                if c["family"] not in families:
+                    families[c["family"]] = []
+                    lines.append(families[c["family"]])  # placeholder, filled below
+                families[c["family"]].append(c)
             else:
-                order.append(("single", c))
-        for kind, item in order:
-            if kind == "single":
-                c = item
-                lines.append(" %s (%s) = %s" % (c["channel"], c["description"] or "?", fmt(c, values[c["channel"]])))
-            else:
-                members = sorted(groups[item], key=lambda x: x[0])
-                c0 = members[0][1]
-                what = "status words" if "status word" in c0["description"] or not c0["description"] else c0["description"].rsplit(" ", 1)[0]
-                unit = c0["unit"]
-                vals = ", ".join("%d:%s" % (n, fmt(c, values[c["channel"]]).replace(" " + unit, "") if unit else fmt(c, values[c["channel"]])) for n, c in members)
-                lines.append(" %s (%s%s) n:value = %s" % (item, what, ", " + unit if unit else "", vals))
+                lines.append(" %s [%s] = %s" % (c["label"] or "?", c["channel"], fmt(c, values[c["channel"]])))
+        for i, item in enumerate(lines):
+            if isinstance(item, list):
+                c0 = item[0]
+                what = c0["description"].rsplit(" ", 1)[0]
+                vals = ", ".join("%d:%s" % (c["number"], fmt(c, values[c["channel"]]).replace(" " + c["unit"], "")) for c in item)
+                lines[i] = " %s [%s<n>]%s, as n:value = %s" % (what, c0["family"], " in " + c0["unit"] if c0["unit"] else "", vals)
         if dev == "LEYSPEC":
             masses = [(values[c["channel"]], int(c["element"])) for c in CHANNELS if c["device"] == dev and c["element"].isdigit()]
             masses.sort(reverse=True)
-            lines.append(" RGA highest partial pressures (mass:mbar) = %s" % ", ".join("%d:%.1e" % (m, p) for p, m in masses[:6]))
+            peak = lambda p, m: "mass %d%s %.1e mbar" % (m, " (%s)" % GASES[m] if m in GASES else "", p)
+            # The ranking is done here: the model is not reliable at comparing exponents.
+            lines.append(" Ga3 RGA dominant gas (highest partial pressure) = %s" % peak(*masses[0]))
+            lines.append(" Ga3 RGA next peaks, in decreasing order = %s" % ", ".join(peak(p, m) for p, m in masses[1:6]))
     return sections
 
 
+PROBLEM = re.compile(r"^(?!no alarm|no error).*(fail|error|alarm|excess|discordance|range|no sensor|no valid|unknown|fault|malfunction)", re.I)
+
+# Words of a question that say nothing about which device it concerns.
+STOPWORDS = set("what which with this that there from have does show give tell value values current status state "
+                "read reading panel through between module instrument link code flag".split())
+
+
+def device_vocabulary(dev):
+    """Words that point at a device: its keywords, the panel names of its items (g21, v21, p21...)
+    and the words of their descriptions."""
+    words = set(KEYWORDS.get(dev, "").split())
+    for c in CHANNELS:
+        if c["device"] == dev and shown(c):
+            words |= set(c["name"].lower().split())
+            words |= set(w for w in re.findall(r"[a-z0-9-]{4,}", c["description"].lower()))
+    return words - STOPWORDS
+
+
+VOCABULARY = {dev: device_vocabulary(dev) for dev in dict.fromkeys(c["device"] for c in CHANNELS)}
+
+
 def snapshot_text(question=""):
-    """Text given to the model: a short overview (all pressures, devices not communicating),
-    then the full blocks of the devices most relevant to the question, within the size limit."""
+    """Text given to the model: a short overview (all pressures, main states, devices not
+    communicating), then the full blocks of the devices most relevant to the question,
+    within the size limit."""
     values, updated, error = STATE.get()
     if not values:
         return "NO DATA: the panel has not been read yet (%s)." % error
@@ -198,46 +240,73 @@ def snapshot_text(question=""):
     if error:
         head.append("WARNING: last read failed (%s); values may be stale." % error)
     down = [d for d in sections if device_down(d, values)]
-    head.append("Devices not communicating: %s." % (", ".join(down) if down else "none"))
-    press = ["%s=%s" % (c["channel"], fmt(c, values[c["channel"]]).replace(" mbar", ""))
-             for c in CHANNELS if c["unit"] == "mbar" and c["device"] not in down and not c["element"].isdigit() or
-             (c["unit"] == "mbar" and c["device"] not in down and c["device"] != "LEYSPEC")]
-    head.append("All pressures (mbar): %s" % ", ".join(press))
+    if down:
+        head.append("Devices NOT COMMUNICATING: %s. The other %d devices are communicating."
+                    % ("; ".join(DEVICE_TITLES.get(d, d) for d in down), len(sections) - len(down)))
+    else:
+        head.append("Devices not communicating: none. All %d devices are communicating." % len(sections))
+    # Checked here rather than by the model, which sees only part of the values.
+    bad = ["%s=%s" % (c["label"], fmt(c, values[c["channel"]])) for c in CHANNELS
+           if shown(c) and c["codes"] and c["device"] not in down
+           and PROBLEM.search(c["codes"].get(int(values[c["channel"]]), "unknown"))]
+    head.append("States meaning a problem (fail, error, alarm, excess, out of range), over ALL devices: %s"
+                % ("; ".join(bad) if bad else "none."))
+    over = [c for c in CHANNELS if c["overview"] and c["device"] not in down]
+    head.append("Pressures (mbar): %s" % ", ".join(
+        "%s=%s" % (c["name"], fmt(c, values[c["channel"]]).replace(" mbar", "")) for c in over if c["unit"] == "mbar"))
+    head.append("Main states: %s" % ", ".join(
+        "%s=%s" % (c["label"], fmt(c, values[c["channel"]])) for c in over if c["unit"] != "mbar"))
     words = set(re.findall(r"[a-z0-9-]{2,}", question.lower()))
     scores = {}
+    words |= set(w[:-1] for w in words if w.endswith("s"))
     for i, dev in enumerate(sections):
-        text = "\n".join(sections[dev]).lower()
-        score = 3 * len(words & set(KEYWORDS.get(dev, "").split()))
-        score += sum(1 for w in words if len(w) >= 3 and w in text)
-        scores[dev] = (-score, i)
+        scores[dev] = (-len(words & VOCABULARY[dev]), i)
     out = "\n".join(head)
     left_out = []
+    room = MAX_SNAPSHOT_CHARS - 250  # keep room for the closing line
+    # If the question points at some devices, give only those: less text, fewer mix-ups.
+    targeted = any(s[0] < 0 for s in scores.values())
     for dev in sorted(sections, key=lambda d: scores[d]):
         block = "\n".join(sections[dev])
-        if len(out) + 1 + len(block) <= MAX_SNAPSHOT_CHARS:
+        if (scores[dev][0] < 0 or not targeted) and len(out) + 1 + len(block) <= room:
             out += "\n" + block
         else:
-            left_out.append(dev)
+            left_out.append(DEVICE_TITLES.get(dev, dev))
     if left_out:
-        out += "\n(Details of %s not shown for lack of room.)" % ", ".join(left_out)
+        out += "\n(Details not shown here: %s.)" % "; ".join(left_out)
     return out
 
 
 SYSTEM_PROMPT = (
-    "You are a read-only assistant for a vacuum system (tube 1500 West). "
-    "You are given the current values read from its control panel. "
-    "Answer the operator's question using only these values. "
-    "Quote the channel name and the value with its unit when you use one. "
-    "Pressures are in mbar. A status word is a raw code: report the number, do not guess its meaning. "
-    "A device marked NOT COMMUNICATING has no valid values. "
-    "If the values do not contain the answer, say so. "
-    "You cannot send commands or change anything: if asked to open, close, start, stop, switch or set "
-    "something, reply that you are read-only and cannot do it, then give the current related value. "
-    "Do not say that something is normal, good or faulty from a status word alone. Be concise."
+    "You are the read-only assistant of a vacuum system, the tube 1500 West. "
+    "With each question you receive the values just read from its control panel.\n"
+    "How to read them: each line is 'name on the panel, what it is [CHANNEL] = value'. "
+    "For a state, the value is a code followed by its meaning in brackets, e.g. '1 (open)'. "
+    "Gauges are G21, G22, G4, G5, Ga4, Ga5; Ga3 is the residual gas analyser (RGA); "
+    "valves are V1, V21, V22; P21 is the turbo pump, P22 the dry pump.\n"
+    "Rules:\n"
+    "1. Answer only from these values. If they do not contain the answer, say so.\n"
+    "2. Find the item by the name the operator uses (e.g. Ga4), never by a similar channel number.\n"
+    "3. Quote the panel name, the value and its unit; for a state give the meaning in brackets, not only the code.\n"
+    "4. For any question about alarms, faults or problems, use the line 'States meaning a problem': it covers "
+    "all devices. Never invent a meaning, a limit or a cause. You may call something a problem only if its meaning says so "
+    "(fail, error, alarm, excess) or a device is NOT COMMUNICATING. No limits are given for pressures and "
+    "temperatures: report them without judging them.\n"
+    "5. You cannot send commands. If the operator asks you to open, close, start, stop, switch or set "
+    "something, your answer must begin with 'I am read-only and cannot send commands.' and then give the "
+    "current state of that item.\n"
+    "6. Be brief: answer the question and stop. No summary, no conclusion, no repetition."
 )
 
-llm = LargeLanguageModel(system_prompt=SYSTEM_PROMPT)
+# Low temperature: the answers must repeat measured values, not be creative.
+llm = LargeLanguageModel(system_prompt=SYSTEM_PROMPT, temperature=CONFIG.get("temperature", 0.2))
 llm_lock = threading.Lock()
+
+
+# A request to act gets a fixed first sentence, whatever the model writes.
+COMMAND = re.compile(r"^\s*(please\s+|can you\s+|could you\s+|will you\s+|now\s+)*"
+                     r"(open|close|shut|start|stop|switch|turn|set|enable|disable|vent|pump|bake|heat|reset|degas|run)\b", re.I)
+READ_ONLY = "I am read-only and cannot send commands."
 
 
 def ask(q: str = ""):
@@ -245,7 +314,14 @@ def ask(q: str = ""):
     if not q:
         return {"error": "empty question"}
     snap = snapshot_text(q)
-    prompt = "CURRENT VALUES\n%s\n\nQUESTION\n%s" % (snap, q)
+    command = bool(COMMAND.match(q))
+    if command:
+        # Do not let the model discuss the action: it only reports the item concerned.
+        task = ('The operator asked: "%s". This cannot be done from here. In one sentence, give only the '
+                'current state of the item concerned, with its panel name.' % q)
+    else:
+        task = q
+    prompt = "CURRENT VALUES\n%s\n\nQUESTION\n%s" % (snap, task)
     t0 = time.time()
     with llm_lock:
         answer, last = None, None
@@ -262,6 +338,8 @@ def ask(q: str = ""):
                 time.sleep(10)
         if answer is None:
             return {"error": "model error: %s" % last}
+    if command and "read-only" not in answer.lower():
+        answer = "%s %s" % (READ_ONLY, answer)
     return {"question": q, "answer": answer, "seconds": round(time.time() - t0, 1), "snapshot": snap}
 
 
@@ -272,7 +350,7 @@ def state():
         if c["device"] == "LEYSPEC" and c["element"].isdigit():
             continue
         if c["channel"] in values:
-            rows.append({"channel": c["channel"], "description": c["description"], "access": c["access"],
+            rows.append({"channel": c["channel"], "description": c["label"], "access": c["access"],
                          "value": fmt(c, values[c["channel"]])})
     return {"panel": "%s:%s" % (CONFIG["panel_host"], CONFIG["panel_port"]),
             "label": CONFIG.get("panel_label", ""),

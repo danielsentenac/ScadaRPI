@@ -1,0 +1,31 @@
+=== qwen35-9b-t02  Fri Nov 20 17:15:22 UTC 2026
+Q: None
+A: model error: Could not load model 'llamacpp:unsloth/Qwen3.5-9B-GGUF/Qwen3.5-9B-Q4_K_M'. This could be due to a potential memory exhaustion on NPU sessions or unsupported model type. Please check the logs of the models runner 'llamacpp-models-runner' for details.
+   [None s, 0 words, 0 chars of values]
+
+Q: None
+A: model error: Could not load model 'llamacpp:unsloth/Qwen3.5-9B-GGUF/Qwen3.5-9B-Q4_K_M'. This could be due to a potential memory exhaustion on NPU sessions or unsupported model type. Please check the logs of the models runner 'llamacpp-models-runner' for details.
+   [None s, 0 words, 0 chars of values]
+
+Q: None
+A: model error: Could not load model 'llamacpp:unsloth/Qwen3.5-9B-GGUF/Qwen3.5-9B-Q4_K_M'. This could be due to a potential memory exhaustion on NPU sessions or unsupported model type. Please check the logs of the models runner 'llamacpp-models-runner' for details.
+   [None s, 0 words, 0 chars of values]
+
+Q: None
+A: model error: Could not load model 'llamacpp:unsloth/Qwen3.5-9B-GGUF/Qwen3.5-9B-Q4_K_M'. This could be due to a potential memory exhaustion on NPU sessions or unsupported model type. Please check the logs of the models runner 'llamacpp-models-runner' for details.
+   [None s, 0 words, 0 chars of values]
+
+Traceback (most recent call last):
+  File "<string>", line 3, in <module>
+  File "/usr/lib/python3.12/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)

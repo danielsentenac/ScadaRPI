@@ -1,0 +1,98 @@
+=== qwen35-4b  Fri Nov 20 17:03:37 UTC 2026
+Q: What are the pressures on all gauges?
+A: The pressures on the gauges are:
+*   **MG_PR1**: 2.09e-02 mbar
+*   **MG_PR2**: 4.49e-07 mbar
+*   **MG_PR3**: 3.08e-07 mbar
+*   **MG_PR4**: 0.00e+00 mbar
+*   **MG_PR5**: 0.00e+00 mbar
+*   **MG_PR6**: 0.00e+00 mbar
+*   **XGS_PR7**: 2.82e-07 mbar
+*   **ROT_PR1**: 3.01e-07 mbar
+
+I am read-only and cannot send commands or change anything.
+   [30.1 s, 48 words, 2358 chars of values]
+
+Q: Is the turbo pump running normally?
+A: The turbo pump P21 rotation speed is **DCU_P21SPEED = 1000 Hz** and its set speed is **DCU_P21FSPEED = 1000 Hz**. Its drive power is **DCU_P21PWR = 18 W**.
+
+Regarding its status: **DCU_P21ST = 1** (operating), **DCU_P21STYST = 1** (standby), **DCU_P21TPST = 1**, **DCU_P21BTPST = 1**, and **DCU_P21BERR = 1**.
+
+I am read-only and cannot verify if "normal" operation exists based solely on these status words without knowing their specific meaning.
+
+**Current Values:**
+*   DCU_P21SPEED = 1000 Hz
+*   DCU_P21FSPEED = 1000 Hz
+*   DCU_P21PWR = 18 W
+*   DCU_P21ST = 1
+*   DCU_P21STYST = 1
+*   DCU_P21TPST = 1
+*   DCU_P21BTPST = 1
+*   DCU_P21BERR = 1
+   [33.5 s, 107 words, 2449 chars of values]
+
+Q: Which gas dominates the residual gas spectrum?
+A: Based on the provided values for the Leybold LEYSPEC RGA partial pressures (mass:mbar):
+*   Mass 18: 2.0e-07 mbar
+*   Mass 17: 5.0e-08 mbar
+*   Mass 28: 3.0e-08 mbar
+*   Mass 2: 9.9e-09 mbar
+*   Mass 44: 7.9e-09 mbar
+*   Mass 32: 2.0e-09 mbar
+
+The channel `LEYSPEC_RGA_partial_pressure` shows that mass 18 has the highest value (2.0e-07 mbar), followed by mass 17. Therefore, the gas corresponding to mass 18 dominates the residual gas spectrum.
+   [23.2 s, 72 words, 2552 chars of values]
+
+Q: What are the bake-out temperatures?
+A: The bake-out controller multiplexed thermocouple temperatures are:
+SICEM_TCMUX_T1=22.2 degC
+SICEM_TCMUX_T2=22.1 degC
+SICEM_TCMUX_T3=22.1 degC
+SICEM_TCMUX_T4=21.8 degC
+SICEM_TCMUX_T5=22.1 degC
+SICEM_TCMUX_T6=22.0 degC
+SICEM_TCMUX_T7=22.2 degC
+SICEM_TCMUX_T8=22.1 degC
+SICEM_TCMUX_T9=21.9 degC
+
+The Sicem bake-out channel temperatures are:
+SICEM_T1=21.8 degC
+SICEM_T2=21.8 degC
+SICEM_T3=22.0 degC
+SICEM_T4=22.2 degC
+SICEM_T5=21.8 degC
+SICEM_T6=21.8 degC
+SICEM_T7=22.0 degC
+SICEM_T8=21.9 degC
+SICEM_T9=21.8 degC
+SICEM_T10=21.8 degC
+SICEM_T11=22.0 degC
+SICEM_T12=21.9 degC
+
+The current Sicem temperature step is SICEM_TEMPSTEP=22.1 degC.
+
+I am read-only and cannot change these temperatures.
+   [41.3 s, 71 words, 2496 chars of values]
+
+Q: Open valve V21
+A: I am read-only and cannot open valve V21. The current status of Valve V21 is 1.
+   [6.4 s, 16 words, 2494 chars of values]
+
+Q: What is the status of the valves?
+A: The status of the valves is as follows:
+*   M1_V21ST (Valve V21 status): 1
+*   M1_V22ST (Valve V22 status): 1
+*   M1_V23ST (Valve V23 status): 1
+*   M1_V1ST (Valve V1 status): 1
+
+I am read-only and cannot change the valve status.
+   [13.9 s, 41 words, 2496 chars of values]
+
+Q: Is any instrument not communicating?
+A: No. There are no instruments not communicating.
+   [4.9 s, 7 words, 2494 chars of values]
+
+Q: Compare the pressure on gauge Ga2 with the RGA total pressure.
+A: The pressure on gauge Ga2 (MG_PR2) is 4.52e-07 mbar. The RGA total pressure (LEYSPEC_TP) is 3.00e-07 mbar.
+   [9.0 s, 17 words, 2459 chars of values]
+

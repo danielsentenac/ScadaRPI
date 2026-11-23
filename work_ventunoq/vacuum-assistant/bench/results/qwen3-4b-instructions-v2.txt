@@ -1,0 +1,65 @@
+=== instr-final  Mon Nov 23 08:45:16 UTC 2026
+Q: What are the pressures on all gauges?
+A: The pressures on all gauges are:
+
+- G22: 2.10e-02 mbar  
+- G21: 4.52e-07 mbar  
+- Ga4: 3.12e-07 mbar  
+- Ga2: 2.78e-07 mbar  
+- Ga5: 2.99e-07 mbar  
+- Ga3: 3.02e-07 mbar  
+
+These values are directly provided in the data.
+   [9.2 s, 38 words, 2418 chars of values]
+
+Q: Is the turbo pump running normally?
+A: Yes, the turbo pump is running normally.
+
+- The turbo pump (P21) is **on** (state = 1), which means it is operating.
+- The **rotation speed** is 1000 Hz, matching the nominal (set) speed — indicating normal operation.
+- The **error code** is 0 (no error), and the **electronics and temperature** are both "0 (OK)" — no faults detected.
+- The **rotation speed** is stable and within expected parameters.
+
+Thus, the turbo pump is running normally.
+   [8.3 s, 76 words, 1780 chars of values]
+
+Q: Which gas dominates the residual gas spectrum?
+A: The gas that dominates the residual gas spectrum is mass 18 (H₂O) with a partial pressure of 2.0e-07 mbar.
+   [3.1 s, 19 words, 1695 chars of values]
+
+Q: What are the bake-out temperatures?
+A: The bake-out temperatures are:
+
+- Bake-out channel temperature: 22.2°C (channel 1), 22.0°C (channel 2), 22.2°C (channel 3), 22.0°C (channel 4), 22.1°C (channel 5), 22.2°C (channel 6), 22.0°C (channel 7), 22.0°C (channel 8), 22.0°C (channel 9), 21.9°C (channel 10), 22.1°C (channel 11), 21.9°C (channel 12)
+
+- Bake-out ramp maximum temperature: 21.8°C
+
+Thus, the bake-out temperatures are **21.8°C to 22.2°C**.
+   [14.5 s, 58 words, 2373 chars of values]
+
+Q: Open valve V21
+A: I am read-only and cannot send commands. The current state of valve V21 is 1 (open).
+   [1.6 s, 16 words, 1266 chars of values]
+
+Q: What is the status of the valves?
+A: The status of the valves is:
+
+- V21 valve = 1 (open)  
+- V22 valve = 1 (open)  
+- V23 valve = 2 (closed)  
+- V1 valve = 1 (open)  
+
+Thus, the valves are: V21 open, V22 open, V23 closed, and V1 open.
+   [5.8 s, 43 words, 1266 chars of values]
+
+Q: Is any instrument not communicating?
+A: No instrument is not communicating. All 9 devices are communicating.
+   [2.1 s, 10 words, 2475 chars of values]
+
+Q: Compare the pressure on gauge Ga2 with the RGA total pressure.
+A: The pressure on gauge Ga2 is **2.77e-07 mbar**.  
+The RGA total pressure is **2.98e-07 mbar**.  
+
+Thus, the pressure on Ga2 is slightly lower than the RGA total pressure.
+   [5.2 s, 28 words, 2418 chars of values]
+

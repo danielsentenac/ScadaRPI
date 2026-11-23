@@ -1,7 +1,8 @@
-# Read-only vacuum assistant for the vactube1500w panel (work_tube1500w).
 name: vacuum-assistant
-icon: 🔬
 description: Local LLM answering questions from the live values of the vactube1500w panel (read-only Modbus TCP)
+ports: []
 bricks:
-  - "arduino:llm"
-  - "arduino:web_ui"
+- arduino:llm:
+    model: genie:qwen3_4b_instruct_2507
+- arduino:web_ui: {}
+icon: 🔬

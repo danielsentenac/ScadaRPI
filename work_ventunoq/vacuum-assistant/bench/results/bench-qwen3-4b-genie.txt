@@ -1,0 +1,83 @@
+=== qwen3-4b-genie  Fri Nov 20 16:58:16 UTC 2026
+Q: What are the pressures on all gauges?
+A: The pressures on all gauges are:
+
+MG_PR1 = 2.09e-02 mbar  
+MG_PR2 = 4.54e-07 mbar  
+MG_PR3 = 3.10e-07 mbar  
+MG_PR4 = 0.00e+00 mbar  
+MG_PR5 = 0.00e+00 mbar  
+MG_PR6 = 0.00e+00 mbar  
+XGS_PR7 = 2.79e-07 mbar  
+ROT_PR1 = 2.99e-07 mbar
+   [18.3 s, 38 words, 2358 chars of values]
+
+Q: Is the turbo pump running normally?
+A: The turbo pump is running, but not normally.
+
+The status word for turbo pump P21 is **1** for all relevant parameters:
+- DCU_P21ST = 1 (status)
+- DCU_P21STYST = 1 (standby status)
+- DCU_P21BERR = 1 (error status)
+
+A value of 1 for error status indicates an error condition. The turbo pump is operating, but with an error, so it is not running normally.
+   [8.6 s, 64 words, 2449 chars of values]
+
+Q: Which gas dominates the residual gas spectrum?
+A: The gas that dominates the residual gas spectrum is the one with the highest partial pressure.
+
+From the RGA (Residual Gas Analyzer) data:
+- The highest partial pressure is 2.0e-07 mbar at mass 18.
+
+Thus, the gas with mass 18 dominates the residual gas spectrum.
+
+Answer: mass 18 (2.0e-07 mbar)
+   [7.1 s, 50 words, 2552 chars of values]
+
+Q: What are the bake-out temperatures?
+A: The bake-out temperatures are:
+
+SICEM_T<n> (Sicem bake-out channel temperature, degC):  
+1:22.1, 2:22.0, 3:22.0, 4:21.8, 5:22.2, 6:22.1, 7:21.9, 8:21.9, 9:21.9, 10:22.0, 11:21.9, 12:22.0  
+
+SICEM_SET<n> (setpoint): all at 20.0 degC  
+
+SICEM_TEMPSTEP: 21.9 degC  
+SICEM_TEMPMAX: 22.1 degC  
+SICEM_TIMEINTER: 21.9  
+SICEM_TIME: 21.8  
+
+Thus, the bake-out temperatures are the values listed under SICEM_T<n> for channels 1–12.
+   [16.8 s, 51 words, 2496 chars of values]
+
+Q: Open valve V21
+A: You are read-only and cannot open, close, start, stop, switch, or set anything.  
+
+Current value for M1_V21ST (Valve V21 status) = 1  
+
+You cannot open valve V21.
+   [4.9 s, 27 words, 2494 chars of values]
+
+Q: What is the status of the valves?
+A: The status of the valves is:
+
+M1_V21ST = 1  
+M1_V22ST = 1  
+M1_V23ST = 1  
+M1_V1ST = 1  
+M1_BYPASSST = 0  
+M1_COMPRESSAIRST = 1  
+M1_P22ST = 1
+   [6.6 s, 27 words, 2496 chars of values]
+
+Q: Is any instrument not communicating?
+A: No instrument is not communicating.
+   [1.7 s, 5 words, 2494 chars of values]
+
+Q: Compare the pressure on gauge Ga2 with the RGA total pressure.
+A: MG_PR2 = 4.52e-07 mbar  
+LEYSPEC_TP = 2.98e-07 mbar  
+
+The pressure on gauge Ga2 (MG_PR2) is higher than the RGA total pressure (LEYSPEC_TP).
+   [5.4 s, 22 words, 2459 chars of values]
+

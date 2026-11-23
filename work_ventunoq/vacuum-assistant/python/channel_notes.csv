@@ -1,56 +1,76 @@
-prefix,description,unit
-MG_PR1,Pfeiffer MaxiGauge gauge G22 pressure,mbar
-MG_PR2,Pfeiffer MaxiGauge gauge G21 pressure,mbar
-MG_PR3,Pfeiffer MaxiGauge gauge Ga4 pressure,mbar
-MG_PR4,Pfeiffer MaxiGauge channel 4 pressure,mbar
-MG_PR5,Pfeiffer MaxiGauge channel 5 pressure,mbar
-MG_PR6,Pfeiffer MaxiGauge channel 6 pressure,mbar
-MG_COMST,MaxiGauge communication,
-XGS_PR7,XGS-600 gauge Ga2 pressure,mbar
-XGS_GA4COMST,XGS-600 communication,
-SICEM_TCMUX_T,Sicem bake-out controller multiplexed thermocouple,degC
-SICEM_T,Sicem bake-out channel temperature,degC
-SICEM_SETP,Sicem bake-out channel temperature setpoint,degC
-SICEM_TEMPSTEP,Sicem temperature step,degC
-SICEM_TEMPMAX,Sicem maximum temperature,degC
-SICEM_TIMEINTER,Sicem time interval,
-SICEM_TIME,Sicem time,
-SICEM_COMST,Sicem communication,
-DCU_P21SPEED,Turbo pump P21 rotation speed,Hz
-DCU_P21FSPEED,Turbo pump P21 set rotation speed,Hz
-DCU_P21HR,Turbo pump P21 operating hours,h
-DCU_P21PWR,Turbo pump P21 drive power,W
-DCU_P21BTPST,Turbo pump P21 bearing temperature status,
-DCU_P21TPST,Turbo pump P21 temperature status,
-DCU_P21ST,Turbo pump P21 status,
-DCU_P21STYST,Turbo pump P21 standby status,
-DCU_P21BERR,Turbo pump P21 error status,
-DCU_P21COMST,Turbo pump P21 controller communication,
-M1_V21ST,Valve V21 status,
-M1_V22ST,Valve V22 status,
-M1_V23ST,Valve V23 status,
-M1_V1ST,Valve V1 status,
-M1_BYPASSST,Bypass status,
-M1_COMPRESSAIRST,Compressed air status,
-M1_P22ST,Dry pump P22 status,
-M1_COMST,Pumping module M1 communication,
-M2_CHANNEL_1_ONOFF_ST,Sicem module channel 1 on/off status,
-M2_CHANNEL_2_ONOFF_ST,Sicem module channel 2 on/off status,
-M2_SICEM_ALRM_ST,Sicem alarm status,
-M2_SICEM_COMERR_ST,Sicem communication error status,
-M2_MUXSHIELD_COMERR_ST,Thermocouple multiplexer communication error status,
-M2_COMST,Sicem module M2 communication,
-TCMUX_TEMP,Thermocouple multiplexer temperature,degC
-TCMUX_COMST,Thermocouple multiplexer communication,
-ROT_PR1,MKS spinning rotor gauge Ga5 pressure,mbar
-ROT_GA5COMST,Spinning rotor gauge communication,
-LEYSPEC_TP,Leybold LEYSPEC RGA (Ga3) total pressure,mbar
-LEYSPEC_RUNNING,RGA scan running (1 = yes),
-LEYSPEC_EMISSION,RGA filament emission (1 = on),
-LEYSPEC_SEMHV,RGA SEM high voltage (1 = on),
-LEYSPEC_RF,RGA RF generator (1 = on),
-LEYSPEC_ERROR,RGA error flag,
-LEYSPEC_ERRORCODE,RGA error code,
-LEYSPEC_FILAMENT,RGA selected filament (1 or 2),
-LEYSPEC_MODE,RGA detector (0 = Faraday; 1 = SEM),
-LEYSPEC_COMST,RGA communication,
+prefix,name,description,unit,codes,overview
+@MG,,Pfeiffer MaxiGauge gauge controller,,,
+@XGS,,Agilent XGS-600 hot-cathode gauge controller,,,
+@ROT,,MKS spinning rotor gauge,,,
+@SICEM,,Sicem bake-out temperature controller,,,
+@DCU,,Pfeiffer DCU turbo pump controller,,,
+@M1,,"Pumping module M1 (valves, bypass, compressed air, dry pump)",,,
+@M2,,Bake-out module M2 (Sicem heating channels and alarms),,,
+@TCMUX,,Rack thermocouple multiplexer,,,
+@LEYSPEC,,Leybold LEYSPEC residual gas analyser (RGA),,,
+MG_PR1,G22,pressure,mbar,,1
+MG_PR2,G21,pressure,mbar,,1
+MG_PR3,Ga4,pressure,mbar,,1
+MG_PR1ST,G22,reading status,,0=pressure OK|1=underrange|2=overrange|3=sensor error|4=sensor off|5=no sensor|6=sensor identification error,
+MG_PR2ST,G21,reading status,,0=pressure OK|1=underrange|2=overrange|3=sensor error|4=sensor off|5=no sensor|6=sensor identification error,
+MG_PR3ST,Ga4,reading status,,0=pressure OK|1=underrange|2=overrange|3=sensor error|4=sensor off|5=no sensor|6=sensor identification error,
+MG_PR1SST,G22,sensor switch,,0=not switchable|1=switched off|2=switched on,
+MG_PR2SST,G21,sensor switch,,0=not switchable|1=switched off|2=switched on,
+MG_PR3SST,Ga4,sensor switch,,0=not switchable|1=switched off|2=switched on,
+MG_PR4,-,unused MaxiGauge channel 4,mbar,,
+MG_PR5,G4,pressure (H2O vapour line),mbar,,1
+MG_PR6,G5,pressure (H2O reservoir),mbar,,1
+MG_PR5ST,G4,reading status,,0=pressure OK|1=underrange|2=overrange|3=sensor error|4=sensor off|5=no sensor|6=sensor identification error,
+MG_PR6ST,G5,reading status,,0=pressure OK|1=underrange|2=overrange|3=sensor error|4=sensor off|5=no sensor|6=sensor identification error,
+MG_PR5SST,G4,sensor switch,,0=not switchable|1=switched off|2=switched on,
+MG_PR6SST,G5,sensor switch,,0=not switchable|1=switched off|2=switched on,
+MG_COMST,,MaxiGauge communication,,0=OK|1=FAIL,
+XGS_PR7,-,Ga2 gauge (not installed; not given to the model),mbar,,
+XGS_GA4COMST,,XGS-600 communication,,0=OK|1=FAIL,
+ROT_PR1,Ga5,pressure,mbar,,1
+ROT_PR1ST,Ga5,reading status,,0=no valid reading|1=reading valid,
+ROT_GA5COMST,,Spinning rotor gauge communication,,0=OK|1=FAIL,
+SICEM_TCMUX_T,,bake-out thermocouple read through the multiplexer,degC,,
+SICEM_T,,bake-out channel temperature,degC,,
+SICEM_SETP,,bake-out channel temperature setpoint,degC,,
+SICEM_TEMPSTEP,,bake-out ramp temperature step,degC,,
+SICEM_TEMPMAX,,bake-out ramp maximum temperature,degC,,
+SICEM_TIMEINTER,,bake-out ramp time interval,,,
+SICEM_TIME,,bake-out ramp time,,,
+SICEM_COMST,,Sicem communication (panel to module M2 serial link),,0=OK|1=FAIL,
+DCU_P21SPEED,P21,turbo pump rotation speed,Hz,,1
+DCU_P21FSPEED,P21,turbo pump nominal (set) rotation speed,Hz,,
+DCU_P21HR,P21,turbo pump operating hours,h,,
+DCU_P21PWR,P21,turbo pump drive power,W,,
+DCU_P21BTPST,P21,turbo pump electronics temperature,,0=OK|1=excess temperature,
+DCU_P21TPST,P21,turbo pump temperature,,0=OK|1=excess temperature,
+DCU_P21ST,P21,turbo pump,,0=pump off|1=pump on,1
+DCU_P21STYST,P21,turbo pump standby,,0=standby off|1=standby on,
+DCU_P21BERR,P21,turbo pump error code,,0=no error|1=excess rotation speed|2=overvoltage|6=run-up time error|8=connection to electronic drive unit failed|10=internal device fault|21=drive unit does not recognise the pump|41=excess motor current|43=data storage malfunction,
+DCU_P21COMST,,Turbo pump controller communication,,0=OK|1=FAIL,
+M1_V21ST,V21,valve,,0=moving|1=open|2=closed|3=limit switch error|4=moving (discordance)|5=open (discordance)|6=closed (discordance)|7=limit switch error (discordance),1
+M1_V22ST,V22,valve,,0=moving|1=open|2=closed|3=limit switch error|4=moving (discordance)|5=open (discordance)|6=closed (discordance)|7=limit switch error (discordance),1
+M1_V23ST,-,valve V23 (manual; not given to the model),,,
+M1_V1ST,V1,valve,,0=moving|1=open|2=closed|3=limit switch error|4=moving (discordance)|5=open (discordance)|6=closed (discordance)|7=limit switch error (discordance),1
+M1_BYPASSST,-,bypass (not used any more),,,
+M1_COMPRESSAIRST,Compressed air,supply,,0=OK|1=FAIL,
+M1_P22ST,P22,dry pump,,0=pump off|1=pump on,1
+M1_COMST,,Pumping module M1 communication,,0=OK|1=FAIL,
+M2_CHANNEL_1_ONOFF_ST,CH1,Sicem heating channel 1,,0=error|1=on|2=off,
+M2_CHANNEL_2_ONOFF_ST,CH2,Sicem heating channel 2,,0=error|1=on|2=off,
+M2_SICEM_ALRM_ST,Sicem,global alarm,,0=no alarm|1=ALARM,
+M2_SICEM_COMERR_ST,Sicem,link between module M2 and the Sicem instrument,,0=OK|1=FAIL,
+M2_MUXSHIELD_COMERR_ST,Sicem,link between module M2 and its thermocouple multiplexer,,0=OK|1=FAIL,
+M2_COMST,,Bake-out module M2 communication,,0=OK|1=FAIL,
+TCMUX_TEMP,,rack thermocouple temperature,degC,,
+TCMUX_COMST,,Thermocouple multiplexer communication,,0=OK|1=FAIL,
+LEYSPEC_TP,Ga3,RGA total pressure,mbar,,1
+LEYSPEC_RUNNING,Ga3,RGA scan,,0=stopped|1=running,
+LEYSPEC_EMISSION,Ga3,RGA filament emission,,0=off|1=on,
+LEYSPEC_SEMHV,Ga3,RGA SEM high voltage,,0=off|1=on,
+LEYSPEC_RF,Ga3,RGA RF generator,,0=off|1=on,
+LEYSPEC_ERROR,Ga3,RGA error flag,,0=no error|1=error,
+LEYSPEC_ERRORCODE,Ga3,RGA error code,,,
+LEYSPEC_FILAMENT,Ga3,RGA filament in use,,1=filament 1|2=filament 2,
+LEYSPEC_MODE,Ga3,RGA detector,,0=Faraday|1=SEM,
+LEYSPEC_COMST,,RGA communication,,0=OK|1=FAIL,
