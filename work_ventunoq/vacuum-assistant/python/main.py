@@ -429,7 +429,7 @@ def state():
 
 
 # ----------------------------------------------------------- actions and their log
-CONTROL = Controller(CONFIG, BY_NAME, STATE.get, device_down, os.path.join(os.path.dirname(HERE), "data"))
+CONTROL = Controller(CONFIG, BY_NAME, STATE.get, device_down, os.path.join(os.path.dirname(HERE), "data"), fmt)
 
 
 def log(since: int = -1):
@@ -443,6 +443,8 @@ def action(name: str = ""):
         return CONTROL.start("SAFETY", CONTROL.seq_safety, preempt=True)
     if name == "baking":
         return CONTROL.start("BACKGROUND BAKING", CONTROL.seq_baking)
+    if name == "report":
+        return CONTROL.start("VACUUM REPORT", CONTROL.seq_report)
     if name == "stop":
         return CONTROL.stop()
     return {"ok": False, "message": "unknown action"}
@@ -457,6 +459,20 @@ def file(name: str = ""):
     return CONTROL.read_file(name)
 
 
+def reports():
+    """Names of the saved vacuum status reports, newest first."""
+    return CONTROL.reports()
+
+
+def report_file(name: str = "", format: str = "png"):
+    """One saved report, as an image (png), a document (pdf) or its data (json)."""
+    from fastapi.responses import FileResponse, JSONResponse
+    path = CONTROL.report_path(name, format)
+    if not path:
+        return JSONResponse({"error": "no such report"}, status_code=404)
+    return FileResponse(path, filename=os.path.basename(path), content_disposition_type="inline")
+
+
 def status():
     return {"job": CONTROL.job or "", "commands_enabled": CONTROL.enabled, "supervising": CONTROL.supervising}
 
@@ -467,6 +483,8 @@ web_ui.expose_api("GET", "/action", action)
 web_ui.expose_api("POST", "/play", play)
 web_ui.expose_api("GET", "/file", file)
 web_ui.expose_api("GET", "/status", status)
+web_ui.expose_api("GET", "/reports", reports)
+web_ui.expose_api("GET", "/report", report_file)
 web_ui.expose_api("GET", "/state", state)
 web_ui.expose_api("GET", "/ask", ask)
 

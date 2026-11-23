@@ -24,11 +24,12 @@ the real Pi (offline during the Pi 3 → Pi 4 swap).
 | `python/modbus_ro.py` | Read-only Modbus TCP client (raw sockets, no dependency) |
 | `python/registers.csv` | Register map of the panel: 329 channels, offsets 0–582 (generated, see below) |
 | `python/channel_notes.csv` | Per channel: panel name (G21, V21, P21...), what it is, unit, meaning of each status code — **to be reviewed** |
-| `python/config.json` | Panel address, poll period, optional page label, `commands_enabled` (default false), `baking_setpoint_degC` (150), `max_setpoint_degC` (150) |
+| `python/config.json` | Panel address, poll period, optional page label, `commands_enabled` (default false), `baking_setpoint_degC` (150), `max_setpoint_degC` (150), the `rga_*` settings of the vacuum report |
 | `python/rules.py` | Operating knowledge: gauge ranges, normal regime, interlocks, heating rules |
 | `python/actions.py` | The sequences (Safety, Background baking), the experiment-file interpreter, the action log |
 | `python/modbus_cmd.py` | Modbus write client used by `actions.py` only |
 | `data/assistant.log`, `data/instructions.exp` | On the board: action log and last experiment file loaded |
+| `python/report.py` | Draws the vacuum status report (Pillow) |
 | `examples/bake-150.exp` | Example experiment file (experiment files must end with `.exp`) |
 | `assets/index.html` | Web page: question box, answer, live value table |
 | `sim/PanelSim.java` | Stand-in for the panel: same Modbus library and settings, plausible values |
@@ -90,8 +91,9 @@ Conventions taken from the panel source: `*_COMST` = 0 means communication OK,
 
 The Pi HMI has an AI ASSISTANT window (`work_tube1500w/AssistantGui.java`,
 opened by the AI ASSISTANT button of the synoptic). It calls this app over
-HTTP: `/ask` (chat), `/action?name=safety|baking|stop`, `/play` (POST
-`{"name", "text"}`), `/log?since=n`, `/file?name=instructions|log`, `/status`.
+HTTP: `/ask` (chat), `/action?name=safety|baking|report|stop`, `/play` (POST
+`{"name", "text"}`), `/log?since=n`, `/file?name=instructions|log`, `/status`,
+`/reports` (names, newest first), `/report?name=<name>&format=png|pdf|json`.
 
 - **SAFETY**: CH1 OFF, CH2 OFF, setpoints CH1-CH9 to 0, close V1, close V21,
   stop P21, close V22, stop P22. It preempts anything running. No confirmation.
@@ -111,7 +113,33 @@ HTTP: `/ask` (chat), `/action?name=safety|baking|stop`, `/play` (POST
   WAIT UNTIL <name> < <value> [TIMEOUT <duration>]    or >; names G21 G22 G4 G5 GA4 GA5 P21SPEED TEMP
   LOG <text>
   SAFETY
+  REPORT                           the vacuum report sequence below
   ```
+- **VACUUM REPORT** (`python/report.py`, `Controller.seq_report`):
+  1. If the RGA scan is not running it is started, only with G21 valid and below
+     `rga_max_pressure_mbar` (1E-5), to protect the filament.
+  2. One spectrum (masses 1 to `rga_last_mass`, 100) is recorded every
+     `rga_cycle_seconds` (25 s: 100 masses at 200 ms).
+  3. The recording stops when masses 2, 18, 28 and 32 are stable: for each,
+     (highest - lowest) / mean over the last `rga_stable_cycles` (5) spectra is
+     within `rga_stable_tolerance` (10 %). A mass whose mean is below
+     `rga_noise_floor_mbar` (1E-11) is at the noise level and is not tested.
+     Without stabilization it stops after `rga_max_minutes` (30) and says so.
+  4. The scan and the filament are put back as they were before the report
+     (the panel clears the spectrum when the scan stops, so the last spectrum is
+     taken before).
+  5. One page is saved in `data/reports/` as `vacuum_report_<date>_<time>` in
+     `.png`, `.pdf` and `.json` (all the data): regime verdict, valves, pumps,
+     heating, pressures (with out-of-range warnings), temperatures CH1-CH9, the
+     last spectrum, the trend of masses 2, 18, 28, 32, 44 from start to stop,
+     the stabilization result per mass, and two pressure trends over the same
+     time: the cold cathodes G21, Ga4 and G4 inside their range (5E-11 to
+     5E-5 mbar), joined by the spinning rotor gauge Ga5 only at 5E-6 mbar and
+     above; and the Pirani gauges G22 and G5 (5E-4 to 800 mbar). Ga3 is the
+     RGA, not a pressure gauge: its total pressure is given with the spectrum.
+  The decision to stop is this numeric criterion computed by the app, not a
+  judgement of the language model. The REPORTS button of the HMI lists and
+  shows the reports; the PDF is at `/report?name=<name>&format=pdf`.
 - **STOP EXPERIMENT**: stops the running sequence; the system is left as it is.
 - After each command the app waits for the panel's status to confirm it; a step
   that is not confirmed, or a failed check, stops the sequence.

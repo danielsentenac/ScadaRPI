@@ -6,9 +6,10 @@
  *   - instructions: a text chat (left) and the preset buttons (right):
  *       SAFETY (heating off, valves closed, pumping system stopped),
  *       BACKGROUND BAKING (150 degC, only if the pumping system is at regime),
- *       PLAY (load an experiment instruction file and execute it), STOP EXPERIMENT;
+ *       PLAY (load an experiment instruction file and execute it),
+ *       VACUUM REPORT (record the RGA until stable, then save a status report), STOP EXPERIMENT;
  *   - live log: every action of the assistant;
- *   - system files: the instruction file in use and the log file.
+ *   - system files: the instruction file in use, the log file and the saved vacuum reports.
  * The chat is typed with the on-screen keyboard (KEYBOARD button, or a touch in the text field),
  * as the panel has no physical keyboard.
  *
@@ -96,6 +97,12 @@ public class AssistantGui extends JFrame {
         baking.setToolTipText("Baking at 150 degC, only if the pumping system is at regime");
         JButton play = button("PLAY", new Color(90, 190, 100));
         play.setToolTipText("Load an experiment instruction file and execute it");
+        JButton report = button("VACUUM REPORT", new Color(120, 170, 240));
+        report.setToolTipText("Record the RGA until the main masses are stable, then save a vacuum status report");
+        report.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) {
+            if (confirm("Record the RGA until it is stable and save a vacuum status report?\n"
+                        + "The RGA scan is started if it is not running."))
+                request("VACUUM REPORT", "/action?name=report"); } });
         JButton stop = button("STOP EXPERIMENT", new Color(235, 235, 245));
         stop.setToolTipText("Stop the running sequence; the system is left as it is");
         safety.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) {
@@ -106,8 +113,8 @@ public class AssistantGui extends JFrame {
         stop.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) {
             request("STOP EXPERIMENT", "/action?name=stop"); } });
         play.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) { play(); } });
-        JPanel presets = titled("BASIC INSTRUCTIONS", new GridLayout(4, 1, 0, 10));
-        presets.add(safety); presets.add(baking); presets.add(play); presets.add(stop);
+        JPanel presets = titled("BASIC INSTRUCTIONS", new GridLayout(5, 1, 0, 8));
+        presets.add(safety); presets.add(baking); presets.add(play); presets.add(report); presets.add(stop);
         presets.setPreferredSize(new Dimension(300, 10));
         JPanel instructions = new JPanel(new BorderLayout(8, 0));
         instructions.setOpaque(false);
@@ -124,7 +131,9 @@ public class AssistantGui extends JFrame {
         instructionFile.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) { showFile("instructions"); } });
         logFile.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) { showFile("log"); } });
         JPanel files = titled("SYSTEM FILES", new FlowLayout(FlowLayout.LEFT, 12, 2));
-        files.add(instructionFile); files.add(logFile);
+        JButton reports = button("REPORTS", new Color(235, 235, 245));
+        reports.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) { showReports(); } });
+        files.add(instructionFile); files.add(logFile); files.add(reports);
 
         JPanel centre = new JPanel(new GridBagLayout());
         centre.setOpaque(false);
@@ -323,6 +332,56 @@ public class AssistantGui extends JFrame {
                                               JOptionPane.PLAIN_MESSAGE);
             } });
         } }, "assistant-file").start();
+    }
+
+    /** List of the saved vacuum reports (newest first); the chosen one is shown as an image. */
+    private void showReports() {
+        new Thread(new Runnable() { public void run() {
+            final java.util.List<String> names = new java.util.ArrayList<String>();
+            try {
+                java.util.regex.Matcher m = java.util.regex.Pattern.compile("vacuum_report_\\d{8}_\\d{6}")
+                        .matcher(http("GET", base + "/reports", null, 10000));
+                while (m.find()) names.add(m.group());
+            } catch (Exception ex) { say("\n[REPORTS] the assistant cannot be reached (" + ex.getMessage() + ")"); return; }
+            SwingUtilities.invokeLater(new Runnable() { public void run() {
+                if (names.isEmpty()) {
+                    JOptionPane.showMessageDialog(AssistantGui.this, "No report saved yet.", "Vacuum reports",
+                                                  JOptionPane.PLAIN_MESSAGE);
+                    return;
+                }
+                JList<String> list = new JList<String>(names.toArray(new String[0]));
+                list.setFont(TEXT); list.setSelectedIndex(0); list.setVisibleRowCount(12);
+                list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                if (JOptionPane.showConfirmDialog(AssistantGui.this, new JScrollPane(list), "Vacuum reports (newest first)",
+                        JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE) == JOptionPane.OK_OPTION
+                        && list.getSelectedValue() != null)
+                    showReport(list.getSelectedValue());
+            } });
+        } }, "assistant-reports").start();
+    }
+
+    private void showReport(final String name) {
+        new Thread(new Runnable() { public void run() {
+            final java.awt.image.BufferedImage page;
+            try {
+                HttpURLConnection con = (HttpURLConnection) new URL(base + "/report?name=" + name + "&format=png").openConnection();
+                con.setConnectTimeout(4000); con.setReadTimeout(20000);
+                InputStream in = con.getInputStream();
+                try { page = javax.imageio.ImageIO.read(in); } finally { in.close(); }
+                if (page == null) throw new IOException("not an image");
+            } catch (Exception ex) { say("\n[REPORTS] cannot read " + name + " (" + ex.getMessage() + ")"); return; }
+            SwingUtilities.invokeLater(new Runnable() { public void run() {
+                int width = Math.min(page.getWidth(), getWidth() - 170);        // fit the window width
+                int height = page.getHeight() * width / page.getWidth();
+                JLabel picture = new JLabel(new ImageIcon(page.getScaledInstance(width, height, Image.SCALE_SMOOTH)));
+                JScrollPane scroll = new JScrollPane(picture);
+                scroll.setPreferredSize(new Dimension(width + 30, Math.min(height + 10, getHeight() - 140)));
+                scroll.getVerticalScrollBar().setUnitIncrement(40);
+                scroll.getVerticalScrollBar().setPreferredSize(new Dimension(28, 0));  // wide enough for a finger
+                JOptionPane.showMessageDialog(AssistantGui.this, scroll,
+                        name + "   (PDF: " + base + "/report?name=" + name + "&format=pdf)", JOptionPane.PLAIN_MESSAGE);
+            } });
+        } }, "assistant-report").start();
     }
 
     /** Background loop: new lines of the action log and the state of the assistant, every 2 s. */

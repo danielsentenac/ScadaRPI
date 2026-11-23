@@ -7,5 +7,13 @@
   "commands_enabled": false,
   "baking_setpoint_degC": 150.0,
   "max_setpoint_degC": 150.0,
-  "heating_channels": 9
+  "heating_channels": 9,
+  "report_title": "TUBE 1500 WEST",
+  "rga_cycle_seconds": 25.0,
+  "rga_stable_cycles": 5,
+  "rga_stable_tolerance": 0.1,
+  "rga_noise_floor_mbar": 1e-11,
+  "rga_max_minutes": 30.0,
+  "rga_last_mass": 100,
+  "rga_max_pressure_mbar": 1e-05
 }

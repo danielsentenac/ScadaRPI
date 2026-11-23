@@ -12,6 +12,9 @@ import re
 import threading
 import time
 
+import json
+
+import report
 import rules
 from modbus_cmd import ModbusCommandClient
 
@@ -49,6 +52,7 @@ def parse_experiment(text, heating_channels, max_setpoint):
       WAIT UNTIL <name> < <value> [TIMEOUT <duration>]     (or >) names: G21 G22 G4 G5 GA4 GA5 P21SPEED TEMP
       LOG <text>
       SAFETY                          the Safety sequence
+      REPORT                          record the RGA until stable and save a vacuum status report
     """
     steps, errors = [], []
     for number, raw in enumerate(text.splitlines(), 1):
@@ -84,6 +88,8 @@ def parse_experiment(text, heating_channels, max_setpoint):
                 step = ("log", line.split(None, 1)[1])
             elif w == ["SAFETY"]:
                 step = ("safety",)
+            elif w == ["REPORT"]:
+                step = ("report",)
             else:
                 raise ValueError("unknown instruction")
             steps.append((number, line, step))
@@ -96,11 +102,45 @@ def parse_experiment(text, heating_channels, max_setpoint):
     return steps
 
 
+STABILITY_MASSES = (2, 18, 28, 32)       # the recording stops when these masses are stable
+TREND_MASSES = (2, 18, 28, 32, 44)       # masses plotted against time in the report
+REPORT_NAME = re.compile(r"vacuum_report_\d{8}_\d{6}")
+
+
+def stability(samples, masses, cycles, tolerance, floor):
+    """Are the `masses` stable over the last `cycles` spectra?
+
+    A mass is stable when (highest - lowest) / mean of its last `cycles` values is within
+    `tolerance`. A mass whose mean is below `floor` is at the noise level and is not tested.
+    Returns (stable, one text line per mass).
+    """
+    lines, stable = [], len(samples) >= cycles
+    if not samples:
+        return False, ["no complete spectrum yet"]
+    for m in masses:
+        last = [s[m] for s in samples[-cycles:]]
+        mean = sum(last) / len(last)
+        if len(samples) < cycles:
+            lines.append("mass %d: %d of %d cycles recorded" % (m, len(samples), cycles))
+        elif mean < floor:
+            lines.append("mass %d: mean %.1e mbar, below the noise level %.0e: not tested" % (m, mean, floor))
+        else:
+            spread = (max(last) - min(last)) / mean
+            good = spread <= tolerance
+            stable = stable and good
+            lines.append("mass %d: mean %.2e mbar, variation %.1f %% over the last %d cycles: %s"
+                         % (m, mean, 100 * spread, cycles, "stable" if good else "NOT stable"))
+    return stable, lines
+
+
 EXPERIMENT_EXT = ".exp"     # extension of the experiment instruction files (PLAY)
 
 
 class Controller:
-    def __init__(self, config, by_name, get_values, device_down, data_dir):
+    def __init__(self, config, by_name, get_values, device_down, data_dir, fmt=None):
+        self.fmt = fmt
+        self.reports_dir = os.path.join(data_dir, "reports")
+        os.makedirs(self.reports_dir, exist_ok=True)
         self.config, self.by_name, self.get_values, self.device_down = config, by_name, get_values, device_down
         self.enabled = bool(config.get("commands_enabled", False))
         self.heating_channels = config.get("heating_channels", 9)
@@ -154,8 +194,10 @@ class Controller:
             self.check_abort()
             time.sleep(min(1.0, max(0.0, end - time.time())))
 
-    def trigger(self, what, channel, code, status=None, expected=None, timeout=30):
+    def trigger(self, what, channel, code, status=None, expected=None, timeout=30, even_if_stopped=False):
         """Write one command register, then wait for the status to confirm it."""
+        if even_if_stopped:          # a step that puts a device back as it was, done even after STOP
+            return self._restore(what, channel, code)
         self.check_abort()
         if not self.enabled:
             self.log("  DRY RUN: %s (would write %s = %d)" % (what, channel, code))
@@ -172,6 +214,16 @@ class Controller:
                 return
         raise Abort("%s was not confirmed by the panel within %d s (%s is %s)"
                     % (what, timeout, status, self.get_values()[0].get(status)))
+
+    def _restore(self, what, channel, code):
+        if not self.enabled:
+            self.log("  DRY RUN: %s (would write %s = %d)" % (what, channel, code))
+            return
+        try:
+            self.client.write_trigger(self.by_name[channel]["offset"], code)
+            self.log("  %s: command sent (%s = %d)" % (what, channel, code))
+        except Exception as e:
+            self.log("  %s: FAILED - %s" % (what, e))
 
     def setpoints(self, value):
         self.check_abort()
@@ -254,6 +306,100 @@ class Controller:
                 self.log("  note: %s" % step[1])
             elif kind == "safety":
                 self.seq_safety()
+            elif kind == "report":
+                self.seq_report()
+
+    # ------------------------------------------------------- vacuum status report
+    def seq_report(self):
+        """Record the RGA until the main masses are stable, then save the vacuum status report.
+
+        The RGA scan is started if it is not running (only with the tube pressure low enough for
+        the filament) and, at the end, the scan and the filament are put back as they were.
+        """
+        c = self.config
+        cycle = c.get("rga_cycle_seconds", 25.0)
+        cycles = c.get("rga_stable_cycles", 5)
+        tolerance = c.get("rga_stable_tolerance", 0.10)
+        floor = c.get("rga_noise_floor_mbar", 1e-11)
+        longest = c.get("rga_max_minutes", 30.0) * 60
+        last_mass = c.get("rga_last_mass", 100)
+        limit = c.get("rga_max_pressure_mbar", 1e-5)
+
+        v = self.values()
+        if not self.ok("LEYSPEC_RUNNING"):
+            raise Abort("report refused: the RGA is not communicating")
+        was_running, was_emission = v["LEYSPEC_RUNNING"] == 1, v["LEYSPEC_EMISSION"] == 1
+        started = False
+        try:
+            if was_running:
+                self.log("  RGA scan already running")
+            else:
+                if not self.ok("MG_PR2") or v.get("MG_PR2ST", 0) != 0 or not v["MG_PR2"] < limit:
+                    raise Abort("report refused: the RGA filament needs G21 valid and below %.0e mbar "
+                                "(G21 = %.2e mbar)" % (limit, v["MG_PR2"]))
+                self.log("  G21 = %.2e mbar, below %.0e mbar: the RGA can be started" % (v["MG_PR2"], limit))
+                if not self.enabled:
+                    raise Abort("dry run: the RGA scan is not running and cannot be started")
+                started = True
+                self.trigger("start the RGA scan", "LEYSPEC_RUNNINGONOFF", ON, "LEYSPEC_RUNNING", 1, timeout=90)
+            self.log("  recording one spectrum every %g s until masses %s vary less than %g %% over %d cycles "
+                     "(at most %g min)" % (cycle, ", ".join(map(str, STABILITY_MASSES)), 100 * tolerance, cycles,
+                                           longest / 60))
+            t0, t_text = time.time(), time.strftime("%Y-%m-%d %H:%M:%S")
+            times, samples, gauges, stable, lines = [], [], [], False, []
+            skip = 1 if started else 0          # the first spectrum after a start may be incomplete
+            while True:
+                self.sleep(cycle)
+                v = self.values()
+                if not self.ok("LEYSPEC_RUNNING") or v["LEYSPEC_RUNNING"] != 1:
+                    raise Abort("the RGA scan stopped during the recording (RGA error code %d)"
+                                % v.get("LEYSPEC_ERRORCODE", 0))
+                spectrum = {m: v["LEYSPEC_%03d" % m] for m in range(1, last_mass + 1)}
+                times.append(round(time.time() - t0, 1))
+                samples.append(spectrum)
+                gauges.append(report.gauge_sample(v, self.ok))
+                stable, lines = stability(samples[skip:], STABILITY_MASSES, cycles, tolerance, floor)
+                self.log("  cycle %d: %s%s" % (len(samples), ", ".join("mass %d = %.2e" % (m, spectrum[m])
+                         for m in TREND_MASSES), " mbar - stable" if stable else " mbar"))
+                if stable or time.time() - t0 > longest:
+                    break
+            verdict = ("Recording stopped after %d cycles: masses %s stable" if stable else
+                       "Recording stopped after %d cycles at the time limit: masses %s NOT all stable") % (
+                       len(samples), ", ".join(map(str, STABILITY_MASSES)))
+            self.log("  " + verdict)
+            rep = {
+                "title": c.get("report_title", "TUBE 1500 WEST"), "label": c.get("panel_label", ""),
+                "started": t_text, "stopped": time.strftime("%Y-%m-%d %H:%M:%S"),
+                "status": report.status(v, self.by_name, self.fmt, self.ok, self.heating_channels),
+                "last_mass": last_mass, "spectrum": samples[-1], "times": times,
+                "trend": {m: [s[m] for s in samples] for m in TREND_MASSES},
+                "gauges": {g[0]: [s[g[0]] for s in gauges] for g in report.GAUGE_TREND},
+                "stable": stable, "verdict": verdict,
+                "criterion": ["Criterion: variation (highest - lowest) / mean within %g %% over the last %d cycles."
+                              % (100 * tolerance, cycles)] + lines,
+            }
+        finally:
+            if started:
+                self.trigger("stop the RGA scan", "LEYSPEC_RUNNINGONOFF", OFF, even_if_stopped=True)
+                if not was_emission:
+                    self.trigger("RGA filament off", "LEYSPEC_EMISSIONONOFF", OFF, even_if_stopped=True)
+        name = "vacuum_report_" + time.strftime("%Y%m%d_%H%M%S")
+        base = os.path.join(self.reports_dir, name)
+        report.render(rep, base + ".png", base + ".pdf")
+        with open(base + ".json", "w") as f:
+            json.dump(rep, f, indent=1)
+        self.log("  report saved: %s (.png, .pdf, .json)" % name)
+
+    def reports(self):
+        names = sorted((n[:-4] for n in os.listdir(self.reports_dir) if n.endswith(".png")), reverse=True)
+        return {"reports": names}
+
+    def report_path(self, name, kind):
+        """File of a saved report, or None. `name` is checked: it never leaves the reports folder."""
+        if not REPORT_NAME.fullmatch(name or "") or kind not in ("png", "pdf", "json"):
+            return None
+        path = os.path.join(self.reports_dir, "%s.%s" % (name, kind))
+        return path if os.path.exists(path) else None
 
     def wait_until(self, name, op, limit, timeout):
         end = time.time() + timeout
