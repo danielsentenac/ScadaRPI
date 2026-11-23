@@ -96,6 +96,9 @@ def parse_experiment(text, heating_channels, max_setpoint):
     return steps
 
 
+EXPERIMENT_EXT = ".exp"     # extension of the experiment instruction files (PLAY)
+
+
 class Controller:
     def __init__(self, config, by_name, get_values, device_down, data_dir):
         self.config, self.by_name, self.get_values, self.device_down = config, by_name, get_values, device_down
@@ -106,7 +109,7 @@ class Controller:
         self.client = ModbusCommandClient(config["panel_host"], config["panel_port"])
         os.makedirs(data_dir, exist_ok=True)
         self.log_path = os.path.join(data_dir, "assistant.log")
-        self.instructions_path = os.path.join(data_dir, "instructions.txt")
+        self.instructions_path = os.path.join(data_dir, "instructions" + EXPERIMENT_EXT)
         self.lines, self.log_lock = [], threading.Lock()
         if os.path.exists(self.log_path):
             with open(self.log_path) as f:
@@ -307,6 +310,9 @@ class Controller:
             return {"ok": True, "message": "stopping %s" % self.job}
 
     def play(self, name, text):
+        if not str(name).lower().endswith(EXPERIMENT_EXT):
+            self.log("Experiment file '%s' REFUSED: the name must end with %s" % (name, EXPERIMENT_EXT))
+            return {"ok": False, "message": "file refused: an experiment file must end with %s" % EXPERIMENT_EXT}
         try:
             steps = parse_experiment(text, self.heating_channels, self.max_setpoint)
         except ValueError as e:

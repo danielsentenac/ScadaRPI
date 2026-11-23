@@ -28,8 +28,8 @@ the real Pi (offline during the Pi 3 → Pi 4 swap).
 | `python/rules.py` | Operating knowledge: gauge ranges, normal regime, interlocks, heating rules |
 | `python/actions.py` | The sequences (Safety, Background baking), the experiment-file interpreter, the action log |
 | `python/modbus_cmd.py` | Modbus write client used by `actions.py` only |
-| `data/assistant.log`, `data/instructions.txt` | On the board: action log and last experiment file loaded |
-| `examples/bake-150.txt` | Example experiment file |
+| `data/assistant.log`, `data/instructions.exp` | On the board: action log and last experiment file loaded |
+| `examples/bake-150.exp` | Example experiment file (experiment files must end with `.exp`) |
 | `assets/index.html` | Web page: question box, answer, live value table |
 | `sim/PanelSim.java` | Stand-in for the panel: same Modbus library and settings, plausible values |
 | `regdump/RegDump.java` | Regenerates `registers.csv` from the panel source |

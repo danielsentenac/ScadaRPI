@@ -35,6 +35,7 @@ public class AssistantGui extends JFrame {
     private static final Font BUTTON = new Font("SansSerif", Font.BOLD, 17);
     private static final Font MONO = new Font("Monospaced", Font.PLAIN, 14);
 
+    static final String EXPERIMENT_EXT = ".exp";   // extension of the experiment instruction files (PLAY)
     private final String base;
     private final JTextArea chat = new JTextArea();
     private final JTextArea log = new JTextArea();
@@ -282,10 +283,16 @@ public class AssistantGui extends JFrame {
 
     private void play() {
         JFileChooser chooser = new JFileChooser(lastDirectory);
-        chooser.setDialogTitle("Experiment instruction file");
+        chooser.setDialogTitle("Experiment instruction file (*" + EXPERIMENT_EXT + ")");
+        chooser.setAcceptAllFileFilterUsed(false);         // only experiment files are offered
+        chooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
+            public boolean accept(File f) { return f.isDirectory() || f.getName().toLowerCase().endsWith(EXPERIMENT_EXT); }
+            public String getDescription() { return "Experiment instruction files (*" + EXPERIMENT_EXT + ")"; } });
         if (chooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) return;
         final File file = chooser.getSelectedFile();
         lastDirectory = file.getParentFile();
+        if (!file.getName().toLowerCase().endsWith(EXPERIMENT_EXT)) {
+            say("\n[PLAY] " + file.getName() + " refused: an experiment file must end with " + EXPERIMENT_EXT); return; }
         final String text;
         try { text = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8); }
         catch (IOException ex) { say("\n[PLAY] cannot read " + file + ": " + ex.getMessage()); return; }
