@@ -29,6 +29,7 @@ the real Pi (offline during the Pi 3 → Pi 4 swap).
 | `python/actions.py` | The sequences (Safety, Background baking), the experiment-file interpreter, the action log |
 | `python/modbus_cmd.py` | Modbus write client used by `actions.py` only |
 | `data/assistant.log`, `data/instructions.exp` | On the board: action log and last experiment file loaded |
+| `python/history.py` | History of the panel values and the parsing of the time asked in a question |
 | `python/report.py` | Status data of the vacuum report and its PNG page (Pillow) |
 | `python/report_xlsx.py` | The vacuum report as an Excel workbook (openpyxl) |
 | `python/netdisk.py` | Upload of the reports to the network share (smbprotocol) |
@@ -89,6 +90,44 @@ commands) is done by the app; the model only words the answer.
 
 Conventions taken from the panel source: `*_COMST` = 0 means communication OK,
 1 means failure; on failure the panel sets values to 0 and status words to 255.
+
+## Direct answers (no model)
+
+A question about the value or state of named items is answered by the app
+itself, from a Modbus read made for that question (`refresh()` in `main.py`),
+with the time of the read. The model is not asked, so it cannot give a number
+that was not read.
+
+- Items are found by their panel name (G21, G22, G4, G5, Ga4, Ga5, Ga3, V1, V21,
+  V22, P21, P22, CH1-CH9, bypass, compressed air, Sicem) or by a group word
+  (pressures, temperatures, valves, pumps; "rack" for the rack thermocouples).
+- An item whose device is not communicating gives `NO VALID VALUE - the <device>
+  is not communicating with the panel` (the panel publishes 0 in that case, which
+  must never be reported as a value). If nothing valid was read, the answer stops
+  there, whatever the question.
+- A plain value question ("G22 value", "what are the pressures") gets only the
+  values read. A question needing interpretation (why, normal, should...) still
+  goes to the model, with the values read given to it and printed before its
+  answer; procedure questions are answered from the operating rules as before.
+
+## Past values
+
+The panel keeps no history, so the app records the values itself
+(`python/history.py`): one row per `history_seconds` (60) in
+`data/history/<date>.csv`, kept `history_days` (30). Nothing is recorded while
+the panel cannot be read, and the history starts when this version was installed.
+
+A question naming a past time is answered from these records, without the model:
+
+| Question | Answer |
+|---|---|
+| `G22 1h`, `G21 30 min ago`, `V21 2 days ago` | the value recorded nearest to that time |
+| `G22 at 14:30` | today at 14:30 (yesterday if that time is still to come) |
+| `V21 yesterday`, `G22 yesterday at 9:00` | |
+| `G22 last 2h`, `CH3 since 14:00`, `P21 trend 45 min` | over the period: first and last value, lowest, highest; for a state, its changes |
+
+A record where the device was not communicating counts as "no valid value",
+never as 0.
 
 ## Actions (HMI panel on the Pi)
 

@@ -18,6 +18,7 @@ from arduino.app_utils import App
 
 from modbus_ro import ModbusReadOnlyClient
 import rules
+import history
 from actions import Controller
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -276,7 +277,7 @@ def heating_lines(values, down, bad):
     return lines
 
 
-def snapshot_text(question=""):
+def snapshot_text(question="", reserve=0):
     """Text given to the model: a short overview (all pressures, main states, devices not
     communicating), then the full blocks of the devices most relevant to the question,
     within the size limit."""
@@ -324,7 +325,7 @@ def snapshot_text(question=""):
         scores[dev] = (-len(words & VOCABULARY[dev]), i)
     out = "\n".join(head)
     left_out = []
-    room = MAX_SNAPSHOT_CHARS - 250  # keep room for the closing line
+    room = MAX_SNAPSHOT_CHARS - 250 - reserve  # keep room for the closing line (and for `reserve` characters added by the caller)
     # If the question points at some devices, give only those: less text, fewer mix-ups.
     targeted = any(s[0] < 0 for s in scores.values())
     for dev in sorted(sections, key=lambda d: scores[d]):
@@ -373,12 +374,237 @@ COMMAND = re.compile(r"^\s*(please\s+|can you\s+|could you\s+|will you\s+|now\s+
 READ_ONLY = "I do not act from the chat: use the SAFETY, BACKGROUND BAKING or PLAY buttons."
 
 
+# ------------------------------------------------------------- direct answers
+# A question about the value or state of named items (G22, V21, CH3, "the pressures"...) is
+# answered by the application itself, from a Modbus read made for that question: the model is
+# not asked, so it cannot give a number that was not read. The model is kept for questions
+# that need wording or interpretation, and even then the values read are put before its answer.
+def refresh():
+    """Read the panel now. Returns "" or the error text (the last polled values are then kept)."""
+    try:
+        regs = ModbusReadOnlyClient(CONFIG["panel_host"], CONFIG["panel_port"]).read_registers(0, CONFIG["register_count"])
+        STATE.set({c["channel"]: decode(c, regs) for c in CHANNELS})
+        return ""
+    except Exception as e:
+        return "%s: %s" % (type(e).__name__, e)
+
+
+def build_items():
+    items = {}
+    for c in CHANNELS:
+        if not shown(c) or (c["device"] == "LEYSPEC" and c["element"].isdigit()):
+            continue
+        if c["name"]:
+            items.setdefault(c["name"].lower(), []).append(c)
+        if c["family"] in ("SICEM_T", "SICEM_SETP"):
+            items.setdefault("ch%d" % c["number"], []).append(c)
+    return items
+
+
+ITEMS = build_items()
+ALIASES = {"rga": "ga3", "turbo": "p21", "turbo pump": "p21", "dry pump": "p22", "scroll": "p22",
+           "sicem alarm": "sicem", "air": "compressed air"}
+GROUPS = [(r"pressures?|gauges?|vacuum", ["g21", "ga5", "ga4", "g22", "g4", "g5"]),
+          (r"temperatures?|setpoints?|heating|heaters?|baking|bake-?out", ["temperatures"]),
+          (r"valves?", ["v21", "v22", "v1"]),
+          (r"pumps?", ["p21", "p22"])]
+NAMED = re.compile(r"(?<![a-z0-9])(%s)(?![a-z0-9])" % "|".join(
+    sorted(map(re.escape, list(ITEMS) + list(ALIASES)), key=len, reverse=True)))
+INTERPRET = re.compile(r"\b(why|normal|ok|okay|good|bad|problem|problems|wrong|should|must|can|could|may|allowed|"
+                       r"explain|mean|means|meaning|compare|higher|lower|high|low|safe|danger|interlock|regime|"
+                       r"ready|enough|reliable|range|how|leak|fault|faults|fail|failed|failure)\b", re.I)
+
+
+def named_items(question):
+    q = question.lower()
+    found = [ALIASES.get(m, m) for m in NAMED.findall(q)]
+    for pattern, members in GROUPS:
+        if re.search(r"\b(%s)\b" % pattern, q):
+            if members[0] == "g21" and re.search(r"\btube\b", q):
+                members = ["g21", "ga5"]              # the two gauges of the tube
+            if members == ["temperatures"] and re.search(r"\brack\b", q):
+                members = ["rack"]                    # rack thermocouples, not the bake-out channels
+            found.extend(members)
+    return list(dict.fromkeys(found))
+
+
+def item_facts(key, values):
+    """Text lines giving what was read for one item, and whether any valid value was read."""
+    if key == "rack":
+        title = DEVICE_TITLES.get("TCMUX", "thermocouple multiplexer")
+        if device_down("TCMUX", values):
+            return ["Rack temperatures: NO VALID VALUE - the %s is not communicating with the panel." % title], False
+        temps = [c for c in CHANNELS if c["family"] == "TCMUX_TEMP" and not c["hidden"]]
+        return ["Rack thermocouple temperatures (degC), as n:value = %s"
+                % ", ".join("%d:%.1f" % (c["number"], values[c["channel"]]) for c in temps)], True
+    if key == "temperatures":
+        if device_down("SICEM", values):
+            return ["Temperatures and setpoints CH1-CH%d: NO VALID VALUE - the %s is not communicating with the panel."
+                    % (HEATING_CHANNELS, DEVICE_TITLES.get("SICEM", "Sicem"))], False
+        n = range(1, HEATING_CHANNELS + 1)
+        lines = ["Setpoints CH1-CH%d (degC): %s" % (HEATING_CHANNELS, ", ".join("%.1f" % values["SICEM_SETP%d" % i] for i in n)),
+                 "Temperatures CH1-CH%d (degC): %s" % (HEATING_CHANNELS, ", ".join("%.1f" % values["SICEM_T%d" % i] for i in n))]
+        if all(values["SICEM_T%d" % i] == 0.0 for i in n):
+            lines.append("All temperatures are exactly 0.0 degC: this is not a plausible reading, the Sicem is "
+                         "probably not delivering data to the panel.")
+        more, _ = item_facts("ch1", values)
+        more2, _ = item_facts("ch2", values)
+        return lines + [l for l in more + more2 if "heating switch" in l or "NO VALID" in l], True
+    lines, valid, down = [], False, []
+    for c in ITEMS[key]:
+        title = DEVICE_TITLES.get(c["device"], c["device"])
+        label = c["label"] if c["name"] else "%s %s" % (key.upper(), c["family_desc"].replace("heating channel CH<n> ", ""))
+        if device_down(c["device"], values):
+            if title not in down:
+                down.append(title)
+                lines.append("%s: NO VALID VALUE - the %s is not communicating with the panel."
+                             % (c["name"] or key.upper(), title))
+            continue
+        v = values[c["channel"]]
+        status = BY_NAME.get(c["channel"] + "ST")
+        if c["unit"] == "mbar" and status and values.get(status["channel"], 0) != 0:
+            lines.append("%s: no valid pressure (%s)" % (label, fmt(status, values[status["channel"]])))
+            continue
+        if c["regtype"] != "FLOAT32" and int(v) == 255:
+            lines.append("%s: no valid value" % label)
+            continue
+        lines.append("%s = %s%s" % (label, fmt(c, v), rules.gauge_note(c["channel"], v)))
+        valid = True
+    return lines, valid
+
+
+def facts(question):
+    """(text of the values read for the items named in the question, any valid value?, items found)."""
+    values, updated, error = STATE.get()
+    keys = named_items(question)
+    lines, any_valid = [], False
+    for key in keys:
+        item_lines, valid = item_facts(key, values)
+        lines.extend(item_lines)
+        any_valid = any_valid or valid
+    return "\n".join(lines), any_valid, keys
+
+
+# ------------------------------------------------------------------ past values
+# The panel keeps no history, so the assistant records the values itself: one row per
+# `history_seconds` (60) in data/history/, kept `history_days` (30). A question naming a past
+# time ("G22 1h", "V21 at 14:30", "G21 last 2h") is answered from these records, without the model.
+HISTORY_PERIOD = CONFIG.get("history_seconds", 60)
+HISTORY = history.History(os.path.join(os.path.dirname(HERE), "data", "history"),
+                          [c["channel"] for c in CHANNELS if c["access"] != "TRIGGER"
+                           and not (c["device"] == "LEYSPEC" and c["element"].isdigit())],
+                          CONFIG.get("history_days", 30))
+
+
+def history_loop():
+    while True:
+        time.sleep(HISTORY_PERIOD)
+        values, updated, _ = STATE.get()
+        if values and time.time() - updated < 15:      # nothing is recorded while the panel cannot be read
+            try:
+                HISTORY.record(values, updated)
+            except Exception as e:
+                print("history: %s: %s" % (type(e).__name__, e))
+
+
+def when_text(t):
+    day = time.strftime("%Y-%m-%d", time.localtime(t))
+    return time.strftime("%H:%M:%S", time.localtime(t)) + ("" if day == time.strftime("%Y-%m-%d") else " on " + day)
+
+
+def span_lines(key, rows):
+    """What the records say about one item over a period."""
+    if key in ("temperatures", "rack"):
+        if key == "rack":
+            return ["Rack temperatures: ask for one time (e.g. 'rack temperature 1h'), not a period."]
+        out = []
+        for n in range(1, HEATING_CHANNELS + 1):
+            out.extend(l for l in span_lines("ch%d" % n, rows) if "temperature" in l or "NO VALID" in l)
+        return out
+    out = []
+    for c in ITEMS[key]:
+        label = c["label"] if c["name"] else "%s %s" % (key.upper(), c["family_desc"].replace("heating channel CH<n> ", ""))
+        status = BY_NAME.get(c["channel"] + "ST")
+        valid = []
+        for t, v in rows:
+            if c["channel"] not in v or device_down(c["device"], v):
+                continue
+            if c["unit"] == "mbar" and status and v.get(status["channel"], 0) != 0:
+                continue
+            if c["regtype"] != "FLOAT32" and int(v[c["channel"]]) == 255:
+                continue
+            valid.append((t, v[c["channel"]]))
+        if not valid:
+            out.append("%s: NO VALID VALUE in the %d records of the period (device not communicating)." % (label, len(rows)))
+            continue
+        gaps = "" if len(valid) == len(rows) else " (%d of %d records without a valid value)" % (len(rows) - len(valid), len(rows))
+        if c["regtype"] == "FLOAT32":
+            one = lambda tv: "%s at %s" % (fmt(c, tv[1]), when_text(tv[0]))
+            out.append("%s: %s -> %s; lowest %s; highest %s%s" % (label, one(valid[0]), one(valid[-1]),
+                       one(min(valid, key=lambda tv: tv[1])), one(max(valid, key=lambda tv: tv[1])), gaps))
+        else:
+            changes = [valid[0]] + [b for a, b in zip(valid, valid[1:]) if b[1] != a[1]]
+            if len(changes) == 1:
+                out.append("%s: %s during the whole period%s" % (label, fmt(c, changes[0][1]), gaps))
+            else:
+                shown_changes = changes[:1] + changes[1:][-6:]
+                out.append("%s: %s%s" % (label, "; ".join("%s from %s" % (fmt(c, v), when_text(t)) for t, v in shown_changes), gaps))
+    if out and all("NO VALID VALUE" in l for l in out):       # one line when nothing valid was recorded
+        return ["%s: NO VALID VALUE in the %d records of the period (device not communicating)."
+                % (ITEMS[key][0]["name"] or key.upper(), len(rows))]
+    return out
+
+
+def past_answer(q, when, keys):
+    now = time.time()
+    first = HISTORY.first_time()
+    start = "The history starts at %s." % when_text(first) if first else "Nothing has been recorded yet."
+    if not keys:
+        return "Name what you want the past value of, for example 'G22 1h' or 'V21 at 14:30'."
+    if when[0] == "at":
+        row = HISTORY.at(when[1], max(2 * HISTORY_PERIOD, 120))
+        if row is None:
+            return "No value was recorded around %s. %s" % (when_text(when[1]), start)
+        lines = []
+        for key in keys:
+            lines.extend(item_facts(key, row[1])[0])
+        return "%s\nRecorded at %s." % ("\n".join(lines), when_text(row[0]))
+    rows = HISTORY.rows(when[1], now)
+    if not rows:
+        return "No value was recorded since %s. %s" % (when_text(when[1]), start)
+    lines = []
+    for key in keys:
+        lines.extend(span_lines(key, rows))
+    return "%s\nFrom %d records between %s and %s." % ("\n".join(lines), len(rows), when_text(rows[0][0]), when_text(rows[-1][0]))
+
+
 def ask(q: str = ""):
     q = (q or "").strip()
     if not q:
         return {"error": "empty question"}
-    snap = snapshot_text(q)
+    t0 = time.time()
+    when = history.asked_time(q, t0)
+    if when and not COMMAND.match(q):
+        answer = past_answer(q, when, named_items(q))
+        return {"question": q, "answer": answer, "seconds": round(time.time() - t0, 1), "snapshot": answer}
+    read_error = refresh()                 # every question is answered from a read made now
+    values, updated, _ = STATE.get()
+    if read_error and (not values or time.time() - updated > 15):
+        return {"question": q, "answer": "I cannot read the panel now (%s), so I have no current value to give."
+                % read_error, "seconds": round(time.time() - t0, 1), "snapshot": ""}
+    stamp = "Read from the panel at %s." % time.strftime("%H:%M:%S", time.localtime(updated))
+    fact_text, any_valid, keys = facts(q)
     command = bool(COMMAND.match(q))
+    if keys and not command and not PROCEDURE.search(q):
+        if not any_valid:                  # nothing valid to word or interpret
+            return {"question": q, "answer": "%s\n%s\nNo other statement can be made about %s without a valid value."
+                    % (fact_text, stamp, "it" if len(keys) == 1 else "them"),
+                    "seconds": round(time.time() - t0, 1), "snapshot": fact_text}
+        if not INTERPRET.search(q):        # a plain value question: no model
+            return {"question": q, "answer": "%s\n%s" % (fact_text, stamp),
+                    "seconds": round(time.time() - t0, 1), "snapshot": fact_text}
+    fact_text = fact_text[:800]            # the prompt length is limited (see MAX_SNAPSHOT_CHARS)
+    snap = snapshot_text(q, reserve=len(fact_text) + 90 if fact_text else 0)
     if command:
         # Do not let the model discuss the action: it only reports the item concerned.
         task = ('The operator asked: "%s". This cannot be done from here. In one sentence, give only the '
@@ -394,8 +620,9 @@ def ask(q: str = ""):
     recent = ""
     if re.search(r"\b(log|action|actions|did|done|doing|experiment|baking|running|happened)\b", q, re.I):
         recent = "\n\nRECENT ACTIONS OF THE ASSISTANT (newest last)\n%s" % "\n".join(CONTROL.lines[-8:])
+    if fact_text:
+        snap = "VALUES OF THE ITEMS ASKED ABOUT (use these, never another number for them)\n%s\n\n%s" % (fact_text, snap)
     prompt = "CURRENT VALUES\n%s\n\nOPERATING RULES\n%s%s\n\nQUESTION\n%s" % (snap, OPERATING_RULES, recent, task)
-    t0 = time.time()
     with llm_lock:
         answer, last = None, None
         for attempt in range(2):  # the model service may be reloading: retry once
@@ -410,9 +637,15 @@ def ask(q: str = ""):
                 last = e
                 time.sleep(10)
         if answer is None:
+            if fact_text:                  # the values read can still be given without the model
+                return {"question": q, "answer": "%s\n%s\n\nThe language model is not available now, so I can only "
+                        "give the values read (%s)." % (fact_text, stamp, str(last)[:120]),
+                        "seconds": round(time.time() - t0, 1), "snapshot": snap}
             return {"error": "model error: %s" % last}
     if command and READ_ONLY not in answer:
         answer = "%s %s" % (READ_ONLY, answer)
+    if fact_text and not PROCEDURE.search(q):   # the values read come first, whatever the model wrote
+        answer = "%s\n%s\n\n%s" % (fact_text, stamp, answer)
     return {"question": q, "answer": answer, "seconds": round(time.time() - t0, 1), "snapshot": snap}
 
 
@@ -500,5 +733,6 @@ def snapshot(q: str = ""):
 web_ui.expose_api("GET", "/snapshot", snapshot)
 
 threading.Thread(target=poll_loop, daemon=True).start()
+threading.Thread(target=history_loop, daemon=True).start()
 
 App.run()

@@ -6,7 +6,7 @@
  *   - instructions: a text chat (left) and the preset buttons (right):
  *       SAFETY (heating off, valves closed, pumping system stopped),
  *       BACKGROUND BAKING (150 degC, only if the pumping system is at regime),
- *       PLAY (load an experiment instruction file and execute it),
+ *       PLAY (load an experiment instruction file, *.exp, from the "play" folder and execute it),
  *       VACUUM REPORT (record the RGA until stable, then save a status report), STOP EXPERIMENT;
  *   - live log: every action of the assistant;
  *   - system files: the instruction file in use, the log file and the saved vacuum reports.
@@ -47,7 +47,8 @@ public class AssistantGui extends JFrame {
     private final java.util.List<JButton> letterKeys = new java.util.ArrayList<JButton>();
     private boolean shift = false;
     private int nextLine = -1;                 // next line of the action log to ask for
-    private File lastDirectory = new File(System.getProperty("user.home"));
+    /** Folder of the experiment files offered by PLAY: "play" in the panel folder, or -Dscadarpi.playDir=<folder>. */
+    private final File playDirectory = new File(System.getProperty("scadarpi.playDir", "play")).getAbsoluteFile();
 
     public AssistantGui(String title, String assistantUrl) {
         super("AI assistant - " + title);
@@ -291,7 +292,8 @@ public class AssistantGui extends JFrame {
     }
 
     private void play() {
-        JFileChooser chooser = new JFileChooser(lastDirectory);
+        playDirectory.mkdirs();                              // PLAY always opens in the play folder
+        JFileChooser chooser = new JFileChooser(playDirectory);
         chooser.setDialogTitle("Experiment instruction file (*" + EXPERIMENT_EXT + ")");
         chooser.setAcceptAllFileFilterUsed(false);         // only experiment files are offered
         chooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
@@ -299,7 +301,6 @@ public class AssistantGui extends JFrame {
             public String getDescription() { return "Experiment instruction files (*" + EXPERIMENT_EXT + ")"; } });
         if (chooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) return;
         final File file = chooser.getSelectedFile();
-        lastDirectory = file.getParentFile();
         if (!file.getName().toLowerCase().endsWith(EXPERIMENT_EXT)) {
             say("\n[PLAY] " + file.getName() + " refused: an experiment file must end with " + EXPERIMENT_EXT); return; }
         final String text;

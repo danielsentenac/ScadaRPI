@@ -1,0 +1,10 @@
+# Example experiment file for the PLAY button: bake at 150 degC for 2 hours.
+CHECK REGIME
+SETPOINT 150
+HEATING ON
+WAIT UNTIL TEMP > 140 TIMEOUT 6h
+LOG 150 degC reached, holding for 2 hours
+WAIT 2h
+HEATING OFF
+SETPOINT 0
+LOG bake finished
