@@ -249,7 +249,38 @@ public class ModbusSlaveThread implements Runnable, DataTypes  {
             for (ModbusEventListener l : modbusEventListenerList) {
                 l.onWriteToMultipleHoldingRegisters(offset, range.length, range);
             }
-            super.writeHoldingRegisterRange(offset, range);
+            // Same rule as for a single register: only command triggers and writable values may be
+            // written. The range must cover whole data elements (both registers of a FLOAT32 or INT32),
+            // so that a value is never applied half written. Anything else is refused.
+            List<Device> touched = new ArrayList<Device>();
+            int pos = offset;
+            while (pos < offset + range.length) {
+               DataElement found = null;
+               Device owner = null;
+               for (Map.Entry<String, Device> d : deviceManager.deviceList.entrySet()) {
+                  found = d.getValue().getDataElement(pos);
+                  if (found != null) { owner = d.getValue(); break; }
+               }
+               if (found == null || found.mbRegisterOffset != pos || found.mbRegisterLength < 1 ||
+                   pos + found.mbRegisterLength > offset + range.length ||
+                   !( found.type == DataType.TRIGGER ||
+                      found.type == DataType.READ_AND_WRITE_VALUE ||
+                      found.type == DataType.READ_AND_WRITE_STATUS ) ) {
+                  logger.log(Level.WARNING, "ModbusSlaveThread:writeHoldingRegisterRange> refused write of " +
+                             range.length + " registers at offset " + offset + " (register " + pos + " not writable)");
+                  throw new IllegalDataAddressException(pos);
+               }
+               if (!touched.contains(owner)) touched.add(owner);
+               pos += found.mbRegisterLength;
+            }
+            for (Device device : touched) device.modbusmutex.lock();
+            try {
+               super.writeHoldingRegisterRange(offset, range);
+               for (Device device : touched) device.addModbusCommand();
+            }
+            finally {
+               for (Device device : touched) device.modbusmutex.unlock();
+            }
         }
 
         @Override

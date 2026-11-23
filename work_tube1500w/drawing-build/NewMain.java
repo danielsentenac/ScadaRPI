@@ -108,6 +108,9 @@ public class NewMain {
     place(named("CH1_ON"), 1297, 305); place(named("CH1_OFF"), 1415, 305); place(named("CH1STVal"), 1543, 313);
     place(named("CH2_ON"), 1297, 360); place(named("CH2_OFF"), 1415, 360); place(named("CH2STVal"), 1543, 368);
 
+    // ---- button opening the AI assistant window (copy of the TEMPERATURES button)
+    GlgObject ai = named("TCMuxTemp").CopyObject(); ai.SetSResource("Name", "Assistant");
+    ai.SetSResource("Label/String", "AI ASSISTANT"); arr.AddObjectToBottom(ai);
     d.SetupHierarchy();
     for (Object[] f : fits) { GlgCube c = new GlgCube(); c.p1 = new GlgPoint((Double) f[1], (Double) f[2], 0.); c.p2 = new GlgPoint((Double) f[3], (Double) f[4], 0.);
       ((GlgObject) f[0]).FitObject(GlgObject.SCREEN_COORD, c, false); }
@@ -115,6 +118,7 @@ public class NewMain {
       x.MoveObjectBy(GlgObject.SCREEN_COORD, (Double) p[1] - b.p1.x, (Double) p[2] - b.p1.y, 0.); }
     for (int i = 92; i <= 103; i++) o.get(i).MoveObjectBy(GlgObject.SCREEN_COORD, 15 - 647, 262 - 371, 0.);
     named("TCMuxTemp").MoveObjectBy(GlgObject.SCREEN_COORD, 8., 0., 0.); named("TubeStatusDetails").MoveObjectBy(GlgObject.SCREEN_COORD, 8., 0., 0.);
+    { GlgCube b = ai.GetBox(); ai.MoveObjectBy(GlgObject.SCREEN_COORD, 195 - b.p1.x, 0., 0.); }
     d.SetGTag("PassiveCol", 0.62, 0.73, 0.93, true);
     d.Update(); d.ResetHierarchy();
     System.out.println("saved=" + d.SaveObject(a[1])); System.exit(0);

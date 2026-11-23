@@ -100,7 +100,8 @@ public abstract class Device extends DataManager implements Runnable, DataTypes 
              if ( dataElement.setvalue != 0 ) {// Command has been triggered by Modbus Master --> add it
                 logger.finer("Device:addModbusCommand>TRIGGER: Pushing Modbus command for " 
                             + dataElement.name + " with value " + dataElement.setvalue);
-                commandSetQueue.add(dataElement);
+                if (!commandSetQueue.contains(dataElement)) // not twice while it waits to be executed
+                   commandSetQueue.add(dataElement);
              }
           }
           catch ( IllegalDataAddressException ex) {
@@ -131,6 +132,7 @@ public abstract class Device extends DataManager implements Runnable, DataTypes 
              if (dataElement.value != dataElement.setvalue) {
                 logger.finer("Device:addModbusCommand>READ_AND_WRITE_VALUE: Pushing Modbus command for " 
                             + dataElement.name + " with value " + dataElement.setvalue );
+                if (!commandSetQueue.contains(dataElement)) // not twice while it waits to be executed
                    commandSetQueue.add(dataElement);
              }
           }

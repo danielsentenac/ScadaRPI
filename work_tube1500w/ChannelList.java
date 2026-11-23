@@ -13,6 +13,8 @@ import com.genlogic.GlgPoint;
 public interface ChannelList  {
 
 String mainDrawing = "TUBE1500W.g";
+// AI assistant application on the Arduino VENTUNO Q (direct Ethernet link), see work_ventunoq
+String assistantUrl = System.getProperty("scadarpi.assistantUrl", "http://192.168.251.2:7000"); // VENTUNO Q on the direct link
 
 /***********************************************************************/
 Hashtable<String, String> TUBE1500WCMD = new Hashtable<String, String>(){

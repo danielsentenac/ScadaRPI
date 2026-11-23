@@ -11,6 +11,9 @@ java -cp "/tmp/build:../lib/*" NewMain /tmp/orig.g TUBE1500W.g      # build
 java -cp "/tmp/build:../lib/*" SnapM TUBE1500W.g /tmp/synoptic.png   # picture of the result
 ```
 
+If a program does not return after printing `saved=true`, stop it (or run it
+under `timeout 60`): the drawing is already written.
+
 `Check.java` verifies that every name the panel drives resolves in the drawing:
 it takes the drawing and a text file with one key of `TUBE1500WSTATUS`
 (`ChannelList.java`) per line.

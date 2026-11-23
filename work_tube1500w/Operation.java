@@ -84,28 +84,16 @@ public class Operation implements DataTypes, Runnable  {
       timev.value = time / 1000;
     }
 
+    // Heating channels of the Sicem: CH1..CH9 must always have the same setpoint
+    private static final int HEATING_CHANNELS = 9;
+
     private boolean operationStopRamp() {
        logger.fine("Operation:operationStopRamp> Stop Ramp Operation - resetting all parameters to zero");
        
-       // Collect useful data
        Device sicem = deviceManager.getDevice("SICEM");
-       DataElement setp1 = sicem.getDataElement("SETP1");
-       DataElement setp2 = sicem.getDataElement("SETP2");
-       DataElement setp3 = sicem.getDataElement("SETP3");
-       DataElement setp4 = sicem.getDataElement("SETP4");
-       DataElement setp5 = sicem.getDataElement("SETP5");
-       DataElement setp6 = sicem.getDataElement("SETP6");
-       DataElement setp7 = sicem.getDataElement("SETP7");
-       DataElement sicemcomst = sicem.getDataElement("COMST");
-       
        // Reset all Operation values to zero
-       setValue(sicem, setp1, 1, 0);
-       setValue(sicem, setp2, 1, 0);
-       setValue(sicem, setp3, 1, 0);
-       setValue(sicem, setp4, 1, 0);
-       setValue(sicem, setp5, 1, 0);
-       setValue(sicem, setp6, 1, 0);
-       setValue(sicem, setp7, 1, 0);
+       for (int i = 1; i <= HEATING_CHANNELS; i++)
+          setValue(sicem, sicem.getDataElement("SETP" + i), 1, 0);
        setTempStep(0);
        setTempMax(0);
        setTimeInter(0);
@@ -122,16 +110,8 @@ public class Operation implements DataTypes, Runnable  {
        							String.valueOf(tempStep) + ", tempMax=" + String.valueOf(tempMax) + 
        							", and timeInter=" + String.valueOf(timeInter));
        
-       // Collect useful data
        Device sicem = deviceManager.getDevice("SICEM");
        DataElement setp1 = sicem.getDataElement("SETP1");
-       DataElement setp2 = sicem.getDataElement("SETP2");
-       DataElement setp3 = sicem.getDataElement("SETP3");
-       DataElement setp4 = sicem.getDataElement("SETP4");
-       DataElement setp5 = sicem.getDataElement("SETP5");
-       DataElement setp6 = sicem.getDataElement("SETP6");
-       DataElement setp7 = sicem.getDataElement("SETP7");
-       DataElement sicemcomst = sicem.getDataElement("COMST");
 
        // Check if tempMax is reached with first setpoint temp
        if ( setp1.value + tempStep > tempMax) {
@@ -148,13 +128,10 @@ public class Operation implements DataTypes, Runnable  {
           // update lastIncrementTime
           lastIncrementTime += (long) (timeInter*1000);
           logger.fine("Operation:operationStartRamp> Start Ramp Operation: Incrementing temperature from " + String.valueOf(setp1.value) + " to " + String.valueOf(setp1.value + tempStep));
-          setValue(sicem, setp1, 1, setp1.value + tempStep);
-          setValue(sicem, setp2, 1, setp2.value + tempStep);
-          setValue(sicem, setp3, 1, setp3.value + tempStep);
-          setValue(sicem, setp4, 1, setp4.value + tempStep);
-          setValue(sicem, setp5, 1, setp5.value + tempStep);
-          setValue(sicem, setp6, 1, setp6.value + tempStep);
-          setValue(sicem, setp7, 1, setp7.value + tempStep);
+          // All channels follow channel 1, so that they keep the same setpoint
+          double next = setp1.value + tempStep;
+          for (int i = 1; i <= HEATING_CHANNELS; i++)
+             setValue(sicem, sicem.getDataElement("SETP" + i), 1, next);
        }
        return true;
     }

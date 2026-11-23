@@ -26,6 +26,7 @@ public class GlgGui extends JFrame implements ChannelList, DataTypes, Runnable  
     private Container content;
     private GlgJLWBean glg_bean;
     public Hashtable<String, GlgChildGui> subwindows;
+    private AssistantGui assistantGui;   // AI assistant window (plain Swing, not a Glg drawing)
     public boolean isSuspended = false;
 
     public GlgGui (Operation _op, String _title) {
@@ -221,6 +222,12 @@ public class GlgGui extends JFrame implements ChannelList, DataTypes, Runnable  
               double visibility =  glg_bean.GetDResource( origin +"/Visibility" );
               logger.finer("GlgGui:InputListener> Origin=" + origin + " Format=" + format + " Action=" + action +
                               " subAction=" + subaction + " visibility=" + visibility);
+              if ( origin.equals("Assistant") ) { // AI assistant window
+                 if ( assistantGui == null )
+                    assistantGui = new AssistantGui(title, assistantUrl);
+                 assistantGui.showWindow();
+                 return;
+              }
               if ( visibility > 0.8)  {
                  boolean showWindow = true;
                  GlgChildGui child = null;
