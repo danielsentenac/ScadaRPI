@@ -3,7 +3,7 @@
   "panel_port": 1288,
   "panel_label": "",
   "poll_seconds": 2.0,
-  "register_count": 385,
+  "register_count": 386,
   "commands_enabled": false,
   "baking_setpoint_degC": 150.0,
   "max_setpoint_degC": 150.0,

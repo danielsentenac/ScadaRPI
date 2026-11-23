@@ -106,6 +106,11 @@ that was not read.
   is not communicating with the panel` (the panel publishes 0 in that case, which
   must never be reported as a value). If nothing valid was read, the answer stops
   there, whatever the question.
+- "Is there any problem?", "status", "is everything ok?" are answered by the
+  app with the checks it makes over all devices (communication, problem states,
+  normal regime, heating) and its own verdict. For a procedure question naming
+  a failure, the rule is worded by the model and the current state is added by
+  the app.
 - A plain value question ("G22 value", "what are the pressures") gets only the
   values read. A question needing interpretation (why, normal, should...) still
   goes to the model, with the values read given to it and printed before its

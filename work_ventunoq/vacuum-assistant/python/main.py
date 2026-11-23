@@ -615,6 +615,40 @@ def past_answer(q, when, keys):
         "\n".join(lines), len(rows), when_text(rows[0][0]), when_text(rows[-1][0]), source)
 
 
+# "Is there any problem?" is a check over all devices: it is done by the application (the lines
+# below are the ones computed for the model), which then states the verdict itself.
+STATUS_QUESTION = re.compile(
+    r"\b(any|a|some)\s+(problem|problems|fault|faults|alarm|alarms|issue|issues|error|errors|failure|failures)\b|"
+    r"\b(everything|all)\s+(is\s+)?(ok|okay|fine|normal|good)\b|what('s| is) wrong|"
+    r"\b(system|general|overall|global)\s+(status|state)\b|\bis the system (ok|okay|fine|normal|ready)\b|"
+    r"^\s*(status|state|summary|overview|problems?|alarms?)\s*\??\s*$", re.I)
+
+
+def overview_lines():
+    """The checks made over all devices: communication, problem states, normal regime, heating."""
+    lines = []
+    for line in snapshot_text("").split("\n"):
+        if line.startswith(("[", "(Details")):
+            break
+        if line.startswith("Values read") or line.rstrip() in ("Pressures (mbar):", "Main states:"):
+            continue
+        lines.append(line)
+    return lines
+
+
+def status_answer(stamp):
+    lines = overview_lines()
+    text = "\n".join(lines)
+    faults = "NOT COMMUNICATING" in text or "over ALL devices: none." not in text or "SAFETY MODE REQUIRED" in text
+    if faults:
+        verdict = "YES, there are problems:"
+    elif "Normal regime: NOT MET" in text:
+        verdict = "No device fault, but the pumping system is not at normal regime:"
+    else:
+        verdict = "No problem found:"
+    return "%s\n%s\n%s" % (verdict, "\n".join("- " + l for l in lines), stamp)
+
+
 def ask(q: str = ""):
     q = (q or "").strip()
     if not q:
@@ -640,6 +674,9 @@ def ask(q: str = ""):
         if not INTERPRET.search(q):        # a plain value question: no model
             return {"question": q, "answer": "%s\n%s" % (fact_text, stamp),
                     "seconds": round(time.time() - t0, 1), "snapshot": fact_text}
+    if not keys and not command and not PROCEDURE.search(q) and STATUS_QUESTION.search(q):
+        answer = status_answer(stamp)
+        return {"question": q, "answer": answer, "seconds": round(time.time() - t0, 1), "snapshot": answer}
     fact_text = fact_text[:800]            # the prompt length is limited (see MAX_SNAPSHOT_CHARS)
     snap = snapshot_text(q, reserve=len(fact_text) + 90 if fact_text else 0)
     if command:
@@ -649,9 +686,7 @@ def ask(q: str = ""):
     elif PROCEDURE.search(q):
         # Procedures come from the operating rules only: the model must not make up steps.
         task = ("%s\nAnswer with the matching operating rule, word for word as far as possible. Do not add any "
-                "other step or advice.%s" % (q, " Then say in one sentence whether that situation is present now."
-                                             if re.search(r"\b(if|in case|fails?|failure|problem|alarm)\b", q, re.I)
-                                             else " Do not add any comment."))
+                "other step, advice or comment, and do not say whether the situation is present now." % q)
     else:
         task = q
     recent = ""
@@ -681,6 +716,10 @@ def ask(q: str = ""):
             return {"error": "model error: %s" % last}
     if command and READ_ONLY not in answer:
         answer = "%s %s" % (READ_ONLY, answer)
+    if PROCEDURE.search(q) and not command and re.search(r"\b(if|in case|fails?|failure|problem|alarm)\b", q, re.I):
+        # whether the situation is present now is stated from the checks, not by the model
+        now_lines = [l for l in overview_lines() if l.startswith(("Devices", "States meaning", "Normal regime", "SAFETY"))]
+        answer = "%s\n\nCurrent state (%s)\n%s" % (answer, stamp, "\n".join("- " + l for l in now_lines))
     if fact_text and not PROCEDURE.search(q):   # the values read come first, whatever the model wrote
         answer = "%s\n%s\n\n%s" % (fact_text, stamp, answer)
     return {"question": q, "answer": answer, "seconds": round(time.time() - t0, 1), "snapshot": snap}
