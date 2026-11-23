@@ -219,7 +219,7 @@ public class Main {
                                         "192.168.250.11",  // Fixed IP address (DIP switch 5-8 of the RGA electronics unit)
                                         1024,              // TCP port
                                         1,                 // RGA address number (01 for 192.168.250.11)
-                                        199,               // Last mass of the step scan (limited to the RGA mass range)
+                                        100,               // Last mass of the step scan (LEYSPEC view 100: 1-100 amu)
                                         3,                 // Measurement speed (3 = 200 ms/mass)
                                         "EE50");           // Ion source recipe (LEYSPEC view series)
 

@@ -16,7 +16,7 @@ public class GlgRGALeyspecGui extends GlgChildGui {
 
     private static final long serialVersionUID = 354054054095L;
     private static final Logger logger = Logger.getLogger("Main");
-    private static final int NB_SAMPLES = 199; // Number of bars of the plot (mass 1 to 199)
+    private static final int NB_SAMPLES = RgaLeyspec.MAX_MASS; // Number of bars of the plot (mass 1 to 100; DataGroup/Factor in RGALeyspec.g)
 
     public GlgRGALeyspecGui (GlgGui _parent, DeviceManager _deviceManager, String _title, String _origin) {
        super(_parent, _deviceManager, _title, _origin);

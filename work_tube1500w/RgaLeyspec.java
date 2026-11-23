@@ -29,7 +29,7 @@ public class RgaLeyspec extends Device {
 
    private static final Logger logger = Logger.getLogger("Main");
 
-   public static final int MAX_MASS = 199;           // Number of mass channels published (001..199), as the RGA plot
+   public static final int MAX_MASS = 100;           // Number of mass channels published (001..100): the unit is a LEYSPEC view 100 (1-100 amu)
    private static final int CONNECT_TIMEOUT_MS = 3000;
    private static final int REPLY_TIMEOUT_MS = 3000;
    private static final int RECONNECT_PAUSE_MS = 5000;
