@@ -3,7 +3,7 @@
   "panel_port": 1288,
   "panel_label": "",
   "poll_seconds": 2.0,
-  "register_count": 583,
+  "register_count": 385,
   "commands_enabled": false,
   "baking_setpoint_degC": 150.0,
   "max_setpoint_degC": 150.0,
@@ -22,5 +22,13 @@
     "share": "vacuum",
     "folder": "TUBE1500W"
   },
-  "timezone": "Europe/Rome"
+  "timezone": "Europe/Rome",
+  "daq": {
+    "host": "olserver134.virgo.infn.it",
+    "user": "",
+    "prefix": "V1:VAC_TUBE1500W_",
+    "rename": {
+      "ROT_GA5COMST": "ROT_Ga5COMST"
+    }
+  }
 }

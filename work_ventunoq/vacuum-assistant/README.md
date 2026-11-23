@@ -29,7 +29,8 @@ the real Pi (offline during the Pi 3 → Pi 4 swap).
 | `python/actions.py` | The sequences (Safety, Background baking), the experiment-file interpreter, the action log |
 | `python/modbus_cmd.py` | Modbus write client used by `actions.py` only |
 | `data/assistant.log`, `data/instructions.exp` | On the board: action log and last experiment file loaded |
-| `python/history.py` | History of the panel values and the parsing of the time asked in a question |
+| `python/history.py` | The assistant's own record of the panel values and the parsing of the time asked in a question |
+| `python/daq.py`, `daq/trend_read.py` | Past values from the DAQ trend files: board side (ssh) and the read-only script run on the Virgo server |
 | `python/report.py` | Status data of the vacuum report and its PNG page (Pillow) |
 | `python/report_xlsx.py` | The vacuum report as an Excel workbook (openpyxl) |
 | `python/netdisk.py` | Upload of the reports to the network share (smbprotocol) |
@@ -112,12 +113,21 @@ that was not read.
 
 ## Past values
 
-The panel keeps no history, so the app records the values itself
-(`python/history.py`): one row per `history_seconds` (60) in
-`data/history/<date>.csv`, kept `history_days` (30). Nothing is recorded while
-the panel cannot be read, and the history starts when this version was installed.
+A question naming a past time is answered without the model, from two sources:
 
-A question naming a past time is answered from these records, without the model:
+1. **The DAQ trend files** (the data DataViewer shows), when they hold the
+   channels asked for at that time. The rack is acquired by the Modbus master
+   configured in `/virgoData/Vacuum/racks/TUBE1500W.cfg` (olserver38); the
+   channels are `V1:VAC_TUBE1500W_<panel channel>` at 1 Hz in
+   `/virgoData/ffl/trend.ffl`. The board reads them through ssh
+   (`python/daq.py`, paramiko): its key may only run the read-only script
+   `daq/trend_read.py` on a Virgo server, which returns the samples as JSON.
+2. **The assistant's own record** otherwise (`python/history.py`): one row per
+   `history_seconds` (60) in `data/history/<date>.csv`, kept `history_days`
+   (30). It covers what the DAQ does not hold (the RGA channels, periods when
+   the rack is not acquired) and starts when this version was installed.
+
+The answer names the source used.
 
 | Question | Answer |
 |---|---|
@@ -127,7 +137,18 @@ A question naming a past time is answered from these records, without the model:
 | `G22 last 2h`, `CH3 since 14:00`, `P21 trend 45 min` | over the period: first and last value, lowest, highest; for a state, its changes |
 
 A record where the device was not communicating counts as "no valid value",
-never as 0.
+never as 0. Over a long period the DAQ values are sampled (at most 300 rows), so
+a short excursion between two samples is not seen.
+
+Set-up of the DAQ access:
+
+- on the server: `daq/trend_read.py` in the account's `~/vacuum_assistant/`,
+  and in its `~/.ssh/authorized_keys` the board's public key with a forced
+  command (one line):
+  `command="/cvmfs/software.igwn.org/conda/envs/igwn-py39/bin/python /users/<account>/vacuum_assistant/trend_read.py",no-pty,no-port-forwarding,no-agent-forwarding,no-X11-forwarding ssh-ed25519 AAAA... vacuum-assistant`
+- on the board: the private key in `data/daq_key` (created there with
+  `ssh-keygen -t ed25519 -N "" -f data/daq_key`, never copied elsewhere) and
+  `"daq": {"host", "user", "prefix", "rename"}` in `config.json`.
 
 ## Actions (HMI panel on the Pi)
 

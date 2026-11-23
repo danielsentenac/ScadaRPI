@@ -19,6 +19,7 @@ from arduino.app_utils import App
 from modbus_ro import ModbusReadOnlyClient
 import rules
 import history
+from daq import DaqTrend, DaqError
 from actions import Controller
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -496,6 +497,42 @@ HISTORY = history.History(os.path.join(os.path.dirname(HERE), "data", "history")
                           CONFIG.get("history_days", 30))
 
 
+DAQ = DaqTrend(CONFIG.get("daq"), os.path.join(os.path.dirname(HERE), "data"))
+
+
+def needed_channels(keys):
+    """Panel channels needed to answer about these items: their values, the reading status of the
+    pressures, and the communication status of their devices."""
+    out = []
+    for key in keys:
+        if key == "temperatures":
+            cs = [c for c in CHANNELS if c["family"] in ("SICEM_T", "SICEM_SETP") and not c["hidden"]] + ITEMS["ch1"] + ITEMS["ch2"]
+        elif key == "rack":
+            cs = [c for c in CHANNELS if c["family"] == "TCMUX_TEMP" and not c["hidden"]]
+        else:
+            cs = ITEMS[key]
+        for c in cs:
+            out.append(c["channel"])
+            if c["channel"] + "ST" in BY_NAME:
+                out.append(c["channel"] + "ST")
+            out.extend(d["channel"] for d in CHANNELS if d["device"] == c["device"] and d["access"] == "COM_STATUS")
+    return list(dict.fromkeys(out))
+
+
+def past_rows(t0, t1, keys, max_rows=300):
+    """Records between t0 and t1 for these items: from the DAQ trend files when they hold all the
+    channels needed, otherwise from the assistant's own record. Returns (rows, text naming the source)."""
+    channels = needed_channels(keys)
+    try:
+        rows, missing, step = DAQ.rows(t0, t1, channels, max_rows)
+        if rows:
+            return rows, "DAQ trend data%s" % ("" if step == 1 else ", one value every %d s" % step)
+        why = "the DAQ has no data for that time" + (" (%s not acquired)" % ", ".join(missing[:3]) if missing else "")
+    except DaqError as e:
+        why = str(e)
+    return HISTORY.rows(t0, t1), "the assistant's own record (%s)" % why
+
+
 def history_loop():
     while True:
         time.sleep(HISTORY_PERIOD)
@@ -557,25 +594,25 @@ def span_lines(key, rows):
 
 def past_answer(q, when, keys):
     now = time.time()
-    first = HISTORY.first_time()
-    start = "The history starts at %s." % when_text(first) if first else "Nothing has been recorded yet."
     if not keys:
         return "Name what you want the past value of, for example 'G22 1h' or 'V21 at 14:30'."
     if when[0] == "at":
-        row = HISTORY.at(when[1], max(2 * HISTORY_PERIOD, 120))
-        if row is None:
-            return "No value was recorded around %s. %s" % (when_text(when[1]), start)
+        rows, source = past_rows(when[1] - 120, when[1] + 120, keys, 2000)
+        if not rows:
+            return "No value was recorded around %s (source tried: %s)." % (when_text(when[1]), source)
+        row = min(rows, key=lambda r: abs(r[0] - when[1]))
         lines = []
         for key in keys:
             lines.extend(item_facts(key, row[1])[0])
-        return "%s\nRecorded at %s." % ("\n".join(lines), when_text(row[0]))
-    rows = HISTORY.rows(when[1], now)
+        return "%s\nRecorded at %s. Source: %s." % ("\n".join(lines), when_text(row[0]), source)
+    rows, source = past_rows(when[1], now, keys)
     if not rows:
-        return "No value was recorded since %s. %s" % (when_text(when[1]), start)
+        return "No value was recorded since %s (source tried: %s)." % (when_text(when[1]), source)
     lines = []
     for key in keys:
         lines.extend(span_lines(key, rows))
-    return "%s\nFrom %d records between %s and %s." % ("\n".join(lines), len(rows), when_text(rows[0][0]), when_text(rows[-1][0]))
+    return "%s\nFrom %d records between %s and %s. Source: %s." % (
+        "\n".join(lines), len(rows), when_text(rows[0][0]), when_text(rows[-1][0]), source)
 
 
 def ask(q: str = ""):
@@ -711,7 +748,7 @@ def report_file(name: str = "", format: str = "png"):
 
 def status():
     return {"job": CONTROL.job or "", "commands_enabled": CONTROL.enabled, "supervising": CONTROL.supervising,
-            "netdisk": CONTROL.netdisk_state}
+            "netdisk": CONTROL.netdisk_state, "daq": DAQ.state}
 
 
 web_ui = WebUI()
