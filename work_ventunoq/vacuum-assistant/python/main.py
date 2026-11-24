@@ -835,27 +835,60 @@ def log(since: int = -1):
     return CONTROL.log_since(since)
 
 
+COMMENTARY_TASK = ("Write the commentary of this historical vacuum report in three short sentences, 70 words at most: what is "
+                   "different at STOP compared with START, how the pressures and the RGA masses evolved between "
+                   "them, which gases dominate at STOP. "
+                   "Use only the facts above, copy their values and their words (rose, fell, steady) exactly, "
+                   "and give no cause, advice or value that is not in them.")
+
+
+def report_commentary(fact_lines):
+    """Commentary of a historical report, worded by the model from the facts computed by the app
+    (history_report.facts). The prompt stays within MAX_PROMPT_WORDS: the last facts are left out
+    if needed. Raises if the model does not answer."""
+    lines = list(fact_lines)
+    while len(lines) > 1 and len((" ".join(lines) + " " + COMMENTARY_TASK).split()) > MAX_PROMPT_WORDS - 12:
+        lines.pop(-2)                      # the last line (regime at the end) is kept
+    prompt = "FACTS COMPUTED FROM THE RECORDED DATA\n%s\n\nQUESTION\n%s" % ("\n".join(lines), COMMENTARY_TASK)
+    with llm_lock:
+        last = None
+        for attempt in range(2):           # the model service may be reloading: retry once
+            try:
+                llm.clear_memory()
+                return llm.chat(prompt)
+            except Exception as e:
+                last = e
+                time.sleep(10)
+        raise last
+
+
 def event_items():
-    """Items and states that can be chosen as the event of a historical report."""
+    """Items and states that can be chosen as START or STOP of a historical report."""
     return {"items": history_report.event_items(BY_NAME)}
 
 
-def events(channel: str = "", code: int = -1, days: float = 30.0):
-    """Times at which `channel` took the state `code`, newest first, searched in the DAQ trend data."""
-    if channel not in [c for _, c in history_report.EVENT_ITEMS] or not 0 < days <= 40:
+def events(channel: str = "", code: int = -1, days: float = 30.0, after: int = 0):
+    """Times at which `channel` took the state `code` (a set point: changed), searched in the DAQ
+    trend data: over the last `days`, newest first; or since `after` (unix), oldest first."""
+    if channel not in [c for _, c in history_report.EVENT_ITEMS] or not 0 < days <= history_report.MAX_DAYS + 2:
         return {"events": [], "message": "unknown item or period"}
     try:
-        found = history_report.find_events(DAQ, channel, code, days)
+        found = history_report.find_events(DAQ, channel, code, days, after=after)
     except Exception as e:
         return {"events": [], "message": "the DAQ cannot be read: %s" % str(e)[:150]}
-    return {"events": [{"t": t, "text": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t))} for t in found],
-            "message": "" if found else "no such event in the last %g days of DAQ data" % days}
+    return {"events": [{"t": t, "text": ("%s  %s" % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t)), detail)).strip()}
+                       for t, detail in found],
+            "message": "" if found else ("no such event after START" if after else
+                                         "no such event in the last %g days of DAQ data" % days)}
 
 
-def action(name: str = "", channel: str = "", code: int = -1, t: int = 0):
-    """Preset buttons of the HMI."""
+def action(name: str = "", channel: str = "", code: int = -1, t: int = 0,
+           channel2: str = "", code2: int = -1, t2: int = 0):
+    """Preset buttons of the HMI. For the historical report: START = (channel, code, t), an empty
+    channel meaning the date t; STOP = (channel2, code2, t2), t2 = 0 meaning the present."""
     if name == "history":
-        return CONTROL.start("HISTORICAL REPORT", lambda: history_report.build(CONTROL, DAQ, channel, code, t))
+        return CONTROL.start("HISTORICAL REPORT", lambda: history_report.build(
+            CONTROL, DAQ, (channel, code, t), (channel2, code2, t2), report_commentary))
     if name == "safety":
         return CONTROL.start("SAFETY", CONTROL.seq_safety, preempt=True)
     if name == "baking":

@@ -294,8 +294,9 @@ public class AssistantGui extends JFrame {
         } }, "assistant-request").start();
     }
 
-    /** HISTORICAL REPORT: choose an item and a state, then one of the times it happened (searched
-     *  by the assistant in the DAQ trend data); the report covers from that event until now. */
+    /** HISTORICAL REPORT, from a START to a STOP. START is an event (an item taking a state, or a
+     *  set point changing; the assistant searches its times in the DAQ trend data) or a date;
+     *  STOP is the present, an event after START, or a date. */
     private void historicalReport() {
         new Thread(new Runnable() { public void run() {
             final java.util.List<String[]> items = new java.util.ArrayList<String[]>();   // name, channel, states
@@ -306,37 +307,80 @@ public class AssistantGui extends JFrame {
                 while (m.find()) items.add(new String[] { m.group(1), m.group(2), m.group(3) });
             } catch (Exception ex) { say("\n[HISTORICAL REPORT] the assistant cannot be reached (" + ex.getMessage() + ")"); return; }
             if (items.isEmpty()) { say("\n[HISTORICAL REPORT] the assistant gave no item to choose"); return; }
-            SwingUtilities.invokeLater(new Runnable() { public void run() { chooseEvent(items); } });
+            SwingUtilities.invokeLater(new Runnable() { public void run() {
+                chooseBound(true, items, 0, new Bound() { public void chosen(final String channel, final String code, final String t, final String text) {
+                    chooseBound(false, items, Long.parseLong(t), new Bound() { public void chosen(String channel2, String code2, String t2, String text2) {
+                        request("HISTORICAL REPORT from " + text + " to " + text2, "/action?name=history&channel=" + channel
+                                + "&code=" + code + "&t=" + t + "&channel2=" + channel2 + "&code2=" + code2 + "&t2=" + t2);
+                    } });
+                } });
+            } });
         } }, "assistant-history").start();
     }
 
-    private void chooseEvent(final java.util.List<String[]> items) {
-        final JComboBox<String> item = new JComboBox<String>(), state = new JComboBox<String>(), days = new JComboBox<String>(
-            new String[] { "last 2 days", "last 7 days", "last 30 days" });
+    /** What chooseBound gives: the event (channel, code) and its unix time; an empty channel is a
+     *  plain date, and the time 0 the present. */
+    private interface Bound { void chosen(String channel, String code, String t, String text); }
+
+    private static final int[] SEARCH_DAYS = { 2, 7, 30, 60 };
+
+    /** Dialog of one bound of the historical report. START (start = true): an event searched in
+     *  the last days, or a date. STOP: the present, an event searched after START (`after`), or a date. */
+    private void chooseBound(final boolean start, final java.util.List<String[]> items, final long after, final Bound then) {
+        final String title = "HISTORICAL REPORT - " + (start ? "START" : "STOP");
+        final JComboBox<String> kind = new JComboBox<String>(start ? new String[] { "an event", "a date" }
+                                                                   : new String[] { "the present", "an event", "a date" });
+        final JComboBox<String> item = new JComboBox<String>(), state = new JComboBox<String>(), days = new JComboBox<String>();
+        final JComboBox<String> day = new JComboBox<String>(), hour = new JComboBox<String>(), minute = new JComboBox<String>();
         final java.util.List<String> codes = new java.util.ArrayList<String>();
         for (String[] i : items) item.addItem(i[0]);
+        for (int d : SEARCH_DAYS) days.addItem("last " + d + " days");
+        days.setSelectedIndex(2);
+        final java.text.SimpleDateFormat dayFormat = new java.text.SimpleDateFormat("yyyy-MM-dd");
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        for (int d = 0; d <= SEARCH_DAYS[SEARCH_DAYS.length - 1]; d++) { day.addItem(dayFormat.format(cal.getTime())); cal.add(java.util.Calendar.DATE, -1); }
+        for (int h = 0; h < 24; h++) hour.addItem(String.format("%02d h", h));
+        for (int m = 0; m < 60; m += 5) minute.addItem(String.format("%02d min", m));
         ActionListener fill = new ActionListener() { public void actionPerformed(ActionEvent e) {
             state.removeAllItems(); codes.clear();
-            java.util.regex.Matcher m = java.util.regex.Pattern.compile("\"(\\d+)\":\"([^\"]*)\"")
+            java.util.regex.Matcher m = java.util.regex.Pattern.compile("\"(-?\\d+)\":\"([^\"]*)\"")
                 .matcher(items.get(Math.max(0, item.getSelectedIndex()))[2]);
             while (m.find()) { codes.add(m.group(1)); state.addItem(m.group(2)); } } };
         item.addActionListener(fill);
         fill.actionPerformed(null);
-        days.setSelectedIndex(2);
-        JPanel panel = new JPanel(new GridLayout(3, 2, 8, 8));
-        for (JComponent c : new JComponent[] { new JLabel("Item"), item, new JLabel("became"), state, new JLabel("searched in the"), days }) {
-            c.setFont(TEXT); panel.add(c); }
-        if (JOptionPane.showConfirmDialog(this, panel, "HISTORICAL REPORT - event", JOptionPane.OK_CANCEL_OPTION,
-                                          JOptionPane.QUESTION_MESSAGE) != JOptionPane.OK_OPTION || state.getSelectedIndex() < 0) return;
+        ActionListener enable = new ActionListener() { public void actionPerformed(ActionEvent e) {
+            boolean event = "an event".equals(kind.getSelectedItem()), date = "a date".equals(kind.getSelectedItem());
+            item.setEnabled(event); state.setEnabled(event); days.setEnabled(event && start);
+            day.setEnabled(date); hour.setEnabled(date); minute.setEnabled(date); } };
+        kind.addActionListener(enable);
+        enable.actionPerformed(null);
+        JPanel time = new JPanel(new GridLayout(1, 3, 6, 0));
+        for (JComponent c : new JComponent[] { day, hour, minute }) { c.setFont(TEXT); time.add(c); }
+        java.util.List<JComponent> rows = new java.util.ArrayList<JComponent>(java.util.Arrays.asList(new JComponent[] {
+            new JLabel(start ? "START at" : "STOP at"), kind, new JLabel("Event: item"), item, new JLabel("became"), state }));
+        if (start) rows.addAll(java.util.Arrays.asList(new JComponent[] { new JLabel("searched in the"), days }));
+        rows.addAll(java.util.Arrays.asList(new JComponent[] { new JLabel("Date"), time }));
+        JPanel panel = new JPanel(new GridLayout(rows.size() / 2, 2, 8, 8));
+        for (JComponent c : rows) { if (c != time) c.setFont(TEXT); panel.add(c); }
+        if (JOptionPane.showConfirmDialog(this, panel, title, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE)
+                != JOptionPane.OK_OPTION) return;
+        if ("the present".equals(kind.getSelectedItem())) { then.chosen("", "-1", "0", "the present"); return; }
+        if ("a date".equals(kind.getSelectedItem())) {
+            String text = day.getSelectedItem() + " " + String.format("%02d:%02d", hour.getSelectedIndex(), minute.getSelectedIndex() * 5);
+            try { then.chosen("", "-1", String.valueOf(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm").parse(text).getTime() / 1000), text); }
+            catch (java.text.ParseException ex) { say("\n[HISTORICAL REPORT] date not understood: " + text); }
+            return;
+        }
+        if (state.getSelectedIndex() < 0) return;
         final String[] chosen = items.get(item.getSelectedIndex());
         final String code = codes.get(state.getSelectedIndex()), what = chosen[0] + " " + state.getSelectedItem();
-        final int span = new int[] { 2, 7, 30 }[days.getSelectedIndex()];
-        say("\n[HISTORICAL REPORT] searching the DAQ data for \"" + what + "\" (this can take a minute)...");
+        final String period = start ? "&days=" + SEARCH_DAYS[days.getSelectedIndex()] : "&days=" + SEARCH_DAYS[SEARCH_DAYS.length - 1] + "&after=" + after;
+        say("\n[HISTORICAL REPORT] searching the DAQ data for \"" + what + "\" (this can take a minute or two)...");
         new Thread(new Runnable() { public void run() {
             final java.util.List<String[]> found = new java.util.ArrayList<String[]>();       // unix time, text
             String message = "";
             try {
-                String reply = http("GET", base + "/events?channel=" + chosen[1] + "&code=" + code + "&days=" + span, null, 240000);
+                String reply = http("GET", base + "/events?channel=" + chosen[1] + "&code=" + code + period, null, 400000);
                 java.util.regex.Matcher m = java.util.regex.Pattern.compile("\"t\":(\\d+),\"text\":\"([^\"]+)\"").matcher(reply);
                 while (m.find()) found.add(new String[] { m.group(1), m.group(2) });
                 message = jsonString(reply, "message");
@@ -345,13 +389,12 @@ public class AssistantGui extends JFrame {
             SwingUtilities.invokeLater(new Runnable() { public void run() {
                 String[] times = new String[found.size()];
                 for (int i = 0; i < times.length; i++) times[i] = found.get(i)[1];
-                Object pick = JOptionPane.showInputDialog(AssistantGui.this, "\"" + what + "\" happened at these times.\n"
-                    + "The report will cover from the chosen one until now.", "HISTORICAL REPORT - which one",
-                    JOptionPane.QUESTION_MESSAGE, null, times, times[0]);
+                Object pick = JOptionPane.showInputDialog(AssistantGui.this, "\"" + what + "\" happened at these times"
+                    + (start ? " (newest first).\nChoose the START of the report." : " after START (oldest first).\nChoose the STOP of the report."),
+                    title, JOptionPane.QUESTION_MESSAGE, null, times, times[0]);
                 if (pick == null) return;
                 for (String[] f : found)
-                    if (f[1].equals(pick))
-                        request("HISTORICAL REPORT " + what + " " + f[1], "/action?name=history&channel=" + chosen[1] + "&code=" + code + "&t=" + f[0]);
+                    if (f[1].equals(pick)) { then.chosen(chosen[1], code, f[0], what + " " + f[1]); return; }
             } });
         } }, "assistant-history-search").start();
     }

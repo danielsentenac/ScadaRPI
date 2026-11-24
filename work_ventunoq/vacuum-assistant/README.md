@@ -377,23 +377,48 @@ Notes:
 ## Historical vacuum report
 
 The VACUUM REPORT describes the present. The HISTORICAL REPORT button of the HMI describes what
-happened since one event, from the trend data saved by the DAQ (`python/history_report.py`):
+happened between a START and a STOP, from the trend data saved by the DAQ (`python/history_report.py`):
 
-1. The operator chooses an item and a state (V22 closed, P22 pump off, heating CH1 off, RGA scan
-   running...) and a search period (2, 7 or 30 days). `/events` looks for the times at which the
-   item took that state: one DAQ request per 5 days, then each change is located to the second.
-   A state that lasted less than about 4 minutes can be missed.
-2. The operator picks one of the times found. `/action?name=history&channel=&code=&t=` builds the
-   report from a short time before the event until now:
-   - states, pressures and temperatures just before the event, just after it and at the end
-     (a change is shown in red);
-   - trends of the pressure gauges and of masses 2, 18, 28, 32, 44, the event marked by a red line;
-   - the first full RGA scan after the event and the final one (the scan running now, read on the
-     panel; else the last one the DAQ holds), on the same scale;
-   - in the workbook: the same tables, the two scans in columns (mass, start, final), the trend data.
-3. The files are `<prefix>HIST_report_<date>_<time>.png/.xlsx`, listed and copied to the share like
+1. **START** is an event or a date. An event is an item taking a state (V22 closed, P22 pump off,
+   heating CH1 off, RGA scan running...) or a temperature set point changing (CH1 to CH9), searched
+   over the last 2, 7, 30 or 60 days. `/events` looks for its times: one DAQ request per 2 days,
+   four at a time, then each change is located to the second. A state that lasted less than about
+   90 seconds can be missed. The operator picks one of the times found.
+2. **STOP** is the present, a date, or an event chosen the same way among those found after START
+   (`/events?...&after=<START>`).
+3. `/action?name=history&channel=&code=&t=&channel2=&code2=&t2=` builds the report (an empty
+   `channel` or `channel2` means the date `t` or `t2`; `t2=0` means the present):
+   - states, pressures, set points and temperatures at START and at STOP, read just after each
+     event to show its effect (a change is shown in red);
+   - trends of the pressure gauges and of masses 2, 18, 28, 32, 44, START and STOP marked by red lines;
+   - the RGA spectrum at START (first full scan after it) and at STOP (the scan running now, read
+     on the panel, when STOP is the present; else the last one the DAQ holds before STOP), on the
+     same scale;
+   - the AI commentary (below);
+   - in the workbook: the same tables, the two scans in columns (mass, START, STOP), the trend data.
+4. The files are `<prefix>HIST_report_<date>_<time>.png/.xlsx`, listed and copied to the share like
    the other reports.
 
 Nothing is written to the panel: the RGA must be left scanning for its trend to exist. RGA masses
 recorded before `rga_current_since` (unix time, config.json) were published 100 times too low and
-are multiplied by 100. Channels the DAQ did not record at the time appear as "no data".
+are multiplied by 100. Channels the DAQ did not record at the time appear as "no data", and so
+does a heating value of -99 (no sensor cable connected on the channel); a channel without any
+value is left out of the temperature table.
+
+### AI commentary
+
+The last block of the page, labelled as written by the language model, is the only part of the
+report the model takes part in, and it only words it:
+
+- `history_report.facts()` computes what there is to say: what differs at STOP compared with
+  START, each pressure and each main RGA mass at both bounds (the values of the tables and of the
+  two spectra) with its evolution (rose or fell by a factor, stayed steady: a factor under 1.5),
+  a peak in between, the dominant gases at STOP, the regime.
+- `main.report_commentary()` gives these lines to the model within the prompt limit and asks for
+  three short sentences.
+- `history_report.checked()` removes from the answer any sentence that quotes a number absent from
+  the facts, that gives a gauge or a gas an evolution other than the computed one, or that is cut.
+  The page says how many sentences were removed. Other errors of wording remain possible: the
+  tables are the reference.
+- The workbook holds the commentary and the facts given to the model. If the model does not
+  answer, the report is made without commentary.

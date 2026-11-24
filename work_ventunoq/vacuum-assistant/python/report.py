@@ -145,8 +145,8 @@ def spectrum_plot(d, box, spectrum, last, scale=None):
 
 def trend_plot(d, box, times, series, labels, colours, ylabel="ion current (A)",
                xlabel="time since the start of the recording", marker=None, gap=None):
-    """Curves against time (seconds from the start of the plot). `marker` is a time marked by a
-    vertical line (the event of a historical report). Points more than `gap` seconds apart are not
+    """Curves against time (seconds from the start of the plot). `marker` is a time, or a list
+    of times, marked by a vertical line (START and STOP of a historical report). Points more than `gap` seconds apart are not
     joined (period without data)."""
     x0, y0, x1, y1 = box
     f = font(15)
@@ -155,9 +155,10 @@ def trend_plot(d, box, times, series, labels, colours, ylabel="ion current (A)",
     span = max(times[-1], 1.0) if times else 1.0
     unit, scale = (("days", 86400.0) if span > 3 * 86400 else ("h", 3600.0) if span > 3 * 3600 else
                    ("min", 60.0) if span > 180 else ("s", 1.0))
-    if marker is not None and 0 <= marker <= span:
-        x = x0 + marker / span * (x1 - x0)
-        d.line([(x, y0), (x, y1)], fill=RED, width=2)
+    for mark in (marker if isinstance(marker, (list, tuple)) else [marker]):
+        if mark is not None and 0 <= mark <= span:
+            x = x0 + mark / span * (x1 - x0)
+            d.line([(x, y0), (x, y1)], fill=RED, width=2)
     ticks = 6 if x1 - x0 > 700 else 4
     for i in range(ticks + 1):
         x = x0 + i * (x1 - x0) / ticks

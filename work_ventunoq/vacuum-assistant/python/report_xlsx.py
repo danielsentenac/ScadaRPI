@@ -78,7 +78,7 @@ def write(rep, path):
         Font(bold=True, color=GREEN if st["regime_met"] else RED))
     put(4, 1, rep["verdict"], Font(bold=True, color=GREEN if rep["stable"] else RED))
 
-    r = 6
+    r = 7
     put(r, 1, "PRESSURES (mbar)", Font(bold=True, color=BLUE))
     head(r + 1, ["Gauge", "Location", "Start", "Stop", "Remark"])
     for i, (row, row0) in enumerate(zip(st["pressures"], first["pressures"]), r + 2):
@@ -175,12 +175,12 @@ def write(rep, path):
 
 
 def write_history(rep, path):
-    """Workbook of a historical report (history_report.build): the tables before / after / end, the
+    """Workbook of a historical report (history_report.build): the tables at START and STOP, the
     two spectra in columns, the data of the trends and the charts."""
     wb = Workbook()
     ws = wb.active
     ws.title = "Report"
-    st, three = rep["status"], (rep["status_before"], rep["status_after"], rep["status"])
+    st, three = rep["status"], rep["statuses"]
     bold = Font(bold=True)
 
     def put(row, col, value, font=None, fmt=None, fill=None):
@@ -195,14 +195,15 @@ def write_history(rep, path):
             put(row, col + i, t, bold, fill=HEAD)
 
     put(1, 1, "HISTORICAL VACUUM REPORT - %s" % rep["title"], Font(bold=True, size=16, color=BLUE))
-    put(2, 1, "Event: %s" % rep["event"], Font(bold=True, color=RED))
-    put(3, 1, "DAQ trend data from %s to %s" % (rep["started"], rep["stopped"]))
-    put(4, 1, "At the end: pumping system at normal regime" if st["regime_met"] else
-        "At the end: pumping system NOT at normal regime - " + "; ".join(st["regime_detail"]),
+    put(2, 1, "START: %s" % rep["start_text"], Font(bold=True, color=RED))
+    put(3, 1, "STOP: %s" % rep["stop_text"], Font(bold=True, color=RED))
+    put(4, 1, "DAQ trend data from %s to %s" % (rep["started"], rep["stopped"]))
+    put(5, 1, "At STOP: pumping system at normal regime" if st["regime_met"] else
+        "At STOP: pumping system NOT at normal regime - " + "; ".join(st["regime_detail"]),
         Font(bold=True, color=GREEN if st["regime_met"] else RED))
     columns = ["%s (%s)" % c for c in rep["columns"]]
 
-    r = 6
+    r = 7
     put(r, 1, "PRESSURES (mbar)", Font(bold=True, color=BLUE))
     head(r + 1, ["Gauge", "Location"] + columns + ["Remark"])
     for i, row in enumerate(st["pressures"]):
@@ -211,16 +212,16 @@ def write_history(rep, path):
         for k, s in enumerate(three):
             p = s["pressures"][i]
             put(r + 2 + i, 3 + k, number(p["value"]), Font(color=RED) if p["note"] else None, SCI)
-        put(r + 2 + i, 6, row["note"], Font(color=RED))
+        put(r + 2 + i, 3 + len(three), row["note"], Font(color=RED))
     r += 3 + len(st["pressures"])
 
     put(r, 1, "TEMPERATURES (degC)", Font(bold=True, color=BLUE))
-    head(r + 1, ["Channel", "Setpoint"] + columns)
+    head(r + 1, ["Channel"] + ["%s %s" % (what, label) for label, _ in rep["columns"] for what in ("Set point", "Temperature")])
     for i, c in enumerate(st["temperatures"]):
         put(r + 2 + i, 1, c["channel"], bold)
-        put(r + 2 + i, 2, number(c["setpoint"]), None, "0.0")
         for k, s in enumerate(three):
-            put(r + 2 + i, 3 + k, number(s["temperatures"][i]["temperature"]), None, "0.0")
+            put(r + 2 + i, 2 + 2 * k, number(s["temperatures"][i]["setpoint"]), None, "0.0")
+            put(r + 2 + i, 3 + 2 * k, number(s["temperatures"][i]["temperature"]), None, "0.0")
     r += 3 + len(st["temperatures"])
 
     put(r, 1, "VALVES, PUMPS, HEATING", Font(bold=True, color=BLUE))
@@ -235,18 +236,34 @@ def write_history(rep, path):
             changed = value != earlier and value not in unknown and earlier not in unknown
             put(r + 2 + i, 3 + k, "no data" if value in unknown else value, Font(bold=True, color=RED) if changed else None)
     r += 3 + len(st["states"])
-    for note in (rep["spectrum_source"] and "Final spectrum: %s." % rep["spectrum_source"], rep["unit_note"]):
+    for note in (rep["spectrum_source"] and "Spectrum at STOP: %s." % rep["spectrum_source"], rep["unit_note"]):
         if note:
             put(r, 1, note, Font(color=GREY))
             r += 1
+
+    # ---- commentary of the language model, with the computed facts it was given
+    if rep.get("commentary") or rep.get("commentary_note", "not requested") != "not requested":
+        r += 1
+        put(r, 1, "AI COMMENTARY - written by the on-board language model, not a measurement: check it against the tables",
+            Font(bold=True, color=RED))
+        for line in ([rep["commentary"]] if rep["commentary"] else []) + \
+                    (["AI commentary: %s." % rep["commentary_note"]] if rep["commentary_note"] else []):
+            r += 1
+            put(r, 1, line)
+        r += 2
+        put(r, 1, "FACTS COMPUTED FROM THE DATA (the only material given to the language model)", Font(bold=True, color=BLUE))
+        for line in rep.get("facts", []):
+            r += 1
+            put(r, 1, line)
+        r += 1
 
     # ---- masses of the two RGA scans, in columns
     start = {int(m): p for m, p in rep["spectrum_start"].items()}
     final = {int(m): p for m, p in rep["spectrum"].items()}
     r += 1
     put(r, 1, "RGA SCANS, masses 1 to %d - ion current (A)" % rep["last_mass"], Font(bold=True, color=BLUE))
-    head(r + 1, ["Mass (AMU)", "Start (%s)" % (rep["spectrum_start_time"] or "no scan"),
-                 "Final (%s)" % (rep["spectrum_time"] or "no scan")])
+    head(r + 1, ["Mass (AMU)", "START (%s)" % (rep["spectrum_start_time"] or "no scan"),
+                 "STOP (%s)" % (rep["spectrum_time"] or "no scan")])
     first_mass_row = r + 2
     for m in range(1, rep["last_mass"] + 1):
         put(r + 1 + m, 1, m)
@@ -258,15 +275,15 @@ def write_history(rep, path):
     # ---- data sheets of the trends
     span = rep["times"][-1] if rep["times"] else 0
     unit, scale = ("h", 3600.0) if span > 3 * 3600 else ("min", 60.0) if span > 180 else ("s", 1.0)
-    times = [(t - rep["event_seconds"]) / scale for t in rep["times"]]       # 0 = the event
+    times = [(t - rep["event_seconds"]) / scale for t in rep["times"]]       # 0 = START
     masses = sorted(int(m) for m in rep["trend"])
     trend = {int(m): v for m, v in rep["trend"].items()}
     tr = wb.create_sheet("RGA trend")
-    tr.append(["Time since the event (%s)" % unit] + ["mass %d (%s)" % (m, report.GASES.get(m, "?")) for m in masses])
+    tr.append(["Time since START (%s)" % unit] + ["mass %d (%s)" % (m, report.GASES.get(m, "?")) for m in masses])
     for i, t in enumerate(times):
         tr.append([t] + [trend[m][i] or None for m in masses])
     ga = wb.create_sheet("Gauges")
-    ga.append(["Time since the event (%s)" % unit] + [g[3] for g in report.GAUGE_TREND])
+    ga.append(["Time since START (%s)" % unit] + [g[3] for g in report.GAUGE_TREND])
     for i, t in enumerate(times):
         ga.append([t] + [rep["gauges"][g[0]][i] or None for g in report.GAUGE_TREND])
     for sheet in (tr, ga):
@@ -280,7 +297,7 @@ def write_history(rep, path):
     # ---- charts, to the right of the tables
     def history_chart(sheet, title, first_col, colours, y_title):
         chart = trend_chart(sheet, title, first_col, colours, len(times), False, y_title)
-        chart.x_axis.title = "time since the event (%s)" % unit
+        chart.x_axis.title = "time since START (%s)" % unit
         return chart
 
     cold = len(report.COLD_CATHODES)
@@ -290,7 +307,7 @@ def write_history(rep, path):
     ws.add_chart(history_chart(tr, "RGA trend of the main masses", 2,
                                [report.SERIES.get(m, (0, 0, 0)) for m in masses], "A"), "H21")
     bar = BarChart()
-    bar.title, bar.style, bar.height, bar.width = "RGA scans, start and final", 10, 9, 34
+    bar.title, bar.style, bar.height, bar.width = "RGA scans at START and STOP", 10, 9, 34
     log_axis(bar, "mass (AMU)", "A")
     last_row = first_mass_row + rep["last_mass"] - 1
     bar.add_data(Reference(ws, min_col=2, max_col=3, min_row=first_mass_row - 1, max_row=last_row), titles_from_data=True)
