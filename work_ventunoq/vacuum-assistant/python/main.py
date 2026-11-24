@@ -21,6 +21,7 @@ import rules
 import history
 from daq import DaqTrend, DaqError
 from actions import Controller
+import history_report
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -834,8 +835,27 @@ def log(since: int = -1):
     return CONTROL.log_since(since)
 
 
-def action(name: str = ""):
+def event_items():
+    """Items and states that can be chosen as the event of a historical report."""
+    return {"items": history_report.event_items(BY_NAME)}
+
+
+def events(channel: str = "", code: int = -1, days: float = 30.0):
+    """Times at which `channel` took the state `code`, newest first, searched in the DAQ trend data."""
+    if channel not in [c for _, c in history_report.EVENT_ITEMS] or not 0 < days <= 40:
+        return {"events": [], "message": "unknown item or period"}
+    try:
+        found = history_report.find_events(DAQ, channel, code, days)
+    except Exception as e:
+        return {"events": [], "message": "the DAQ cannot be read: %s" % str(e)[:150]}
+    return {"events": [{"t": t, "text": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t))} for t in found],
+            "message": "" if found else "no such event in the last %g days of DAQ data" % days}
+
+
+def action(name: str = "", channel: str = "", code: int = -1, t: int = 0):
     """Preset buttons of the HMI."""
+    if name == "history":
+        return CONTROL.start("HISTORICAL REPORT", lambda: history_report.build(CONTROL, DAQ, channel, code, t))
     if name == "safety":
         return CONTROL.start("SAFETY", CONTROL.seq_safety, preempt=True)
     if name == "baking":
@@ -882,6 +902,8 @@ web_ui.expose_api("POST", "/play", play)
 web_ui.expose_api("GET", "/file", file)
 web_ui.expose_api("GET", "/status", status)
 web_ui.expose_api("GET", "/reports", reports)
+web_ui.expose_api("GET", "/event_items", event_items)
+web_ui.expose_api("GET", "/events", events)
 web_ui.expose_api("GET", "/report", report_file)
 web_ui.expose_api("GET", "/state", state)
 web_ui.expose_api("GET", "/ask", ask)

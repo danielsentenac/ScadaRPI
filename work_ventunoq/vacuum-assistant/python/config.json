@@ -13,6 +13,7 @@
   "rga_stable_cycles": 5,
   "rga_stable_tolerance": 0.1,
   "rga_noise_floor_A": 1e-12,
+  "rga_current_since": 1795528796,
   "rga_max_minutes": 30.0,
   "rga_last_mass": 100,
   "rga_max_pressure_mbar": 1e-05,

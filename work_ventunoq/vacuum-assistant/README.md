@@ -29,6 +29,7 @@ the real Pi (offline during the Pi 3 → Pi 4 swap).
 | `python/actions.py` | The sequences (Safety, Background baking), the experiment-file interpreter, the action log |
 | `python/modbus_cmd.py` | Modbus write client used by `actions.py` only |
 | `data/assistant.log`, `data/instructions.exp` | On the board: action log and last experiment file loaded |
+| `python/history_report.py` | Historical vacuum report: trends and RGA spectra since a chosen event, from the DAQ trend data |
 | `python/history.py` | The assistant's own record of the panel values and the parsing of the time asked in a question |
 | `python/daq.py`, `daq/trend_read.py` | Past values from the DAQ trend files: board side (ssh) and the read-only script run on the Virgo server |
 | `python/report.py` | Status data of the vacuum report and its PNG page (Pillow) |
@@ -372,3 +373,27 @@ Notes:
   G21, V21...) first; to be done together with the status-code meanings.
 - Switch model: `arduino-app-cli app brick config user:vacuum-assistant arduino:llm --model <id>` then restart the app.
 - To repeat the test: `arduino-app-cli model install <id>`, and `arduino-app-cli model delete <id>` afterwards.
+
+## Historical vacuum report
+
+The VACUUM REPORT describes the present. The HISTORICAL REPORT button of the HMI describes what
+happened since one event, from the trend data saved by the DAQ (`python/history_report.py`):
+
+1. The operator chooses an item and a state (V22 closed, P22 pump off, heating CH1 off, RGA scan
+   running...) and a search period (2, 7 or 30 days). `/events` looks for the times at which the
+   item took that state: one DAQ request per 5 days, then each change is located to the second.
+   A state that lasted less than about 4 minutes can be missed.
+2. The operator picks one of the times found. `/action?name=history&channel=&code=&t=` builds the
+   report from a short time before the event until now:
+   - states, pressures and temperatures just before the event, just after it and at the end
+     (a change is shown in red);
+   - trends of the pressure gauges and of masses 2, 18, 28, 32, 44, the event marked by a red line;
+   - the first full RGA scan after the event and the final one (the scan running now, read on the
+     panel; else the last one the DAQ holds), on the same scale;
+   - in the workbook: the same tables, the two scans in columns (mass, start, final), the trend data.
+3. The files are `<prefix>HIST_report_<date>_<time>.png/.xlsx`, listed and copied to the share like
+   the other reports.
+
+Nothing is written to the panel: the RGA must be left scanning for its trend to exist. RGA masses
+recorded before `rga_current_since` (unix time, config.json) were published 100 times too low and
+are multiplied by 100. Channels the DAQ did not record at the time appear as "no data".

@@ -104,6 +104,9 @@ public class AssistantGui extends JFrame {
             if (confirm("Record the RGA until it is stable and save a vacuum status report?\n"
                         + "The RGA scan is started if it is not running."))
                 request("VACUUM REPORT", "/action?name=report"); } });
+        JButton history = button("HISTORICAL REPORT", new Color(150, 190, 245));
+        history.setToolTipText("Report of what happened since one event (a valve closed...), from the DAQ trend data");
+        history.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) { historicalReport(); } });
         JButton stop = button("STOP EXPERIMENT", new Color(235, 235, 245));
         stop.setToolTipText("Stop the running sequence; the system is left as it is");
         safety.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) {
@@ -114,8 +117,8 @@ public class AssistantGui extends JFrame {
         stop.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) {
             request("STOP EXPERIMENT", "/action?name=stop"); } });
         play.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) { play(); } });
-        JPanel presets = titled("BASIC INSTRUCTIONS", new GridLayout(5, 1, 0, 8));
-        presets.add(safety); presets.add(baking); presets.add(play); presets.add(report); presets.add(stop);
+        JPanel presets = titled("BASIC INSTRUCTIONS", new GridLayout(6, 1, 0, 8));
+        presets.add(safety); presets.add(baking); presets.add(play); presets.add(report); presets.add(history); presets.add(stop);
         presets.setPreferredSize(new Dimension(300, 10));
         JPanel instructions = new JPanel(new BorderLayout(8, 0));
         instructions.setOpaque(false);
@@ -289,6 +292,68 @@ public class AssistantGui extends JFrame {
             try { say("\n[" + label + "] " + jsonString(http("GET", base + path, null, 10000), "message")); }
             catch (Exception ex) { say("\n[" + label + "] NOT SENT: the assistant cannot be reached (" + ex.getMessage() + ")"); }
         } }, "assistant-request").start();
+    }
+
+    /** HISTORICAL REPORT: choose an item and a state, then one of the times it happened (searched
+     *  by the assistant in the DAQ trend data); the report covers from that event until now. */
+    private void historicalReport() {
+        new Thread(new Runnable() { public void run() {
+            final java.util.List<String[]> items = new java.util.ArrayList<String[]>();   // name, channel, states
+            try {
+                String reply = http("GET", base + "/event_items", null, 10000);
+                java.util.regex.Matcher m = java.util.regex.Pattern.compile(
+                    "\\{\"name\":\"([^\"]+)\",\"channel\":\"([^\"]+)\",\"states\":\\{([^}]*)\\}").matcher(reply);
+                while (m.find()) items.add(new String[] { m.group(1), m.group(2), m.group(3) });
+            } catch (Exception ex) { say("\n[HISTORICAL REPORT] the assistant cannot be reached (" + ex.getMessage() + ")"); return; }
+            if (items.isEmpty()) { say("\n[HISTORICAL REPORT] the assistant gave no item to choose"); return; }
+            SwingUtilities.invokeLater(new Runnable() { public void run() { chooseEvent(items); } });
+        } }, "assistant-history").start();
+    }
+
+    private void chooseEvent(final java.util.List<String[]> items) {
+        final JComboBox<String> item = new JComboBox<String>(), state = new JComboBox<String>(), days = new JComboBox<String>(
+            new String[] { "last 2 days", "last 7 days", "last 30 days" });
+        final java.util.List<String> codes = new java.util.ArrayList<String>();
+        for (String[] i : items) item.addItem(i[0]);
+        ActionListener fill = new ActionListener() { public void actionPerformed(ActionEvent e) {
+            state.removeAllItems(); codes.clear();
+            java.util.regex.Matcher m = java.util.regex.Pattern.compile("\"(\\d+)\":\"([^\"]*)\"")
+                .matcher(items.get(Math.max(0, item.getSelectedIndex()))[2]);
+            while (m.find()) { codes.add(m.group(1)); state.addItem(m.group(2)); } } };
+        item.addActionListener(fill);
+        fill.actionPerformed(null);
+        days.setSelectedIndex(2);
+        JPanel panel = new JPanel(new GridLayout(3, 2, 8, 8));
+        for (JComponent c : new JComponent[] { new JLabel("Item"), item, new JLabel("became"), state, new JLabel("searched in the"), days }) {
+            c.setFont(TEXT); panel.add(c); }
+        if (JOptionPane.showConfirmDialog(this, panel, "HISTORICAL REPORT - event", JOptionPane.OK_CANCEL_OPTION,
+                                          JOptionPane.QUESTION_MESSAGE) != JOptionPane.OK_OPTION || state.getSelectedIndex() < 0) return;
+        final String[] chosen = items.get(item.getSelectedIndex());
+        final String code = codes.get(state.getSelectedIndex()), what = chosen[0] + " " + state.getSelectedItem();
+        final int span = new int[] { 2, 7, 30 }[days.getSelectedIndex()];
+        say("\n[HISTORICAL REPORT] searching the DAQ data for \"" + what + "\" (this can take a minute)...");
+        new Thread(new Runnable() { public void run() {
+            final java.util.List<String[]> found = new java.util.ArrayList<String[]>();       // unix time, text
+            String message = "";
+            try {
+                String reply = http("GET", base + "/events?channel=" + chosen[1] + "&code=" + code + "&days=" + span, null, 240000);
+                java.util.regex.Matcher m = java.util.regex.Pattern.compile("\"t\":(\\d+),\"text\":\"([^\"]+)\"").matcher(reply);
+                while (m.find()) found.add(new String[] { m.group(1), m.group(2) });
+                message = jsonString(reply, "message");
+            } catch (Exception ex) { message = "the assistant cannot be reached (" + ex.getMessage() + ")"; }
+            if (found.isEmpty()) { say("[HISTORICAL REPORT] " + what + ": " + message); return; }
+            SwingUtilities.invokeLater(new Runnable() { public void run() {
+                String[] times = new String[found.size()];
+                for (int i = 0; i < times.length; i++) times[i] = found.get(i)[1];
+                Object pick = JOptionPane.showInputDialog(AssistantGui.this, "\"" + what + "\" happened at these times.\n"
+                    + "The report will cover from the chosen one until now.", "HISTORICAL REPORT - which one",
+                    JOptionPane.QUESTION_MESSAGE, null, times, times[0]);
+                if (pick == null) return;
+                for (String[] f : found)
+                    if (f[1].equals(pick))
+                        request("HISTORICAL REPORT " + what + " " + f[1], "/action?name=history&channel=" + chosen[1] + "&code=" + code + "&t=" + f[0]);
+            } });
+        } }, "assistant-history-search").start();
     }
 
     private void play() {
