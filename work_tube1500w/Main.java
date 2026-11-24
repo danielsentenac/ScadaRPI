@@ -158,7 +158,7 @@ public class Main {
         // Create TurboPfeifferDCU device
         Device dcu = new TurboPfeifferDCU("DCU",
                                           sicem.mbRegisterEnd, // Modbus start offset
-                                          "/dev/serial/by-id/usb-FTDI_USB-COM485_Plus4_FT4JD8P2-if01-port0", 
+                                          "/dev/serial/by-id/usb-FTDI_USB-COM485_Plus2_FTAFX9AX-if01-port0", 
                                           Baud._9600, 
                                           DataBits._8,  
                                           Parity.NONE, 
