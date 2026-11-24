@@ -402,7 +402,14 @@ def rules_for(question):
     asked = stems(question)
     hit = [l for l in lines if asked & stems(l)]
     return "\n".join(hit or lines)
-PROCEDURE = re.compile(r"what (should|must|to|do|shall|can)|how (should|do|to)|procedure|safety mode|in case of|what if|what is the normal|interlock|why |protect", re.I)
+PROCEDURE = re.compile(r"what (should|must|to|do|shall|can)|how (should|do|to)|procedure|safety mode|in case of|what if|what is the normal|interlock|why |protect|used for|purpose|what does|\bmeans?\b|what for", re.I)
+# A procedure asked for a hypothetical case ("what should I do if P21 fails?")
+CONDITIONAL = re.compile(r"\b(if|in case|fails?|failure|problem|alarm|triggers?|trips?)\b", re.I)
+# What an item is or is for ("what is G4 used for?", "what is Ga3?")
+WHAT_IS = re.compile(r"used for|purpose|what for|^\s*what (is|are) (the |a )?[\w ]{1,20}\??\s*$|what does .* (measure|do)\b", re.I)
+# Whether the normal regime is met now: stated by the app from its own checks, not by the model.
+REGIME_STATE = re.compile(r"\bregime\b", re.I)
+REGIME_RULE = re.compile(r"^\s*(what|which)\b(?!.*\b(now|met|missing|wrong|not)\b)", re.I)
 
 # A request to act gets a fixed first sentence, whatever the model writes.
 COMMAND = re.compile(r"^\s*(please\s+|can you\s+|could you\s+|will you\s+|now\s+)*"
@@ -701,6 +708,20 @@ def ask(q: str = ""):
     stamp = "Read from the panel at %s." % time.strftime("%H:%M:%S", time.localtime(updated))
     fact_text, any_valid, keys = facts(q)
     command = bool(COMMAND.match(q))
+    if keys and not command and WHAT_IS.search(q):
+        # What an item is: from the rules if they mention it (model), else from the panel's own description.
+        plain = [k for k in keys if k in ITEMS and not re.search(r"(?<![a-z0-9])%s(?![a-z0-9])" % re.escape(k),
+                                                                 OPERATING_RULES.lower())]
+        if len(plain) == len(keys):
+            lines = []
+            for k in plain:
+                seen = []
+                for c in ITEMS[k]:
+                    if c["description"] and c["description"] not in seen:
+                        seen.append(c["description"])
+                lines.append("%s: %s." % (ITEMS[k][0]["name"] or k.upper(), "; ".join(seen[:4])))
+            answer = "%s\nThe operating rules say nothing more about %s." % ("\n".join(lines), "it" if len(plain) == 1 else "them")
+            return {"question": q, "answer": answer, "seconds": round(time.time() - t0, 1), "snapshot": answer}
     if keys and not command and not PROCEDURE.search(q):
         if not any_valid:                  # nothing valid to word or interpret
             return {"question": q, "answer": "%s\n%s\nNo other statement can be made about %s without a valid value."
@@ -712,11 +733,21 @@ def ask(q: str = ""):
     if not keys and not command and not PROCEDURE.search(q) and STATUS_QUESTION.search(q):
         answer = status_answer(stamp)
         return {"question": q, "answer": answer, "seconds": round(time.time() - t0, 1), "snapshot": answer}
+    if not command and REGIME_STATE.search(q) and not REGIME_RULE.search(q):
+        lines = [l for l in overview_lines() if l.startswith(("Normal regime", "Devices", "SAFETY", "Gauges reading"))]
+        lines.sort(key=lambda l: not l.startswith("Normal regime"))
+        answer = "%s\n%s" % ("\n".join("- " + l for l in lines), stamp)
+        return {"question": q, "answer": answer, "seconds": round(time.time() - t0, 1), "snapshot": answer}
+    hypothetical = bool(PROCEDURE.search(q) and not command and CONDITIONAL.search(q))
     fact_text = fact_text[:800]            # the prompt length is limited (see MAX_PROMPT_WORDS)
     if command:
         # Do not let the model discuss the action: it only reports the item concerned.
         task = ('The operator asked: "%s". This cannot be done from here. In one sentence, give only the '
                 'current state of the item concerned, with its panel name.' % q)
+    elif hypothetical:
+        # The model gets the rules only, no values: it must quote the procedure, not describe the present.
+        task = ("%s\nAnswer with the operating rule that applies to this case, word for word, including what "
+                "the operator must press. Do not add any other step, advice or comment." % q)
     elif PROCEDURE.search(q):
         # Procedures come from the operating rules only: the model must not make up steps.
         task = ("%s\nAnswer with the matching operating rule, word for word as far as possible. Do not add any "
@@ -726,13 +757,17 @@ def ask(q: str = ""):
     recent = ""
     if re.search(r"\b(log|action|actions|did|done|doing|experiment|baking|running|happened)\b", q, re.I):
         recent = "\n\nRECENT ACTIONS OF THE ASSISTANT (newest last)\n%s" % "\n".join(CONTROL.lines[-4:])
-    rule_text = rules_for(q)
-    fixed = "%s %s %s %s" % (fact_text, rule_text, recent, task)
-    snap = snapshot_text(q, reserve=len(fact_text) + 90 if fact_text else 0,
-                         max_words=max(MAX_PROMPT_WORDS - len(fixed.split()) - 22, 0))
-    if fact_text:
-        snap = "VALUES OF THE ITEMS ASKED ABOUT (use these, never another number for them)\n%s\n\n%s" % (fact_text, snap)
-    prompt = "CURRENT VALUES\n%s\n\nOPERATING RULES\n%s%s\n\nQUESTION\n%s" % (snap, rule_text, recent, task)
+    if hypothetical:
+        snap = ""
+        prompt = "OPERATING RULES\n%s\n\nQUESTION\n%s" % (OPERATING_RULES, task)
+    else:
+        rule_text = rules_for(q)
+        fixed = "%s %s %s %s" % (fact_text, rule_text, recent, task)
+        snap = snapshot_text(q, reserve=len(fact_text) + 90 if fact_text else 0,
+                             max_words=max(MAX_PROMPT_WORDS - len(fixed.split()) - 22, 0))
+        if fact_text:
+            snap = "VALUES OF THE ITEMS ASKED ABOUT (use these, never another number for them)\n%s\n\n%s" % (fact_text, snap)
+        prompt = "CURRENT VALUES\n%s\n\nOPERATING RULES\n%s%s\n\nQUESTION\n%s" % (snap, rule_text, recent, task)
     if len(prompt.split()) > MAX_PROMPT_WORDS:   # last resort: a longer prompt breaks the model service
         prompt = " ".join(prompt.split()[:MAX_PROMPT_WORDS - len(task.split()) - 2]) + "\n\nQUESTION\n" + task
     with llm_lock:
@@ -756,7 +791,7 @@ def ask(q: str = ""):
             return {"error": "model error: %s" % last}
     if command and READ_ONLY not in answer:
         answer = "%s %s" % (READ_ONLY, answer)
-    if PROCEDURE.search(q) and not command and re.search(r"\b(if|in case|fails?|failure|problem|alarm)\b", q, re.I):
+    if hypothetical:
         # whether the situation is present now is stated from the checks, not by the model
         now_lines = [l for l in overview_lines() if l.startswith(("Devices", "States meaning", "Normal regime", "SAFETY"))]
         answer = "%s\n\nCurrent state (%s)\n%s" % (answer, stamp, "\n".join("- " + l for l in now_lines))
