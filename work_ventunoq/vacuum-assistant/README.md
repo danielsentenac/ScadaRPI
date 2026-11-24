@@ -161,7 +161,7 @@ Set-up of the DAQ access:
 The Pi HMI has an AI ASSISTANT window (`work_tube1500w/AssistantGui.java`,
 opened by the AI ASSISTANT button of the synoptic). It calls this app over
 HTTP: `/ask` (chat), `/action?name=safety|baking|report|stop`, `/play` (POST
-`{"name", "text"}`), `/log?since=n`, `/file?name=instructions|log`, `/status`,
+`{"name", "text"}`), `/log?since=n`, `/file?name=instructions|log`, `/grammar`, `/check` (POST `{"text"}`), `/status`,
 `/reports` (names, newest first), `/report?name=<name>&format=png|xlsx`.
 
 - **SAFETY**: CH1 OFF, CH2 OFF, setpoints CH1-CH9 to 0, close V1, close V21,
@@ -184,6 +184,13 @@ HTTP: `/ask` (chat), `/action?name=safety|baking|report|stop`, `/play` (POST
   SAFETY
   REPORT                           the vacuum report sequence below
   ```
+- **EDIT EXPERIMENT**: the editor of the HMI to write an experiment file on the touchscreen.
+  Its right side is the grammar dictionary, read from the assistant (`/grammar`, the list
+  `GRAMMAR` in `python/actions.py`, kept next to the parser): touching an instruction or a word
+  (valves, pumps, names of WAIT UNTIL) inserts it in the text. CHECK sends the text to the
+  assistant's own parser (`POST /check`): nothing is run, the bad lines are listed. SAVE writes
+  `<name>.exp` in the `play` folder of the panel, where PLAY offers it; OPEN reads a file from
+  that folder. The editor only writes files: an experiment starts with PLAY alone.
 - **VACUUM REPORT** (`python/report.py`, `Controller.seq_report`):
   1. If the RGA scan is not running it is started, only with G21 valid and below
      `rga_max_pressure_mbar` (1E-5), to protect the filament.
@@ -214,7 +221,10 @@ HTTP: `/ask` (chat), `/action?name=safety|baking|report|stop`, `/play` (POST
      `smb://netdisk.virgo.infn.it/vacuum/TUBE1500W` (`netdisk` in
      `config.json`) are uploaded after each report and every 10 minutes, so a
      report made while the share was unreachable is sent later. Nothing is
-     ever deleted on either side. The account is read from
+     ever deleted on the share. On the board, once a day, the report files
+     older than `reports_days` (90) and the lines of `data/assistant.log`
+     older than `log_days` (90) are removed (0 keeps everything); this is
+     done only after a successful copy to the share. The account is read from
      `data/netdisk.credentials` on the board (never in the repository):
 
      ```

@@ -905,6 +905,18 @@ def play(payload: dict):
     return CONTROL.play(str(payload.get("name", "experiment")), str(payload.get("text", "")))
 
 
+def check(payload: dict):
+    """Check an experiment file ({"text": ...}) without running it: the editor of the HMI."""
+    return CONTROL.check(str(payload.get("text", "")))
+
+
+def grammar():
+    """The instructions of the experiment files, for the dictionary of the HMI editor."""
+    import actions
+    return {"instructions": [{"syntax": s, "meaning": m} for s, m in actions.GRAMMAR],
+            "words": actions.GRAMMAR_WORDS, "notes": actions.GRAMMAR_NOTES}
+
+
 def file(name: str = ""):
     return CONTROL.read_file(name)
 
@@ -936,6 +948,8 @@ web_ui.expose_api("GET", "/file", file)
 web_ui.expose_api("GET", "/status", status)
 web_ui.expose_api("GET", "/reports", reports)
 web_ui.expose_api("GET", "/event_items", event_items)
+web_ui.expose_api("POST", "/check", check)
+web_ui.expose_api("GET", "/grammar", grammar)
 web_ui.expose_api("GET", "/events", events)
 web_ui.expose_api("GET", "/report", report_file)
 web_ui.expose_api("GET", "/state", state)

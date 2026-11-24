@@ -43,9 +43,7 @@ public class AssistantGui extends JFrame {
     private final JTextField input = new JTextField();
     private final JButton send = new JButton("SEND");
     private final JLabel state = new JLabel("connecting...");
-    private final JPanel keyboard = new JPanel(new GridLayout(4, 1, 0, 4));
-    private final java.util.List<JButton> letterKeys = new java.util.ArrayList<JButton>();
-    private boolean shift = false;
+    private Keyboard keyboard;                 // on-screen keyboard of the chat
     private int nextLine = -1;                 // next line of the action log to ask for
     /** Folder of the experiment files offered by PLAY: "play" in the panel folder, or -Dscadarpi.playDir=<folder>. */
     private final File playDirectory = new File(System.getProperty("scadarpi.playDir", "play")).getAbsoluteFile();
@@ -98,6 +96,9 @@ public class AssistantGui extends JFrame {
         baking.setToolTipText("Baking at 150 degC, only if the pumping system is at regime");
         JButton play = button("PLAY", new Color(90, 190, 100));
         play.setToolTipText("Load an experiment instruction file and execute it");
+        JButton edit = button("EDIT EXPERIMENT", new Color(170, 220, 175));
+        edit.setToolTipText("Write, check and save an experiment instruction file, with the list of the instructions");
+        edit.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) { editExperiment(); } });
         JButton report = button("VACUUM REPORT", new Color(120, 170, 240));
         report.setToolTipText("Record the RGA until the main masses are stable, then save a vacuum status report");
         report.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) {
@@ -117,8 +118,8 @@ public class AssistantGui extends JFrame {
         stop.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) {
             request("STOP EXPERIMENT", "/action?name=stop"); } });
         play.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) { play(); } });
-        JPanel presets = titled("BASIC INSTRUCTIONS", new GridLayout(6, 1, 0, 8));
-        presets.add(safety); presets.add(baking); presets.add(play); presets.add(report); presets.add(history); presets.add(stop);
+        JPanel presets = titled("BASIC INSTRUCTIONS", new GridLayout(7, 1, 0, 6));
+        presets.add(safety); presets.add(baking); presets.add(play); presets.add(edit); presets.add(report); presets.add(history); presets.add(stop);
         presets.setPreferredSize(new Dimension(300, 10));
         JPanel instructions = new JPanel(new BorderLayout(8, 0));
         instructions.setOpaque(false);
@@ -147,7 +148,10 @@ public class AssistantGui extends JFrame {
         c.gridy = 1; c.weighty = 0.50; centre.add(logPanel, c);
         c.gridy = 2; c.weighty = 0; c.insets = new Insets(0, 0, 0, 0); centre.add(files, c);
         root.add(centre, BorderLayout.CENTER);
-        buildKeyboard();
+        keyboard = new Keyboard(input, "SEND", new Runnable() { public void run() { ask(); } }, "CLEAR",
+                                new Runnable() { public void run() { input.setText(""); } },
+                                new Runnable() { public void run() { showKeyboard(false); } });
+        keyboard.setVisible(false);
         root.add(keyboard, BorderLayout.SOUTH);
 
         chat.append("Ask about the state of the system, or use the buttons on the right.\n");
@@ -167,76 +171,87 @@ public class AssistantGui extends JFrame {
     private static final String[] KEY_ROWS = { "1234567890", "qwertyuiop", "asdfghjkl?", "zxcvbnm,.-" };
     private static final String SHIFT_DIGITS = "<>=%+/():'";
 
-    /* The keys never take the focus, so the caret stays in the chat text field. */
-    private JButton key(String text, double weight, JPanel row, GridBagConstraints c, ActionListener action) {
-        JButton b = new JButton(text);
-        b.setFont(BUTTON); b.setFocusable(false); b.setMargin(new Insets(9, 2, 9, 2));
-        b.setBackground(new Color(245, 245, 250));
-        b.addActionListener(action);
-        c.weightx = weight;
-        row.add(b, c);
-        return b;
-    }
+    /** On-screen keyboard typing into `target` (the panel has no physical keyboard). The keys never
+     *  take the focus, so the caret stays in the text. Used by the chat and by the experiment editor. */
+    private static final class Keyboard extends JPanel {
+        private static final long serialVersionUID = 354054054091L;
+        javax.swing.text.JTextComponent target;
+        Runnable enter, clear, hide;
+        private final java.util.List<JButton> letterKeys = new java.util.ArrayList<JButton>();
+        private boolean shift = false;
 
-    private void buildKeyboard() {
-        keyboard.setOpaque(false);
-        keyboard.setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 0));
-        ActionListener type = new ActionListener() { public void actionPerformed(ActionEvent e) {
-            type(((JButton) e.getSource()).getText()); } };
-        for (int r = 0; r < KEY_ROWS.length; r++) {
-            JPanel row = new JPanel(new GridBagLayout());
-            row.setOpaque(false);
-            GridBagConstraints c = new GridBagConstraints();
-            c.fill = GridBagConstraints.BOTH; c.weighty = 1; c.insets = new Insets(0, 2, 0, 2);
-            if (r == 3) key("SHIFT", 1.6, row, c, new ActionListener() { public void actionPerformed(ActionEvent e) {
-                setShift(!shift); } });
-            for (char ch : KEY_ROWS[r].toCharArray()) letterKeys.add(key(String.valueOf(ch), 1, row, c, type));
-            if (r == 0) key("DELETE", 1.6, row, c, new ActionListener() { public void actionPerformed(ActionEvent e) {
-                backspace(); } });
-            if (r == 1) key("CLEAR", 1.6, row, c, new ActionListener() { public void actionPerformed(ActionEvent e) {
-                input.setText(""); } });
-            if (r == 2) key("SEND", 1.6, row, c, new ActionListener() { public void actionPerformed(ActionEvent e) {
-                ask(); } });
-            if (r == 3) {
-                key("SPACE", 4, row, c, new ActionListener() { public void actionPerformed(ActionEvent e) { type(" "); } });
-                key("HIDE", 1.6, row, c, new ActionListener() { public void actionPerformed(ActionEvent e) {
-                    showKeyboard(false); } });
+        Keyboard(javax.swing.text.JTextComponent target, String enterLabel, Runnable enter,
+                 String clearLabel, Runnable clear, Runnable hide) {
+            super(new GridLayout(4, 1, 0, 4));
+            this.target = target; this.enter = enter; this.clear = clear; this.hide = hide;
+            setOpaque(false);
+            setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 0));
+            ActionListener type = new ActionListener() { public void actionPerformed(ActionEvent e) {
+                type(((JButton) e.getSource()).getText()); } };
+            for (int r = 0; r < KEY_ROWS.length; r++) {
+                JPanel row = new JPanel(new GridBagLayout());
+                row.setOpaque(false);
+                GridBagConstraints c = new GridBagConstraints();
+                c.fill = GridBagConstraints.BOTH; c.weighty = 1; c.insets = new Insets(0, 2, 0, 2);
+                if (r == 3) key("SHIFT", 1.6, row, c, new ActionListener() { public void actionPerformed(ActionEvent e) {
+                    setShift(!shift); } });
+                for (char ch : KEY_ROWS[r].toCharArray()) letterKeys.add(key(String.valueOf(ch), 1, row, c, type));
+                if (r == 0) key("DELETE", 1.6, row, c, new ActionListener() { public void actionPerformed(ActionEvent e) {
+                    backspace(); } });
+                if (r == 1) key(clearLabel, 1.6, row, c, new ActionListener() { public void actionPerformed(ActionEvent e) {
+                    Keyboard.this.clear.run(); } });
+                if (r == 2) key(enterLabel, 1.6, row, c, new ActionListener() { public void actionPerformed(ActionEvent e) {
+                    Keyboard.this.enter.run(); } });
+                if (r == 3) {
+                    key("SPACE", 4, row, c, new ActionListener() { public void actionPerformed(ActionEvent e) { type(" "); } });
+                    key("HIDE", 1.6, row, c, new ActionListener() { public void actionPerformed(ActionEvent e) {
+                        Keyboard.this.hide.run(); } });
+                }
+                add(row);
             }
-            keyboard.add(row);
         }
-        keyboard.setVisible(false);
+
+        private JButton key(String text, double weight, JPanel row, GridBagConstraints c, ActionListener action) {
+            JButton b = new JButton(text);
+            b.setFont(BUTTON); b.setFocusable(false); b.setMargin(new Insets(9, 2, 9, 2));
+            b.setBackground(new Color(245, 245, 250));
+            b.addActionListener(action);
+            c.weightx = weight;
+            row.add(b, c);
+            return b;
+        }
+
+        private void setShift(boolean on) {
+            shift = on;
+            int i = 0;
+            for (String rowKeys : KEY_ROWS)
+                for (char ch : rowKeys.toCharArray()) {
+                    String t = String.valueOf(ch);
+                    if (on) t = Character.isDigit(ch) ? String.valueOf(SHIFT_DIGITS.charAt(ch == '0' ? 9 : ch - '1'))
+                                                      : t.toUpperCase();
+                    letterKeys.get(i++).setText(t);
+                }
+        }
+
+        void type(String text) {
+            if (!target.isEnabled() || !target.isEditable()) return;
+            target.replaceSelection(text);
+            if (shift) setShift(false);                // shift holds for one key
+        }
+
+        void backspace() {
+            if (!target.isEnabled() || !target.isEditable()) return;
+            if (target.getSelectedText() != null) { target.replaceSelection(""); return; }
+            int at = target.getCaretPosition();
+            if (at == 0) return;
+            try { target.getDocument().remove(at - 1, 1); } catch (javax.swing.text.BadLocationException ignored) { }
+        }
     }
 
     private void showKeyboard(boolean on) {
         keyboard.setVisible(on);
         getContentPane().revalidate();
         input.requestFocusInWindow();
-    }
-
-    private void setShift(boolean on) {
-        shift = on;
-        int i = 0;
-        for (String rowKeys : KEY_ROWS)
-            for (char ch : rowKeys.toCharArray()) {
-                String t = String.valueOf(ch);
-                if (on) t = Character.isDigit(ch) ? String.valueOf(SHIFT_DIGITS.charAt(ch == '0' ? 9 : ch - '1'))
-                                                  : t.toUpperCase();
-                letterKeys.get(i++).setText(t);
-            }
-    }
-
-    private void type(String text) {
-        if (!input.isEnabled()) return;
-        input.replaceSelection(text);
-        if (shift) setShift(false);                // shift holds for one key
-    }
-
-    private void backspace() {
-        if (!input.isEnabled()) return;
-        if (input.getSelectedText() != null) { input.replaceSelection(""); return; }
-        int at = input.getCaretPosition();
-        if (at == 0) return;
-        try { input.getDocument().remove(at - 1, 1); } catch (javax.swing.text.BadLocationException ignored) { }
     }
 
     // ------------------------------------------------------------------ widgets
@@ -424,6 +439,199 @@ public class AssistantGui extends JFrame {
                 say("\n[PLAY " + file.getName() + "] " + jsonString(http("POST", base + "/play", body, 10000), "message"));
             } catch (Exception ex) { say("\n[PLAY] NOT SENT: the assistant cannot be reached (" + ex.getMessage() + ")"); }
         } }, "assistant-play").start();
+    }
+
+    // ------------------------------------------------------------------ experiment editor
+    /** Instruction of the grammar: what is inserted in the text when it is touched. A complete
+     *  instruction ("CHECK REGIME") is inserted with its end of line, the others up to their
+     *  first parameter ("SETPOINT <degC>" gives "SETPOINT "). */
+    private static String insertion(String syntax) {
+        int at = syntax.indexOf('<');
+        return at < 0 ? syntax + "\n" : syntax.substring(0, at);
+    }
+
+    /** EDIT EXPERIMENT: full-screen editor of an experiment file, with the grammar dictionary of
+     *  the assistant (GET /grammar: touch an instruction or a word to insert it), a check by the
+     *  assistant's own parser (POST /check, nothing is run) and the saving in the PLAY folder. */
+    private void editExperiment() {
+        final JDialog d = new JDialog(this, "Experiment editor", true);
+        d.setUndecorated(true);
+        JPanel root = new JPanel(new BorderLayout(8, 6));
+        root.setBackground(BACKGROUND);
+        root.setBorder(BorderFactory.createEmptyBorder(8, 10, 8, 10));
+        d.setContentPane(root);
+        JLabel title = new JLabel("EXPERIMENT EDITOR");
+        title.setFont(new Font("SansSerif", Font.BOLD, 22)); title.setForeground(Color.BLUE);
+        final JLabel status = new JLabel("Touch an instruction on the right to insert it. CHECK asks the assistant whether the file is valid.");
+        status.setFont(TEXT);
+        JPanel top = new JPanel(new BorderLayout(14, 0));
+        top.setOpaque(false);
+        top.add(title, BorderLayout.WEST); top.add(status, BorderLayout.CENTER);
+        root.add(top, BorderLayout.NORTH);
+
+        final JTextArea text = new JTextArea();
+        text.setFont(new Font("Monospaced", Font.PLAIN, 17));
+        final JTextField name = new JTextField("new-experiment", 18);
+        name.setFont(TEXT);
+        final Keyboard keys = new Keyboard(text, "NEW LINE", null, "DEL LINE", null, null);
+        JPanel textPanel = titled("FILE TEXT", new BorderLayout());
+        textPanel.add(new JScrollPane(text), BorderLayout.CENTER);
+
+        // ---- grammar dictionary: instructions (list) and words (buttons)
+        final DefaultListModel<String> model = new DefaultListModel<String>();
+        final java.util.List<String> syntaxes = new java.util.ArrayList<String>();
+        final JList<String> list = new JList<String>(model);
+        list.setFont(new Font("SansSerif", Font.PLAIN, 14)); list.setFocusable(false);
+        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        list.addMouseListener(new MouseAdapter() { public void mouseClicked(MouseEvent e) {
+            int i = list.locationToIndex(e.getPoint());
+            if (i < 0 || i >= syntaxes.size()) return;
+            String add = insertion(syntaxes.get(i));
+            try {                                                   // an instruction starts its own line
+                int caret = text.getCaretPosition(), line = text.getLineOfOffset(caret);
+                if (text.getSelectedText() == null && caret > text.getLineStartOffset(line)) add = "\n" + add;
+            } catch (javax.swing.text.BadLocationException ignored) { }
+            text.replaceSelection(add);
+            text.requestFocusInWindow();
+        } });
+        final JPanel words = new JPanel(new GridLayout(0, 6, 4, 4));
+        words.setOpaque(false);
+        final JTextArea notes = new JTextArea();
+        notes.setEditable(false); notes.setFocusable(false); notes.setLineWrap(true); notes.setWrapStyleWord(true);
+        notes.setFont(new Font("SansSerif", Font.PLAIN, 13)); notes.setOpaque(false);
+        JPanel dictionary = titled("GRAMMAR - touch to insert", new BorderLayout(0, 4));
+        JPanel below = new JPanel(new BorderLayout(0, 4));
+        below.setOpaque(false);
+        below.add(words, BorderLayout.CENTER); below.add(notes, BorderLayout.SOUTH);
+        JScrollPane listScroll = new JScrollPane(list, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        listScroll.getVerticalScrollBar().setPreferredSize(new Dimension(30, 10));      // wide enough for a finger
+        dictionary.add(listScroll, BorderLayout.CENTER); dictionary.add(below, BorderLayout.SOUTH);
+        dictionary.setPreferredSize(new Dimension(560, 10));
+        JPanel centre = new JPanel(new BorderLayout(8, 0));
+        centre.setOpaque(false);
+        centre.add(textPanel, BorderLayout.CENTER); centre.add(dictionary, BorderLayout.EAST);
+        root.add(centre, BorderLayout.CENTER);
+        new Thread(new Runnable() { public void run() {
+            final java.util.List<String[]> entries = new java.util.ArrayList<String[]>();
+            final java.util.List<String> wordList = new java.util.ArrayList<String>();
+            String note;
+            try {
+                String reply = http("GET", base + "/grammar", null, 10000);
+                java.util.regex.Matcher m = java.util.regex.Pattern.compile(
+                    "\\{\"syntax\":\"([^\"]+)\",\"meaning\":\"([^\"]*)\"\\}").matcher(reply);
+                while (m.find()) entries.add(new String[] { m.group(1), m.group(2) });
+                java.util.regex.Matcher w = java.util.regex.Pattern.compile("\"words\":\\[([^\\]]*)\\]").matcher(reply);
+                if (w.find()) for (String word : w.group(1).split(",")) wordList.add(word.replace("\"", "").trim());
+                note = jsonString(reply, "notes");
+            } catch (Exception ex) { note = "The grammar could not be read: the assistant cannot be reached (" + ex.getMessage() + ")."; }
+            final String shown = note;
+            SwingUtilities.invokeLater(new Runnable() { public void run() {
+                for (String[] entry : entries) {
+                    syntaxes.add(entry[0]);
+                    model.addElement("<html><body style='width:370px; padding:3px 0'><b>" + entry[0].replace("<", "&lt;")
+                                     + "</b> &nbsp; <font color='#505050'>" + entry[1].replace("<", "&lt;") + "</font></body></html>");
+                }
+                for (final String word : wordList) {
+                    JButton b = new JButton(word);
+                    b.setFont(new Font("SansSerif", Font.BOLD, 13)); b.setFocusable(false); b.setMargin(new Insets(6, 2, 6, 2));
+                    b.setBackground(new Color(245, 245, 250));
+                    b.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) {
+                        text.replaceSelection(word + " "); text.requestFocusInWindow(); } });
+                    words.add(b);
+                }
+                notes.setText(shown);
+                d.getContentPane().revalidate();
+            } });
+        } }, "assistant-grammar").start();
+
+        // ---- file name and buttons
+        final Runnable check = new Runnable() { public void run() {
+            final String body = "{\"text\":" + jsonQuote(text.getText()) + "}";
+            status.setForeground(Color.BLACK); status.setText("Checking...");
+            new Thread(new Runnable() { public void run() {
+                String message; boolean ok = false;
+                try {
+                    String reply = http("POST", base + "/check", body, 10000);
+                    message = jsonString(reply, "message"); ok = reply.contains("\"ok\":true");
+                } catch (Exception ex) { message = "not checked: the assistant cannot be reached (" + ex.getMessage() + ")"; }
+                final String m = message; final boolean good = ok;
+                SwingUtilities.invokeLater(new Runnable() { public void run() {
+                    status.setForeground(good ? new Color(0, 110, 40) : new Color(190, 30, 25));
+                    status.setText("<html>CHECK: " + m.replace("<", "&lt;").replace("; line", "<br>line") + "</html>");
+                } });
+            } }, "assistant-check").start();
+        } };
+        JButton fresh = button("NEW", new Color(235, 235, 245)), open = button("OPEN", new Color(235, 235, 245));
+        JButton checkButton = button("CHECK", new Color(120, 170, 240)), save = button("SAVE", new Color(90, 190, 100));
+        JButton close = button("CLOSE", new Color(235, 235, 245)), showKeys = button("KEYBOARD", new Color(235, 235, 245));
+        fresh.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) {
+            if (text.getText().trim().isEmpty() || JOptionPane.showConfirmDialog(d, "Discard the text and start a new file?", "New",
+                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION) {
+                text.setText(""); name.setText("new-experiment"); status.setForeground(Color.BLACK); status.setText("New file."); } } });
+        open.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) {
+            String[] found = playDirectory.list(new java.io.FilenameFilter() { public boolean accept(File dir, String n) {
+                return n.toLowerCase().endsWith(EXPERIMENT_EXT); } });
+            if (found == null || found.length == 0) {
+                JOptionPane.showMessageDialog(d, "No experiment file in " + playDirectory, "Open", JOptionPane.PLAIN_MESSAGE); return; }
+            java.util.Arrays.sort(found);
+            Object pick = JOptionPane.showInputDialog(d, "Experiment files in " + playDirectory, "Open",
+                                                      JOptionPane.QUESTION_MESSAGE, null, found, found[0]);
+            if (pick == null) return;
+            try {
+                text.setText(new String(Files.readAllBytes(new File(playDirectory, pick.toString()).toPath()), StandardCharsets.UTF_8));
+                text.setCaretPosition(0);
+                name.setText(pick.toString().substring(0, pick.toString().length() - EXPERIMENT_EXT.length()));
+                status.setForeground(Color.BLACK); status.setText("Opened " + pick + ".");
+            } catch (IOException ex) { JOptionPane.showMessageDialog(d, "Cannot read " + pick + ": " + ex.getMessage()); }
+        } });
+        checkButton.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) { check.run(); } });
+        save.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) {
+            String n = name.getText().trim();
+            if (n.toLowerCase().endsWith(EXPERIMENT_EXT)) n = n.substring(0, n.length() - EXPERIMENT_EXT.length());
+            if (!n.matches("[A-Za-z0-9][A-Za-z0-9._-]{0,60}")) {
+                JOptionPane.showMessageDialog(d, "File name: letters, digits, '-', '.' and '_' only.", "Save", JOptionPane.PLAIN_MESSAGE); return; }
+            File file = new File(playDirectory, n + EXPERIMENT_EXT);
+            if (file.exists() && JOptionPane.showConfirmDialog(d, file.getName() + " exists. Replace it?", "Save",
+                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.OK_OPTION) return;
+            try {
+                playDirectory.mkdirs();
+                String content = text.getText();
+                Files.write(file.toPath(), (content.endsWith("\n") ? content : content + "\n").getBytes(StandardCharsets.UTF_8));
+                say("\n[EDIT EXPERIMENT] " + file.getName() + " saved in " + playDirectory + " (PLAY offers it)");
+                check.run();                                    // the status line then tells whether it is valid
+                JOptionPane.showMessageDialog(d, file.getName() + " saved.\nIt is offered by the PLAY button.", "Save", JOptionPane.PLAIN_MESSAGE);
+            } catch (IOException ex) { JOptionPane.showMessageDialog(d, "NOT saved: " + ex.getMessage(), "Save", JOptionPane.PLAIN_MESSAGE); }
+        } });
+        close.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) { d.dispose(); } });
+        showKeys.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) {
+            keys.setVisible(!keys.isVisible()); d.getContentPane().revalidate(); } });
+        JLabel nameLabel = new JLabel("File name"), ext = new JLabel(EXPERIMENT_EXT + "   ");
+        nameLabel.setFont(TEXT); ext.setFont(TEXT);
+        JPanel bar = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        bar.setOpaque(false);
+        for (JComponent c : new JComponent[] { nameLabel, name, ext, fresh, open, checkButton, save, showKeys, close }) bar.add(c);
+
+        // ---- keyboard: types where the caret is (text or file name)
+        java.awt.event.FocusAdapter follow = new java.awt.event.FocusAdapter() { public void focusGained(java.awt.event.FocusEvent e) {
+            keys.target = (javax.swing.text.JTextComponent) e.getComponent(); } };
+        text.addFocusListener(follow); name.addFocusListener(follow);
+        keys.enter = new Runnable() { public void run() { if (keys.target == text) keys.type("\n"); else text.requestFocusInWindow(); } };
+        keys.clear = new Runnable() { public void run() {
+            if (keys.target != text) { name.setText(""); return; }
+            try {                                               // DEL LINE: the line of the caret
+                int line = text.getLineOfOffset(text.getCaretPosition());
+                int from = text.getLineStartOffset(line), to = text.getLineEndOffset(line);
+                text.getDocument().remove(from, to - from);
+            } catch (javax.swing.text.BadLocationException ignored) { }
+        } };
+        keys.hide = new Runnable() { public void run() { keys.setVisible(false); d.getContentPane().revalidate(); } };
+        JPanel south = new JPanel(new BorderLayout(0, 6));
+        south.setOpaque(false);
+        south.add(bar, BorderLayout.NORTH); south.add(keys, BorderLayout.CENTER);
+        root.add(south, BorderLayout.SOUTH);
+        d.setBounds(getBounds());
+        text.requestFocusInWindow();
+        d.setVisible(true);
     }
 
     private void showFile(final String which) {

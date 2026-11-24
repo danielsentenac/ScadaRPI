@@ -25,6 +25,35 @@ QUANTITIES = {"G22": "MG_PR1", "G21": "MG_PR2", "GA4": "MG_PR3", "G4": "MG_PR4",
               "P21SPEED": "DCU_P21SPEED"}
 
 
+# The grammar of the experiment files, as shown by the editor of the HMI (/grammar): one entry per
+# instruction, (syntax, meaning). It describes what parse_experiment accepts: keep both together.
+GRAMMAR = [
+    ("CHECK REGIME", "stop the experiment unless the normal regime is met"),
+    ("SETPOINT <degC>", "same set point on all the heating channels (0 to the maximum allowed)"),
+    ("HEATING ON", "CH1 and CH2 on, only if the normal regime is met"),
+    ("HEATING OFF", "CH1 and CH2 off"),
+    ("OPEN <valve>", "V1, V21 or V22; refused if an interlock condition is present"),
+    ("CLOSE <valve>", "V1, V21 or V22"),
+    ("START <pump>", "P21 or P22"),
+    ("STOP <pump>", "P21 or P22"),
+    ("BYPASS ON", "interlock bypass on"),
+    ("BYPASS OFF", "interlock bypass off"),
+    ("WAIT <duration>", "30 or 30s, 10min, 2h"),
+    ("WAIT UNTIL <name> < <value> [TIMEOUT <duration>]", "until it is BELOW the value, e.g. WAIT UNTIL G21 < 1e-6"),
+    ("WAIT UNTIL <name> > <value> [TIMEOUT <duration>]", "until it is ABOVE the value, e.g. WAIT UNTIL TEMP > 140"),
+    ("LOG <text>", "a line written in the live log"),
+    ("SAFETY", "the Safety sequence"),
+    ("REPORT", "record the RGA until stable and save a vacuum report"),
+    ("# <comment>", "ignored by the assistant"),
+]
+# Words that can follow an instruction: valves, pumps, names usable in WAIT UNTIL, and examples.
+GRAMMAR_WORDS = sorted(VALVES) + sorted(PUMPS) + ["G21", "G22", "G4", "G5", "GA4", "GA5", "P21SPEED", "TEMP",
+                                                  "<", ">", "TIMEOUT", "10min", "1h"]
+GRAMMAR_NOTES = ("One instruction per line, capital or small letters. Pressures in mbar (e.g. 1e-6), "
+                 "P21SPEED in Hz, TEMP = highest heating temperature in degC. The whole file is checked "
+                 "before anything runs. WAIT UNTIL without TIMEOUT waits 1h at most, then the experiment stops.")
+
+
 class Abort(Exception):
     """The running sequence must stop: operator request, failed step or failed check."""
 
@@ -400,11 +429,18 @@ class Controller:
         """Uploads the reports missing on the share: after each report, and every 10 minutes
         (so that a report made while the share was unreachable is sent later)."""
         import netdisk
-        last = None
+        last, cleaned = None, None
         while True:
             self.sync_now.wait(600)
             self.sync_now.clear()
             target = self.config.get("netdisk")
+            today = time.strftime("%Y-%m-%d")
+            if today != cleaned and (last == "ok" or not (target and target.get("server"))):
+                cleaned = today                               # once a day, and at start
+                try:
+                    self._cleanup()
+                except Exception as e:
+                    self.log("Cleanup failed: %s: %s" % (type(e).__name__, str(e)[:200]))
             if not target or not target.get("server"):
                 continue
             where = "smb://%s/%s/%s" % (target["server"], target["share"], target.get("folder", ""))
@@ -419,6 +455,37 @@ class Controller:
             if message != last and (message != "ok" or last is not None):
                 self.log(message if message != "ok" else "Copy to %s works again" % where)
             last = message
+
+    def _cleanup(self):
+        """Removes from the board the reports older than `reports_days` (90) and the lines of the
+        assistant log older than `log_days` (90); 0 keeps everything. Run once a day, and only
+        after a successful copy to the share when one is configured: the share keeps every report
+        (nothing is ever deleted there)."""
+        def limit(days):
+            return time.strftime("%Y-%m-%d", time.localtime(time.time() - days * 86400))
+
+        days = self.config.get("reports_days", 90)
+        if days > 0:
+            old = sorted(n for n in os.listdir(self.reports_dir)
+                         if REPORT_NAME.fullmatch(os.path.splitext(n)[0])
+                         and re.search(r"_report_(\d{4}-\d{2}-\d{2})_", n).group(1) < limit(days))
+            for n in old:
+                os.remove(os.path.join(self.reports_dir, n))
+            if old:
+                self.log("Cleanup: %d report file(s) older than %d days removed from the board (%s to %s)"
+                         % (len(old), days, old[0], old[-1]))
+        days = self.config.get("log_days", 90)
+        if days > 0:
+            with self.log_lock:
+                with open(self.log_path) as f:
+                    lines = f.read().splitlines()
+                first = next((i for i, l in enumerate(lines) if l[:10] >= limit(days)), len(lines))
+                if first:
+                    with open(self.log_path + ".tmp", "w") as f:
+                        f.write("".join(l + "\n" for l in lines[first:]))
+                    os.replace(self.log_path + ".tmp", self.log_path)
+            if first:
+                self.log("Cleanup: %d line(s) older than %d days removed from the assistant log" % (first, days))
 
     def reports(self):
         names = sorted((n[:-4] for n in os.listdir(self.reports_dir)
@@ -498,6 +565,14 @@ class Controller:
         with open(self.instructions_path, "w") as f:
             f.write("# %s, loaded %s\n%s" % (name, time.strftime("%Y-%m-%d %H:%M:%S"), text))
         return self.start("Experiment '%s' (%d steps)" % (name, len(steps)), lambda: self.seq_experiment(steps))
+
+    def check(self, text):
+        """Is `text` a valid experiment file? Nothing is run, nothing is saved."""
+        try:
+            steps = parse_experiment(text, self.heating_channels, self.max_setpoint)
+        except ValueError as e:
+            return {"ok": False, "message": "NOT valid: %s" % e}
+        return {"ok": True, "message": "valid: %d instruction(s), no error" % len(steps)}
 
     def read_file(self, name):
         path = {"instructions": self.instructions_path, "log": self.log_path}.get(name)

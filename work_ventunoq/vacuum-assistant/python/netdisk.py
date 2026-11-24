@@ -5,7 +5,8 @@ Account, in data/netdisk.credentials (kept on the board only, never in the repos
     username=<account>
     password=<password>
     domain=<domain>          (optional)
-Every local file missing on the share is uploaded; files are never deleted, on either side.
+Every local file missing on the share is uploaded; nothing is ever deleted on the share (old
+reports are removed from the board only: Controller._cleanup in actions.py).
 """
 import os
 
