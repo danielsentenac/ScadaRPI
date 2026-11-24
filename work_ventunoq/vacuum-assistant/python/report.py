@@ -89,7 +89,7 @@ def status(values, by_name, fmt, ok, heating_channels):
         "pressures": pressures,
         "temperatures": [{"channel": "CH%d" % n, "setpoint": text("SICEM_SETP%d" % n), "temperature": text("SICEM_T%d" % n)}
                          for n in range(1, heating_channels + 1)],
-        "rga_total": text("LEYSPEC_TP"),
+        "rga_total": pressures[0]["value"] if not pressures[0]["note"] else "not valid",   # G21, see PRESSURES
         "regime_met": not not_met and not unknown,
         "regime_detail": not_met + ["cannot check: " + u for u in unknown],
     }
@@ -254,7 +254,7 @@ def render(rep, png_path):
     box = (M + 70, y + 48, W - M, y + 262)
     peaks = spectrum_plot(d, box, rep["spectrum"], rep["last_mass"])
     y = box[3] + 54
-    d.text((M, y), "RGA total pressure %s.   Highest peaks, mass " % st.get("rga_total", "-")
+    d.text((M, y), "Total pressure (G21) %s.   Highest peaks, mass " % st.get("rga_total", "-")
            + ",  ".join("%d = %.1e A" % (m, rep["spectrum"][m]) for m in peaks),
            font=small, fill=BLACK)
     y += 32

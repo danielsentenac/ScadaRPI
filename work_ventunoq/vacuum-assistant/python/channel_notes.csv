@@ -64,7 +64,7 @@ M2_MUXSHIELD_COMERR_ST,Sicem,link between module M2 and its thermocouple multipl
 M2_COMST,,Bake-out module M2 communication,,0=OK|1=FAIL,
 TCMUX_TEMP,,rack thermocouple temperature,degC,,
 TCMUX_COMST,,Thermocouple multiplexer communication,,0=OK|1=FAIL,
-LEYSPEC_TP,Ga3,RGA total pressure in the tube,mbar,,1
+LEYSPEC_TP,-,RGA total pressure (not used: its value is not reliable; the total pressure is given by G21),mbar,,
 LEYSPEC_RUNNING,Ga3,RGA scan,,0=stopped|1=running,
 LEYSPEC_EMISSION,Ga3,RGA filament emission,,0=off|1=on,
 LEYSPEC_SEMHV,Ga3,RGA SEM high voltage,,0=off|1=on,

@@ -210,7 +210,7 @@ def build(control, daq, start, stop, comment=None):
     t0 = t_start - lead
 
     # ---- the two snapshots: at START and at STOP (just after the event, to show its effect)
-    wanted = set(["LEYSPEC_TP", "ROT_PR1ST"] + [b[0] for b in (start, stop) if b[0]])
+    wanted = set(["ROT_PR1ST"] + [b[0] for b in (start, stop) if b[0]])
     for ch, st, _, _ in report.PRESSURES:
         wanted.update([ch] + ([st] if st else []))
     wanted.update(ch for ch, _, _ in report.STATES)

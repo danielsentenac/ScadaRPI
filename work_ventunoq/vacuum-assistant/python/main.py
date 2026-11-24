@@ -524,6 +524,10 @@ def item_facts(key, values):
             continue
         lines.append("%s = %s%s" % (label, fmt(c, v), rules.gauge_note(c["channel"], v) + rules.turbo_note(c["channel"], values)))
         valid = True
+    if key == "ga3" and "g21" in ITEMS:
+        # the RGA's own total pressure is not reliable (it stays at the bottom of its scale): G21 gives it
+        more, _ = item_facts("g21", values)
+        lines += ["Total pressure for the RGA, given by gauge G21: %s" % l for l in more[:1]] + more[1:]
     return lines, valid
 
 

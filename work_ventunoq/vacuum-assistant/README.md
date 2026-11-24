@@ -214,8 +214,9 @@ HTTP: `/ask` (chat), `/action?name=safety|baking|report|stop`, `/play` (POST
      over the same time: the cold cathodes G21, Ga4 and G4 inside their range
      (5E-11 to 5E-5 mbar), joined by the spinning rotor gauge Ga5 only at
      5E-6 mbar and above; and the Pirani gauges G22 and G5 (5E-4 to 800 mbar).
-     Ga3 is the RGA, not a pressure gauge: its total pressure is given with
-     the spectrum. The workbook has the sheets Report (tables and the four
+     Ga3 is the RGA, not a pressure gauge. Its own total pressure reading is
+     not used anywhere (it stays at the bottom of its scale): the total
+     pressure given with the spectrum, and in the answers about the RGA, is G21. The workbook has the sheets Report (tables and the four
      charts), RGA spectrum, RGA trend and Gauges (the numbers behind them).
   6. The `.xlsx` files missing on the network share
      `smb://netdisk.virgo.infn.it/vacuum/TUBE1500W` (`netdisk` in

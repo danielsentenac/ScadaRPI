@@ -89,7 +89,7 @@ def write(rep, path):
         put(i, 4, number(row["value"]), Font(color=RED) if row["note"] else None, SCI)
         put(i, 5, note, Font(color=RED))
     r += 3 + len(st["pressures"])
-    put(r, 1, "RGA total pressure (mbar)", bold)
+    put(r, 1, "Total pressure for the RGA, from G21 (mbar)", bold)
     put(r, 4, number(st.get("rga_total", "")), None, SCI)
 
     r += 2
