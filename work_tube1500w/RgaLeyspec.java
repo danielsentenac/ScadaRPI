@@ -12,7 +12,9 @@
  *
  * The device runs a continuous step scan ("scan mode", recipe G0) over the
  * mass range [1, lastMass]; the last complete values are read with DD.
- * Pressures are requested in Pa (RGA default unit) and stored in mbar.
+ * The value of each mass is the ion current in A, as sent by the RGA (the LEYSPEC software
+ * shows the same numbers); the conversion to partial pressure is not done by the RGA.
+ * The total pressure is requested in Pa (RGA default unit) and stored in mbar.
  */
 import java.util.*;
 import java.io.IOException;
@@ -51,6 +53,8 @@ public class RgaLeyspec extends Device {
    // value given to the constructor, and it is read again at each scan start: the voltage can be tuned
    // without restarting the panel (edit the file, then STOP / START the scan).
    public static final String SEM_VOLTAGE_FILE = "leyspec_sem_voltage.txt";
+   private static final String SPEED_FILE = "leyspec_scan_speed.txt";
+   private static final int[] SPEED_MS = { 50, 100, 200, 500, 1000, 2000 }; // ms/mass of speeds 1..6
    public static final int SEM_VOLTAGE_MIN = 1000;  // LEYSPEC view / ultra : 1000..3000 V
    public static final int SEM_VOLTAGE_MAX = 3000;
 
@@ -73,7 +77,7 @@ public class RgaLeyspec extends Device {
     *                         "EE70VS140VG160" (see protocol table 3) for the LEYSPEC ultra series
     * @param _semVoltage      SEM high voltage in V (1000..3000), set before each scan in SEM mode;
     *                         0 = not set (the RGA keeps its stored value). A too low voltage gives
-    *                         partial pressures far below reality; a needlessly high one wears the SEM.
+    *                         weak ion currents; a needlessly high one wears the SEM.
     */
    public RgaLeyspec (String _name,
                       int _mbRegisterStart,
@@ -113,7 +117,7 @@ public class RgaLeyspec extends Device {
      if ( mbRegisterEnd % 2 != 0 )
         mbRegisterEnd++;
 
-     // RGA data (partial pressures in mbar)
+     // RGA data (ion current of each mass, in A)
      addDataElement( new DataElement(name, massName(1), DataType.READ_ONLY_VALUE,RegisterType.FLOAT32,mbRegisterEnd));
      for ( int i = 2 ; i <= MAX_MASS ; i++ )
         addDataElement( new DataElement(name, massName(i), DataType.READ_ONLY_VALUE,RegisterType.FLOAT32,mbRegisterEnd+=2));
@@ -140,6 +144,10 @@ public class RgaLeyspec extends Device {
 
      // Com Status
      addDataElement( new DataElement(name, "COMST", DataType.COM_STATUS,RegisterType.INT16,mbRegisterEnd+=1));
+
+     // Settings (added after the existing registers, which keep their place)
+     addDataElement( new DataElement(name, "SEMVOLT", DataType.READ_AND_WRITE_VALUE,RegisterType.INT16,mbRegisterEnd+=1)); // SEM high voltage in V (1000..3000)
+     addDataElement( new DataElement(name, "SPEED", DataType.READ_AND_WRITE_VALUE,RegisterType.INT16,mbRegisterEnd+=1));   // Measurement speed 1..6 (50, 100, 200, 500, 1000, 2000 ms/mass)
 
      mbRegisterEnd+=1;
 
@@ -226,6 +234,7 @@ public class RgaLeyspec extends Device {
       getDataElement("SEMHV").value = sem;
       getDataElement("RF").value = rf;
       getDataElement("MODE").value = (detector == 0) ? 1 : 0;
+      publishSettings();
 
       DataElement running = getDataElement("RUNNING");
       double wasRunning = running.value;
@@ -264,7 +273,7 @@ public class RgaLeyspec extends Device {
          for (int i = 0; i < nChannels && i < MAX_MASS; i++) {
             String f = fields[i].trim();
             double pa = Integer.parseInt(f.substring(0, 3)) / 100.0 * Math.pow(10, -Integer.parseInt(f.substring(3)));
-            getDataElement(massName(i + 1)).value = (pa <= NOT_MEASURED_PA) ? 0.0 : pa * PA_TO_MBAR;
+            getDataElement(massName(i + 1)).value = (pa <= NOT_MEASURED_PA) ? 0.0 : pa; // Ion current in A
          }
          String tp = fields[nChannels].trim();
          double tpPa = Integer.parseInt(tp.substring(0, 3)) / 100.0 * Math.pow(10, -Integer.parseInt(tp.substring(3)));
@@ -317,6 +326,35 @@ public class RgaLeyspec extends Device {
             else if ( e.setvalue == 1 )
                setDetector(true);
          }
+         else if (e.name.equals("SEMVOLT")) { // SEM high voltage in V : kept for the next scans, applied at once if the SEM is on
+            int volts = (int) e.setvalue;
+            if ( volts < SEM_VOLTAGE_MIN || volts > SEM_VOLTAGE_MAX ) {
+               if ( volts != 0 )
+                  logger.log(Level.WARNING, "RgaLeyspec:executeCommand> " + name + " SEM high voltage " + volts + " V refused (" + SEM_VOLTAGE_MIN + " to " + SEM_VOLTAGE_MAX + " V)");
+            }
+            else {
+               semVoltage = volts;
+               saveSetting(SEM_VOLTAGE_FILE, volts);
+               boolean applied = flag(query("DS"), 'S') == 1 && command(String.format("SE%04d", volts));
+               logger.info("RgaLeyspec:executeCommand> " + name + " SEM high voltage setting " + volts + " V"
+                           + (applied ? ", applied now" : ", will be applied at the next scan start"));
+            }
+         }
+         else if (e.name.equals("SPEED")) { // Measurement speed 1..6 : part of the scan recipe, a running scan is restarted
+            int newSpeed = (int) e.setvalue;
+            for (int i = 0; i < SPEED_MS.length; i++) // Also accepted in ms/mass
+               if ( newSpeed == SPEED_MS[i] ) newSpeed = i + 1;
+            if ( newSpeed < 1 || newSpeed > 6 ) {
+               if ( newSpeed != 0 )
+                  logger.log(Level.WARNING, "RgaLeyspec:executeCommand> " + name + " measurement speed " + newSpeed + " refused (1 to 6, or 50, 100, 200, 500, 1000, 2000 ms/mass)");
+            }
+            else {
+               speed = newSpeed;
+               saveSetting(SPEED_FILE, newSpeed);
+               logger.info("RgaLeyspec:executeCommand> " + name + " measurement speed setting " + newSpeed);
+               if ( isMeasuring() ) { stopScan(); Thread.sleep(1000); startScan(); }
+            }
+         }
          else if (e.name.equals("FILAMENT")) { // Filament selection : 1 or 2 (filament must be off)
             if ( !hasTwoFilaments )
                logger.log(Level.WARNING, "RgaLeyspec:executeCommand> " + name + " has only one filament");
@@ -329,6 +367,8 @@ public class RgaLeyspec extends Device {
          }
 
          readStatus(); // Refresh status at once
+         if ( e.type == DataType.READ_AND_WRITE_VALUE && holdingRegisters != null ) // A refused value does not stay in the register
+            holdingRegisters.setInt16At(e.mbRegisterOffset, (int) e.value);
 
          // Reset TRIGGER value
          if (e.type == DataType.TRIGGER) {
@@ -367,6 +407,7 @@ public class RgaLeyspec extends Device {
 
       if ( isMeasuring() ) return; // Already running
 
+      speed = speedSetting();
       String recipe = String.format("G0FM001LM%03dSD%d", lastMass, speed) + ionSourceRecipe;
       if ( !command(recipe) ) return;
       if ( !filamentOn() ) return;
@@ -394,19 +435,42 @@ public class RgaLeyspec extends Device {
 
    // SEM high voltage to use : from the file SEM_VOLTAGE_FILE if it holds a valid number, else from the constructor
    private int semVoltageSetting() {
-      int volts = semVoltage;
-      java.io.File file = new java.io.File(SEM_VOLTAGE_FILE);
-      if ( file.exists() ) {
-         try ( java.util.Scanner sc = new java.util.Scanner(file) ) {
-            if ( sc.hasNextInt() ) volts = sc.nextInt();
-            else logger.log(Level.WARNING, "RgaLeyspec:semVoltageSetting> no number in " + SEM_VOLTAGE_FILE);
-         }
-         catch (IOException ex) {
-            logger.log(Level.WARNING, "RgaLeyspec:semVoltageSetting> cannot read " + SEM_VOLTAGE_FILE + " : " + ex.getMessage());
-         }
-      }
+      int volts = readSetting(SEM_VOLTAGE_FILE, semVoltage);
       if ( volts <= 0 ) return 0;
       return Math.max(SEM_VOLTAGE_MIN, Math.min(volts, SEM_VOLTAGE_MAX));
+   }
+
+   // Measurement speed to use : from the file SPEED_FILE if it holds a valid number, else from the constructor
+   private int speedSetting() {
+      return Math.max(1, Math.min(readSetting(SPEED_FILE, speed), 6));
+   }
+
+   private void publishSettings() {
+      getDataElement("SEMVOLT").value = semVoltageSetting();
+      getDataElement("SPEED").value = speedSetting();
+   }
+
+   // A setting changed from the panel is kept in a one-number file of the panel directory
+   private int readSetting(String fileName, int defaultValue) {
+      java.io.File file = new java.io.File(fileName);
+      if ( !file.exists() ) return defaultValue;
+      try ( java.util.Scanner sc = new java.util.Scanner(file) ) {
+         if ( sc.hasNextInt() ) return sc.nextInt();
+         logger.log(Level.WARNING, "RgaLeyspec:readSetting> no number in " + fileName);
+      }
+      catch (IOException ex) {
+         logger.log(Level.WARNING, "RgaLeyspec:readSetting> cannot read " + fileName + " : " + ex.getMessage());
+      }
+      return defaultValue;
+   }
+
+   private void saveSetting(String fileName, int value) {
+      try ( java.io.PrintWriter out = new java.io.PrintWriter(fileName) ) {
+         out.println(value);
+      }
+      catch (IOException ex) {
+         logger.log(Level.WARNING, "RgaLeyspec:saveSetting> cannot write " + fileName + " : " + ex.getMessage());
+      }
    }
 
    // Stop the scan : stop, SEM high voltage off, RF off (the filament is left as it is)

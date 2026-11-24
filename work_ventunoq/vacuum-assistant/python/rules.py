@@ -13,7 +13,7 @@ OPERATING_RULES = (
     "switches off the heating current in the Sicem controller.\n"
     "- Sicem global alarm: it means a failure of the Sicem controller itself. It is not wired to any interlock. "
     "If it is in alarm, the operator must press CH1 OFF and CH2 OFF.\n"
-    "- Normal regime: P22 on; G22 between 0.5 and 5E-4 mbar; V22 open; P21 on with speed above 900 Hz; "
+    "- Normal regime: P22 on; G22 between 0.5 and 5E-4 mbar; V22 open; P21 on at its speed (above 900 Hz in normal mode, nominal 1000 Hz; above 600 Hz in standby mode, nominal 666 Hz); "
     "V21 open; G21 between 1E-5 and 5E-11 mbar.\n"
     "- Ga5 is for high pressure: it cannot measure below 5E-6 mbar; at low pressure use G21.\n"
     "- Protection of the turbo pump P21 against high pressure: a hardware interlock on gauge G22. V21 and V22 "
@@ -37,6 +37,14 @@ GAUGE_RANGES = {
 # Normal regime ("sistema operativo a regime"):
 # (requirement, channels used, test, what to say when met, what to say when not met).
 # The comparison is done here and its result written out: the model must not compare numbers.
+def _turbo_speed(v):
+    """Speed required from the turbo pump, its nominal speed and the mode: the standby mode runs
+    the pump at two thirds of the nominal 1000 Hz, which is a correct state of the pump."""
+    if v.get("DCU_P21STYST") == 1:
+        return 600, 666, "standby mode"
+    return 900, 1000, "normal mode"
+
+
 NORMAL_REGIME = [
     ("P22 on", ["M1_P22ST"], lambda v: v["M1_P22ST"] == 1,
      lambda v: "P22 is on", lambda v: "P22 dry pump is off"),
@@ -45,10 +53,14 @@ NORMAL_REGIME = [
      lambda v: "G22 = %.2e mbar is OUTSIDE its normal range (0.5 to 5E-4 mbar)" % v["MG_PR1"]),
     ("V22 open", ["M1_V22ST"], lambda v: v["M1_V22ST"] == 1,
      lambda v: "V22 is open", lambda v: "V22 is not open"),
-    ("P21 on with speed above 900 Hz", ["DCU_P21ST", "DCU_P21SPEED"],
-     lambda v: v["DCU_P21ST"] == 1 and v["DCU_P21SPEED"] > 900,
-     lambda v: "P21 is on at %d Hz (above the required 900 Hz)" % v["DCU_P21SPEED"],
-     lambda v: "P21 turbo pump is off" if v["DCU_P21ST"] != 1 else "P21 speed = %d Hz is NOT above the required 900 Hz" % v["DCU_P21SPEED"]),
+    ("P21 on at its speed (above 900 Hz in normal mode, above 600 Hz in standby mode)",
+     ["DCU_P21ST", "DCU_P21SPEED", "DCU_P21STYST"],
+     lambda v: v["DCU_P21ST"] == 1 and v["DCU_P21SPEED"] > _turbo_speed(v)[0],
+     lambda v: "P21 is on at %d Hz, correct for %s (above %d Hz, nominal %d Hz)"
+               % ((v["DCU_P21SPEED"], _turbo_speed(v)[2]) + _turbo_speed(v)[:2]),
+     lambda v: "P21 turbo pump is off" if v["DCU_P21ST"] != 1 else
+               "P21 speed = %d Hz is NOT above the %d Hz required in %s (nominal %d Hz)"
+               % (v["DCU_P21SPEED"], _turbo_speed(v)[0], _turbo_speed(v)[2], _turbo_speed(v)[1])),
     ("V21 open", ["M1_V21ST"], lambda v: v["M1_V21ST"] == 1,
      lambda v: "V21 is open", lambda v: "V21 is not open"),
     ("G21 between 1E-5 and 5E-11 mbar", ["MG_PR2"], lambda v: 5e-11 <= v["MG_PR2"] <= 1e-5,
@@ -90,6 +102,16 @@ def gauge_note(channel, value):
     if low <= value <= high:
         return " (%s gauge; inside its measuring range, %.0e to %.0e mbar)" % (kind, high, low)
     return " (%s gauge; OUTSIDE its measuring range, %.0e to %.0e mbar: not reliable%s)" % (kind, high, low, advice)
+
+
+def turbo_note(channel, values):
+    """Text added after the turbo pump speed: whether it is correct for the mode (standby or normal)."""
+    if channel != "DCU_P21SPEED" or values.get("DCU_P21ST") != 1:
+        return ""
+    required, nominal, mode = _turbo_speed(values)
+    if values[channel] > required:
+        return " (CORRECT for %s: nominal %d Hz, must be above %d Hz)" % (mode, nominal, required)
+    return " (TOO LOW for %s: nominal %d Hz, must be above %d Hz)" % (mode, nominal, required)
 
 
 def regime(values, channel_ok):

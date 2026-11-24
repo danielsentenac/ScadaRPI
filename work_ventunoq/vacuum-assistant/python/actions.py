@@ -121,12 +121,12 @@ def stability(samples, masses, cycles, tolerance, floor):
         if len(samples) < cycles:
             lines.append("mass %d: %d of %d cycles recorded" % (m, len(samples), cycles))
         elif mean < floor:
-            lines.append("mass %d: mean %.1e mbar, below the noise level %.0e: not tested" % (m, mean, floor))
+            lines.append("mass %d: mean %.1e A, below the noise level %.0e: not tested" % (m, mean, floor))
         else:
             spread = (max(last) - min(last)) / mean
             good = spread <= tolerance
             stable = stable and good
-            lines.append("mass %d: mean %.2e mbar, variation %.1f %% over the last %d cycles: %s"
+            lines.append("mass %d: mean %.2e A, variation %.1f %% over the last %d cycles: %s"
                          % (m, mean, 100 * spread, cycles, "stable" if good else "NOT stable"))
     return stable, lines
 
@@ -322,7 +322,7 @@ class Controller:
         cycle = c.get("rga_cycle_seconds", 25.0)
         cycles = c.get("rga_stable_cycles", 5)
         tolerance = c.get("rga_stable_tolerance", 0.10)
-        floor = c.get("rga_noise_floor_mbar", 1e-11)
+        floor = c.get("rga_noise_floor_A", 1e-12)
         longest = c.get("rga_max_minutes", 30.0) * 60
         last_mass = c.get("rga_last_mass", 100)
         limit = c.get("rga_max_pressure_mbar", 1e-5)
@@ -363,7 +363,7 @@ class Controller:
                 gauges.append(report.gauge_sample(v, self.ok))
                 stable, lines = stability(samples[skip:], STABILITY_MASSES, cycles, tolerance, floor)
                 self.log("  cycle %d: %s%s" % (len(samples), ", ".join("mass %d = %.2e" % (m, spectrum[m])
-                         for m in TREND_MASSES), " mbar - stable" if stable else " mbar"))
+                         for m in TREND_MASSES), " A - stable" if stable else " A"))
                 if stable or time.time() - t0 > longest:
                     break
             verdict = ("Recording stopped after %d cycles: masses %s stable" if stable else

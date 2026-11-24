@@ -126,7 +126,7 @@ def spectrum_plot(d, box, spectrum, last):
     f = font(15)
     measured = [m for m, p in spectrum.items() if p > 0 and m <= last]
     lo, hi = decades([spectrum[m] for m in measured])
-    ypix = frame(d, box, lo, hi, "partial pressure (mbar)")
+    ypix = frame(d, box, lo, hi, "ion current (A)")
     step = (x1 - x0) / float(last + 1)
     for m in range(0, last + 1, 10):
         x = x0 + m * step
@@ -146,7 +146,7 @@ def trend_plot(d, box, times, series, labels, colours):
     x0, y0, x1, y1 = box
     f = font(15)
     lo, hi = decades([v for s in series.values() for v in s])
-    ypix = frame(d, box, lo, hi, "partial pressure (mbar)")
+    ypix = frame(d, box, lo, hi, "ion current (A)")
     span = max(times[-1], 1.0) if times else 1.0
     unit, scale = ("min", 60.0) if span > 180 else ("s", 1.0)
     ticks = 6 if x1 - x0 > 700 else 4
@@ -243,7 +243,7 @@ def render(rep, png_path):
     peaks = spectrum_plot(d, box, rep["spectrum"], rep["last_mass"])
     y = box[3] + 54
     d.text((M, y), "RGA total pressure %s.   Highest peaks, mass " % st.get("rga_total", "-")
-           + ",  ".join("%d = %.1e mbar" % (m, rep["spectrum"][m]) for m in peaks),
+           + ",  ".join("%d = %.1e A" % (m, rep["spectrum"][m]) for m in peaks),
            font=small, fill=BLACK)
     y += 32
 

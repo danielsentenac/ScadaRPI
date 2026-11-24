@@ -205,7 +205,8 @@ def device_sections(values, words=()):
                 families[c["family"]].append(c)
             else:
                 lines.append(" %s [%s] = %s%s" % (c["label"] or "?", c["channel"], fmt(c, values[c["channel"]]),
-                                                 rules.gauge_note(c["channel"], values[c["channel"]])))
+                                                 rules.gauge_note(c["channel"], values[c["channel"]])
+                                                 + rules.turbo_note(c["channel"], values)))
         for i, item in enumerate(lines):
             if isinstance(item, list):
                 c0 = item[0]
@@ -220,9 +221,9 @@ def device_sections(values, words=()):
         if dev == "LEYSPEC":
             masses = [(values[c["channel"]], int(c["element"])) for c in CHANNELS if c["device"] == dev and c["element"].isdigit()]
             masses.sort(reverse=True)
-            peak = lambda p, m: "mass %d%s %.1e mbar" % (m, " (%s)" % GASES[m] if m in GASES else "", p)
+            peak = lambda p, m: "mass %d%s %.1e A" % (m, " (%s)" % GASES[m] if m in GASES else "", p)
             # The ranking is done here: the model is not reliable at comparing exponents.
-            lines.append(" Ga3 RGA dominant gas (highest partial pressure) = %s" % peak(*masses[0]))
+            lines.append(" Ga3 RGA dominant gas (highest ion current) = %s" % peak(*masses[0]))
             lines.append(" Ga3 RGA next peaks, in decreasing order = %s" % ", ".join(peak(p, m) for p, m in masses[1:6]))
     return sections
 
@@ -520,7 +521,7 @@ def item_facts(key, values):
         if c["regtype"] != "FLOAT32" and int(v) == 255:
             lines.append("%s: no valid value" % label)
             continue
-        lines.append("%s = %s%s" % (label, fmt(c, v), rules.gauge_note(c["channel"], v)))
+        lines.append("%s = %s%s" % (label, fmt(c, v), rules.gauge_note(c["channel"], v) + rules.turbo_note(c["channel"], values)))
         valid = True
     return lines, valid
 

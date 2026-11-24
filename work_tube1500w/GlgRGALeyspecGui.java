@@ -60,11 +60,25 @@ public class GlgRGALeyspecGui extends GlgChildGui {
        STATUS.put("RGAfilament", TUBE1500WSTATUS.get(origin + "filamentsub"));
        STATUS.put("RGAfilamentCol", TUBE1500WSTATUS.get(origin + "filamentsub"));
        STATUS.put("RGAfilamentStr", TUBE1500WSTATUS.get(origin + "filamentsub"));
-       STATUS.put("RGAtp", TUBE1500WSTATUS.get(origin + "tpsub"));
-       STATUS.put("RGAtpStr", TUBE1500WSTATUS.get(origin + "tpsub"));
+       // Total pressure : the tube gauge G21 (the total pressure gauge of the RGA does not go below 1E-7 mbar)
+       STATUS.put("RGAtp", G21_CHANNEL);
+       STATUS.put("RGAtpStr", G21_CHANNEL);
+       STATUS.put("RGAtpCol", G21_CHANNEL);
+       // Plot unit switch (click) : ion current or partial pressure
+       STATUS.put("RGAunit", TUBE1500WSTATUS.get(origin + "runningsub"));
+       STATUS.put("RGAunitStr", TUBE1500WSTATUS.get(origin + "runningsub"));
+       STATUS.put("RGAunitCol", TUBE1500WSTATUS.get(origin + "runningsub"));
+       STATUS.put("RGAsemvoltStr", TUBE1500WSTATUS.get(origin + "semvoltsub"));
+       STATUS.put("RGAspeedStr", TUBE1500WSTATUS.get(origin + "speedsub"));
+       STATUS.put("RGAsemvolt", TUBE1500WSTATUS.get(origin + "semvoltsub"));  // Object name : full visibility
+       STATUS.put("RGAspeed", TUBE1500WSTATUS.get(origin + "speedsub"));
+       STATUS.put("RGAsemvoltCol", TUBE1500WSTATUS.get(origin + "semvoltsub"));
+       STATUS.put("RGAspeedCol", TUBE1500WSTATUS.get(origin + "speedsub"));
        String channelName =  STATUS.get("RGAemission");
        // Get corresponding device from deviceManager
        String deviceName = channelName.split("_",2)[0];
+       glg_bean.SetSResource("/RGA/YAxisLabel/String", "Ion current (A)");
+       glg_bean.SetSTag("RGAunitStr", "Plot: ion current (A)", true);
        for ( int j = 0 ; j < NB_SAMPLES ; j++) {// RGA data (plot)
           int mass = j + 1;
           glg_bean.SetSResource("/RGA/DataGroup/DataSample" + j + "/TooltipLabel",
@@ -94,16 +108,94 @@ public class GlgRGALeyspecGui extends GlgChildGui {
         if ( glgName.contains("filamentStr") )
             glg_bean.SetSTag(glgName,  RGAFilamentSTATUS.get(status), true);
         if ( glgName.contains("tpStr") )         // Total pressure
-            glg_bean.SetSTag(glgName, dataElement.value > 0 ? String.format("Total: %.2E mbar", dataElement.value)
-                                                            : "Total: -", true);
+            glg_bean.SetSTag(glgName, dataElement.value > 0 ? String.format("G21: %.2E mbar", dataElement.value)
+                                                            : "G21: -", true);
+        if ( glgName.contains("unitStr") )       // Plot unit (click to switch)
+            glg_bean.SetSTag(glgName, !pressureMode ? "Plot: ion current (A)"
+                                      : totalPressure() > 0 ? "Plot: partial pressure" : "Plot: no G21 value", true);
+        if ( glgName.contains("unitCol") )
+            glg_bean.SetGTag(glgName, new GlgPoint(1., 1., 1.), true);
+        if ( glgName.contains("semvoltStr") )    // SEM high voltage setting (click to change)
+            glg_bean.SetSTag(glgName, status > 0 ? "SEM: " + status + " V" : "SEM: -", true);
+        if ( glgName.contains("speedStr") )      // Measurement speed setting (click to change)
+            glg_bean.SetSTag(glgName, status >= 1 && status <= 6 ? "Speed: " + SPEED_MS[status - 1] + " ms/mass" : "Speed: -", true);
+        if ( glgName.contains("semvoltCol") || glgName.contains("speedCol") ) // Editable fields : white
+            glg_bean.SetGTag(glgName, new GlgPoint(1., 1., 1.), true);
+        if ( glgName.contains("tpCol") )         // Total pressure : plain dark text, as the labels
+            glg_bean.SetGTag(glgName, new GlgPoint(0., 0., 0.23), true);
         if ( glgName.contains("DataSample") ) { // DataSample is a tag for plot object value (double type) property
-           if ( dataElement.value > 0 ) { // Log plot RGA
-              glg_bean.SetDResource(glgName, Math.log10(dataElement.value), true);
-              glg_bean.SetDResource(glgName.replace("Value","TooltipValue"),dataElement.value);// Set tooltip value
+           double shown = plotValue(dataElement.value);
+           adjustYAxis(shown);
+           if ( shown > 0 ) { // Log plot RGA
+              glg_bean.SetDResource(glgName, Math.log10(shown), true);
+              glg_bean.SetDResource(glgName.replace("Value","TooltipValue"), shown);// Set tooltip value
            }
            else
               glg_bean.SetDResource(glgName, Math.log10(0), true);
         }
+    }
+
+    // Plot unit : ion current (A) as measured, or partial pressure (mbar) = current / sum of the
+    // currents x total pressure given by G21 (method of the LEYSPEC manual, paragraph 9.6; it
+    // ignores the different sensitivity of each gas).
+    private static final String G21_CHANNEL = "MG_PR2";
+    private boolean pressureMode = false;
+    private double passSum = 0, currentSum = 0; // Sum of the ion currents : being built / of the last pass
+
+    private double totalPressure() {
+       Device mg = deviceManager.getDevice(G21_CHANNEL.split("_",2)[0]);
+       DataElement p = (mg == null) ? null : mg.getDataElement(G21_CHANNEL.split("_",2)[1]);
+       return (p == null) ? 0 : p.value;
+    }
+
+    private double plotValue(double current) {
+       if ( current > 0 ) passSum += current;
+       if ( !pressureMode ) return current;
+       double total = totalPressure();
+       return (total > 0 && currentSum > 0) ? current / currentSum * total : 0;
+    }
+
+    private void switchUnit() {
+       pressureMode = !pressureMode;
+       glg_bean.SetSResource("/RGA/YAxisLabel/String", pressureMode ? "Partial pressure (mbar)" : "Ion current (A)");
+       glg_bean.SetSTag("RGAunitStr", pressureMode ? "Plot: partial pressure" : "Plot: ion current (A)", true);
+    }
+
+    // Y axis of the plot : DECADES decades, starting one decade below the smallest value measured
+    // (the drawing has 7 decade labels; the range moves, the number of decades does not)
+    private static final int DECADES = 7, DEFAULT_LOW = -14;
+    private int samplesSeen = 0, axisLow = DEFAULT_LOW;
+    private double scanMin = Double.MAX_VALUE;
+
+    // Called for each mass of the plot; the axis is adjusted once per pass over all the masses
+    private void adjustYAxis(double value) {
+       if ( value > 0 && value < scanMin ) scanMin = value;
+       if ( ++samplesSeen < NB_SAMPLES ) return;
+       currentSum = passSum; // All the masses seen : sum used for the partial pressures of the next pass
+       passSum = 0;
+       int low = (scanMin == Double.MAX_VALUE) ? axisLow    // Nothing measured : keep the axis
+                 : Math.max(-16, Math.min((int) Math.floor(Math.log10(scanMin)) - 1, -6));
+       samplesSeen = 0;
+       scanMin = Double.MAX_VALUE;
+       if ( low == axisLow ) return;
+       axisLow = low;
+       glg_bean.SetDResource("RGA/Low", low);
+       glg_bean.SetDResource("RGA/High", low + DECADES);
+       for (int i = 0; i <= DECADES; i++)
+          glg_bean.SetSResource("RGA/YLabelGroup/YLabel" + i + "/String", String.format("1e%03d", low + i));
+       glg_bean.Update();
+    }
+
+    private static final int[] SPEED_MS = { 50, 100, 200, 500, 1000, 2000 };
+
+    private void openSetPoint(String statusKey, String title) {
+       String channelName = STATUS.get(statusKey);
+       if ( channelName == null ) return;
+       Device device = deviceManager.getDevice(channelName.split("_",2)[0]);
+       if ( device == null ) return;
+       DataElement dataElement = device.getDataElement(channelName.split("_",2)[1]);
+       if ( dataElement != null )
+          new DialogSetPoint(parent, statusKey, device, dataElement, title, true);
     }
 
     // Queue a trigger command (1 = ON, 2 = OFF) for the command channel "origin + key"
@@ -159,6 +251,12 @@ public class GlgRGALeyspecGui extends GlgChildGui {
            else if ( origintag.equals("RGASEMOFF") )
               sendTrigger("SEM", 2);
            // Filament selection field
+           else if ( origintag.equals("RGAunit") )
+              switchUnit();
+           else if ( origintag.equals("RGAsemvolt") )
+              openSetPoint("RGAsemvoltStr", "SEM high voltage in V (1000 to 3000)");
+           else if ( origintag.equals("RGAspeed") )
+              openSetPoint("RGAspeedStr", "Speed in ms/mass (50, 100, 200, 500, 1000 or 2000)");
            else if ( origintag.equals("RGAfilament") ) {
               String cmdName =  STATUS.get(origintag);
               Device device = deviceManager.getDevice(cmdName.split("_",2)[0]);

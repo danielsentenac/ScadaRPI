@@ -1,7 +1,7 @@
 /*
  * This Class is used for the MKS Rotor Gauge GUI using Glg Toolkit.
- * It reuses the generic gauge drawing (Gauge.g); the rotor gauge has no
- * ON/OFF command, so the ON/OFF buttons of the drawing have no effect.
+ * It reuses the generic gauge drawing (Gauge.g); its ON/OFF buttons start
+ * the measurement (rotor driven to speed) and stop the rotor.
  */
 
 import com.genlogic.*;
@@ -18,8 +18,11 @@ public class GlgROTGaugeGui extends GlgGaugeGui {
     private static final Hashtable<Integer, String> ROTGaugeReadingSTATUS = new Hashtable<Integer, String>(){
     private static final long serialVersionUID = 354054054091L;
     {
-       put(0,"- no reading");
+       put(0,"- stopped");
        put(1,"- measuring");
+       put(2,"- starting");
+       put(3,"- stopping");
+       put(4,"- no sensor");
        put(255,"- ?");
     }};
 

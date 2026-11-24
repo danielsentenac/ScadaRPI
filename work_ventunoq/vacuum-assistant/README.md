@@ -68,7 +68,7 @@ the real Pi (offline during the Pi 3 → Pi 4 swap).
    - **gauge measuring ranges** (Pirani 800 to 5E-4 mbar, cold cathode 5E-5 to
      5E-11, spinning rotor 1 to 5E-6): a reading outside is marked not reliable;
    - **normal regime**: P22 on; G22 0.5 to 5E-4 mbar; V22 open; P21 on above
-     900 Hz; V21 open; G21 1E-5 to 5E-11 mbar - each condition stated as met or not;
+     900 Hz (above 600 Hz when its standby mode is on, nominal 666 Hz); V21 open; G21 1E-5 to 5E-11 mbar - each condition stated as met or not;
    - **interlocks of V22, V21 and V1**, each with the conditions present now and
      a verdict (can / cannot be opened now). G22 acts through two MaxiGauge
      relays (LOW 1.0 mbar, HIGH 5.0 mbar): V21 and V22 cannot be opened unless
@@ -191,7 +191,7 @@ HTTP: `/ask` (chat), `/action?name=safety|baking|report|stop`, `/play` (POST
   3. The recording stops when masses 2, 18, 28 and 32 are stable: for each,
      (highest - lowest) / mean over the last `rga_stable_cycles` (5) spectra is
      within `rga_stable_tolerance` (10 %). A mass whose mean is below
-     `rga_noise_floor_mbar` (1E-11) is at the noise level and is not tested.
+     `rga_noise_floor_A` (1E-12 A) is at the noise level and is not tested.
      Without stabilization it stops after `rga_max_minutes` (30) and says so.
   4. The scan and the filament are put back as they were before the report
      (the panel clears the spectrum when the scan stops, so the last spectrum is

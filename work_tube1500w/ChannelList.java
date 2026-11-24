@@ -33,6 +33,7 @@ put("Ga4","MG_PR3ONOFF");       // Type 2 (TRIGGER)
 put("G4","MG_PR4ONOFF");        // Type 2 (TRIGGER) H2O vapour line (cold cathode)
 put("G5","MG_PR5ONOFF");        // Type 2 (TRIGGER) H2O reservoir (Pirani)
 put("Ga2","XGS_PR7ONOFF");       // Type 2 (TRIGGER)
+put("ROTGa5","ROT_GA5ONOFF");    // Type 2 (TRIGGER) Rotor gauge measurement START/STOP
 
 //
 // RGA (Leybold LEYSPEC)
@@ -223,6 +224,8 @@ put("RGAGa3emissionsub","LEYSPEC_EMISSION");
 put("RGAGa3modesub","LEYSPEC_MODE");
 put("RGAGa3filamentsub","LEYSPEC_FILAMENT");
 put("RGAGa3tpsub","LEYSPEC_TP");
+put("RGAGa3semvoltsub","LEYSPEC_SEMVOLT");
+put("RGAGa3speedsub","LEYSPEC_SPEED");
 
 }};
 
@@ -385,6 +388,9 @@ put(255,"?");
 Hashtable<Integer,GlgPoint> ROTGaugeEmissionColorSTATUS = new Hashtable<Integer, GlgPoint>(){{ 
 put(0,new GlgPoint(1.,0.7,0.));
 put(1,new GlgPoint(0.,1.,0.));
+put(2,new GlgPoint(1.,1.,0.));   // starting
+put(3,new GlgPoint(1.,1.,0.));   // stopping
+put(4,new GlgPoint(1.,0.,0.));   // no sensor
 put(255,new GlgPoint(0.62,0.73,0.93));
 }};
 //

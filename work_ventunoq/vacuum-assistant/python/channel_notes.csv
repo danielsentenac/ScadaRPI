@@ -28,7 +28,7 @@ MG_COMST,,MaxiGauge communication,,0=OK|1=FAIL,
 XGS_PR7,-,Ga2 gauge (not installed; not given to the model),mbar,,
 XGS_GA4COMST,,XGS-600 communication,,0=OK|1=FAIL,
 ROT_PR1,Ga5,pressure in the tube (high-pressure gauge),mbar,,1
-ROT_PR1ST,Ga5,reading status,,0=no valid reading|1=reading valid,
+ROT_PR1ST,Ga5,reading status,,0=rotor stopped (no reading)|1=measuring (reading valid)|2=rotor starting (no reading yet)|3=rotor stopping (no reading)|4=no sensor detected (no reading),
 ROT_GA5COMST,,Spinning rotor gauge communication,,0=OK|1=FAIL,
 SICEM_TCMUX_T,,bake-out thermocouple read through the multiplexer,degC,,
 SICEM_T,,heating channel CH<n> temperature,degC,,
@@ -45,7 +45,7 @@ DCU_P21PWR,P21,turbo pump drive power,W,,
 DCU_P21BTPST,P21,turbo pump electronics temperature,,0=OK|1=excess temperature,
 DCU_P21TPST,P21,turbo pump temperature,,0=OK|1=excess temperature,
 DCU_P21ST,P21,turbo pump,,0=pump off|1=pump on,1
-DCU_P21STYST,P21,turbo pump standby,,0=standby off|1=standby on,
+DCU_P21STYST,P21,turbo pump standby,,0=standby off (nominal speed 1000 Hz)|1=standby on (nominal speed 666 Hz),1
 DCU_P21BERR,P21,turbo pump error code,,0=no error|1=excess rotation speed|2=overvoltage|6=run-up time error|8=connection to electronic drive unit failed|10=internal device fault|21=drive unit does not recognise the pump|41=excess motor current|43=data storage malfunction,
 DCU_P21COMST,,Turbo pump controller communication,,0=OK|1=FAIL,
 M1_V21ST,V21,valve (tube to turbo pump P21),,0=moving|1=open|2=closed|3=limit switch error|4=moving (discordance)|5=open (discordance)|6=closed (discordance)|7=limit switch error (discordance),1
@@ -74,3 +74,5 @@ LEYSPEC_ERRORCODE,Ga3,RGA error code,,,
 LEYSPEC_FILAMENT,Ga3,RGA filament in use,,1=filament 1|2=filament 2,
 LEYSPEC_MODE,Ga3,RGA detector,,0=Faraday|1=SEM,
 LEYSPEC_COMST,,RGA communication,,0=OK|1=FAIL,
+LEYSPEC_SEMVOLT,Ga3,RGA SEM high voltage setting,V,,
+LEYSPEC_SPEED,Ga3,RGA scan speed setting,,1=50 ms/mass|2=100 ms/mass|3=200 ms/mass|4=500 ms/mass|5=1000 ms/mass|6=2000 ms/mass,

@@ -33,10 +33,10 @@ def log_axis(chart, title_x, title_y):
     chart.y_axis.crosses = "min"                              # x axis at the bottom of a log scale
 
 
-def trend_chart(ws, title, first_col, colours, n_rows, minutes):
+def trend_chart(ws, title, first_col, colours, n_rows, minutes, unit="mbar"):
     chart = ScatterChart()
     chart.title, chart.style, chart.height, chart.width = title, 13, 9, 17
-    log_axis(chart, "time since the start (%s)" % ("min" if minutes else "s"), "mbar")
+    log_axis(chart, "time since the start (%s)" % ("min" if minutes else "s"), unit)
     chart.x_axis.number_format = "0.0"
     x = Reference(ws, min_col=1, min_row=2, max_row=n_rows + 1)
     for col, rgb in enumerate(colours, first_col):
@@ -121,7 +121,7 @@ def write(rep, path):
     # ---- data sheets
     spectrum = {int(m): p for m, p in rep["spectrum"].items()}
     sp = wb.create_sheet("RGA spectrum")
-    sp.append(["Mass (AMU)", "Partial pressure (mbar)"])
+    sp.append(["Mass (AMU)", "Ion current (A)"])
     for m in range(1, rep["last_mass"] + 1):
         sp.append([m, spectrum.get(m) or None])            # not measured: empty cell
     minutes = bool(rep["times"]) and rep["times"][-1] > 180
@@ -147,7 +147,7 @@ def write(rep, path):
     # ---- charts, on the Report sheet to the right of the tables
     bar = BarChart()
     bar.title, bar.style, bar.height, bar.width = "Last RGA spectrum, masses 1 to %d" % rep["last_mass"], 10, 9, 34
-    log_axis(bar, "mass (AMU)", "mbar")
+    log_axis(bar, "mass (AMU)", "A")
     bar.add_data(Reference(sp, min_col=2, min_row=1, max_row=rep["last_mass"] + 1), titles_from_data=True)
     bar.set_categories(Reference(sp, min_col=1, min_row=2, max_row=rep["last_mass"] + 1))
     bar.legend = None
@@ -155,7 +155,7 @@ def write(rep, path):
     ws.add_chart(bar, "G2")
     n, cold = len(times), len(report.COLD_CATHODES)
     ws.add_chart(trend_chart(tr, "RGA trend during the recording", 2,
-                             [report.SERIES.get(m, (0, 0, 0)) for m in masses], n, minutes), "G21")
+                             [report.SERIES.get(m, (0, 0, 0)) for m in masses], n, minutes, "A"), "G21")
     ws.add_chart(trend_chart(ga, "Cold cathode gauges (Ga5 from 5E-6 mbar)", 2,
                              [g[4] for g in report.COLD_CATHODES], n, minutes), "G40")
     ws.add_chart(trend_chart(ga, "Pirani gauges", 2 + cold, [g[4] for g in report.PIRANIS], n, minutes), "R40")
