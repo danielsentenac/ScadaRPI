@@ -221,7 +221,8 @@ public class Main {
                                         1,                 // RGA address number (01 for 192.168.250.11)
                                         100,               // Last mass of the step scan (LEYSPEC view 100: 1-100 amu)
                                         3,                 // Measurement speed (3 = 200 ms/mass)
-                                        "EE50");           // Ion source recipe (LEYSPEC view series)
+                                        "EE50",            // Ion source recipe (LEYSPEC view series)
+                                        1200);             // SEM high voltage in V (file leyspec_sem_voltage.txt overrides it)
 
         // Add LEYSPEC to DeviceManager
         deviceManager.addDevice(leyspec);

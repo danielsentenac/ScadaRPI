@@ -471,6 +471,15 @@ def named_items(question):
     return list(dict.fromkeys(found))
 
 
+def reading_ok(status, code):
+    """Is this reading-status code the 'good' one? The gauges differ: 0 = pressure OK on the
+    MaxiGauge, 1 = reading valid on the rotor gauge, so the meaning of the code decides."""
+    meaning = status["codes"].get(int(code), "")
+    if meaning:
+        return bool(re.search(r"\bok\b|\bvalid\b", meaning, re.I)) and not re.search(r"\bno\b|\bnot\b", meaning, re.I)
+    return int(code) == 0
+
+
 def item_facts(key, values):
     """Text lines giving what was read for one item, and whether any valid value was read."""
     if key == "rack":
@@ -505,7 +514,7 @@ def item_facts(key, values):
             continue
         v = values[c["channel"]]
         status = BY_NAME.get(c["channel"] + "ST")
-        if c["unit"] == "mbar" and status and values.get(status["channel"], 0) != 0:
+        if c["unit"] == "mbar" and status and not reading_ok(status, values.get(status["channel"], 0)):
             lines.append("%s: no valid pressure (%s)" % (label, fmt(status, values[status["channel"]])))
             continue
         if c["regtype"] != "FLOAT32" and int(v) == 255:
@@ -608,7 +617,7 @@ def span_lines(key, rows):
         for t, v in rows:
             if c["channel"] not in v or device_down(c["device"], v):
                 continue
-            if c["unit"] == "mbar" and status and v.get(status["channel"], 0) != 0:
+            if c["unit"] == "mbar" and status and not reading_ok(status, v.get(status["channel"], 0)):
                 continue
             if c["regtype"] != "FLOAT32" and int(v[c["channel"]]) == 255:
                 continue

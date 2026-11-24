@@ -45,6 +45,14 @@ public class RgaLeyspec extends Device {
    private int lastMass;          // Last mass really scanned
    private int speed;             // Measurement speed SD 1..6 (50, 100, 200, 500, 1000, 2000 ms/mass)
    private String ionSourceRecipe;// Ion source part of the recipe ("EE50" for the view series)
+   private int semVoltage;        // SEM high voltage in V (SE command), 0 = leave the value stored in the RGA
+
+   // Optional file (in the panel directory) holding the SEM high voltage in V. If present it replaces the
+   // value given to the constructor, and it is read again at each scan start: the voltage can be tuned
+   // without restarting the panel (edit the file, then STOP / START the scan).
+   public static final String SEM_VOLTAGE_FILE = "leyspec_sem_voltage.txt";
+   public static final int SEM_VOLTAGE_MIN = 1000;  // LEYSPEC view / ultra : 1000..3000 V
+   public static final int SEM_VOLTAGE_MAX = 3000;
 
    private Socket socket;
    private InputStream in;
@@ -63,6 +71,9 @@ public class RgaLeyspec extends Device {
     * @param _ionSourceRecipe Ion source settings appended to the scan recipe:
     *                         "EE50" for the LEYSPEC view series,
     *                         "EE70VS140VG160" (see protocol table 3) for the LEYSPEC ultra series
+    * @param _semVoltage      SEM high voltage in V (1000..3000), set before each scan in SEM mode;
+    *                         0 = not set (the RGA keeps its stored value). A too low voltage gives
+    *                         partial pressures far below reality; a needlessly high one wears the SEM.
     */
    public RgaLeyspec (String _name,
                       int _mbRegisterStart,
@@ -71,7 +82,8 @@ public class RgaLeyspec extends Device {
                       int _address,
                       int _lastMass,
                       int _speed,
-                      String _ionSourceRecipe) {
+                      String _ionSourceRecipe,
+                      int _semVoltage) {
 
      name = _name; // Device name
      host = _host;
@@ -81,6 +93,14 @@ public class RgaLeyspec extends Device {
      lastMass = Math.max(2, Math.min(_lastMass, MAX_MASS));
      speed = Math.max(1, Math.min(_speed, 6));
      ionSourceRecipe = _ionSourceRecipe;
+     semVoltage = _semVoltage;
+
+     // The RGA serves one TCP client at a time and keeps the session of a client that vanished
+     // without the DC command (it then ignores new connections for minutes): say goodbye when
+     // the panel is stopped, so that the next start reconnects at once.
+     Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+        public void run() { goodbye(); }
+     }));
 
      mbRegisterStart = _mbRegisterStart;  // Starting Modbus register offset
 
@@ -352,7 +372,14 @@ public class RgaLeyspec extends Device {
       if ( !filamentOn() ) return;
       if ( !command("R1") ) return;
       Thread.sleep(1000);
-      if ( hasSEM && flag(query("DS"), 'D') == 0 ) { // SEM detector selected : turn on its high voltage
+      if ( hasSEM && flag(query("DS"), 'D') == 0 ) { // SEM detector selected : set and turn on its high voltage
+         int volts = semVoltageSetting();
+         if ( volts > 0 ) {
+            if ( command(String.format("SE%04d", volts)) )
+               logger.info("RgaLeyspec:startScan> " + name + " SEM high voltage set to " + volts + " V");
+            else
+               logger.log(Level.WARNING, "RgaLeyspec:startScan> " + name + " SEM high voltage " + volts + " V not accepted");
+         }
          if ( !command("S1") ) { command("R0"); return; }
          Thread.sleep(1000);
       }
@@ -363,6 +390,23 @@ public class RgaLeyspec extends Device {
       }
       resetScanData();
       logger.info("RgaLeyspec:startScan> " + name + " scan started (" + recipe + ")");
+   }
+
+   // SEM high voltage to use : from the file SEM_VOLTAGE_FILE if it holds a valid number, else from the constructor
+   private int semVoltageSetting() {
+      int volts = semVoltage;
+      java.io.File file = new java.io.File(SEM_VOLTAGE_FILE);
+      if ( file.exists() ) {
+         try ( java.util.Scanner sc = new java.util.Scanner(file) ) {
+            if ( sc.hasNextInt() ) volts = sc.nextInt();
+            else logger.log(Level.WARNING, "RgaLeyspec:semVoltageSetting> no number in " + SEM_VOLTAGE_FILE);
+         }
+         catch (IOException ex) {
+            logger.log(Level.WARNING, "RgaLeyspec:semVoltageSetting> cannot read " + SEM_VOLTAGE_FILE + " : " + ex.getMessage());
+         }
+      }
+      if ( volts <= 0 ) return 0;
+      return Math.max(SEM_VOLTAGE_MIN, Math.min(volts, SEM_VOLTAGE_MAX));
    }
 
    // Stop the scan : stop, SEM high voltage off, RF off (the filament is left as it is)
@@ -426,6 +470,18 @@ public class RgaLeyspec extends Device {
       if ( !command("UC0") ) throw new IOException("UC0 refused");
       logger.info("RgaLeyspec:connect> Connected to " + name + " (" + host + ":" + port + ") type=" + cs + " version=" + version
                   + " scan range=[1," + lastMass + "] SEM=" + hasSEM + " two filaments=" + hasTwoFilaments);
+   }
+
+   // Tell the RGA that this client leaves (measurement and settings are left as they are), then close
+   private void goodbye() {
+      try {
+         if ( isConnected() ) {
+            socket.setSoTimeout(1000);
+            query("DC");
+         }
+      }
+      catch (Exception ex) { }
+      disconnect();
    }
 
    private void disconnect() {
