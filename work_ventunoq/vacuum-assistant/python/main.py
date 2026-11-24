@@ -278,7 +278,7 @@ def heating_lines(values, down, bad):
     return lines
 
 
-def snapshot_text(question="", reserve=0):
+def snapshot_text(question="", reserve=0, max_words=None):
     """Text given to the model: a short overview (all pressures, main states, devices not
     communicating), then the full blocks of the devices most relevant to the question,
     within the size limit."""
@@ -324,6 +324,14 @@ def snapshot_text(question="", reserve=0):
     words |= set(w[:-1] for w in words if w.endswith("s"))
     for i, dev in enumerate(sections):
         scores[dev] = (-len(words & VOCABULARY[dev]), i)
+    if max_words is not None:              # most important lines first, within the word limit
+        kept, used = [], 0
+        for line in head:
+            if used + len(line.split()) <= max_words:
+                kept.append(line)
+                used += len(line.split())
+        head = kept
+    fits = lambda text: max_words is None or len(text.split()) <= max_words - 25
     out = "\n".join(head)
     left_out = []
     room = MAX_SNAPSHOT_CHARS - 250 - reserve  # keep room for the closing line (and for `reserve` characters added by the caller)
@@ -331,42 +339,69 @@ def snapshot_text(question="", reserve=0):
     targeted = any(s[0] < 0 for s in scores.values())
     for dev in sorted(sections, key=lambda d: scores[d]):
         block = "\n".join(sections[dev])
-        if (scores[dev][0] < 0 or not targeted) and len(out) + 1 + len(block) <= room:
+        if (scores[dev][0] < 0 or not targeted) and len(out) + 1 + len(block) <= room and fits(out + " " + block):
             out += "\n" + block
         else:
             left_out.append(DEVICE_TITLES.get(dev, dev))
-    if left_out:
+    if left_out and max_words is None:
         out += "\n(Details not shown here: %s.)" % "; ".join(left_out)
+    elif left_out:
+        out += "\n(Other details not shown.)"
     return out
 
 
+# The model service (Qualcomm GenAI runner 1.5.0) imposes two limits, both counted as
+# words x 1.3 "tokens":
+#  - the system prompt is cut at 256 tokens (about 160 words of ours: it appends 33 words);
+#  - after each answer, if question + answer exceed about 676 tokens it summarises them and
+#    extracts "facts" with the model; that step crashes the model process, which leaves the
+#    NPU memory locked until the board is rebooted ("issue while cleaning up memory", then
+#    "not configured correctly to run AI models").
+# So the system prompt stays short and each prompt is built within MAX_PROMPT_WORDS, with
+# the answer limited to MAX_ANSWER_TOKENS: (300 + 200) x 1.3 + 8 = 658 < 676.
+MAX_PROMPT_WORDS = CONFIG.get("max_prompt_words", 300)
+MAX_ANSWER_TOKENS = CONFIG.get("max_answer_tokens", 200)
+
 SYSTEM_PROMPT = (
-    "You are the assistant of a vacuum system, the tube 1500 West. "
-    "With each question you receive the values just read from its control panel.\n"
-    "Reading them: each line is 'name on the panel, what it is [CHANNEL] = value'; a state is a code "
-    "followed by its meaning, e.g. '1 (open)'. Gauges: G21, G22, G4, G5, Ga4, Ga5; Ga3 is the RGA; "
-    "valves: V1, V21, V22; P21 turbo pump, P22 dry pump; CH1-CH9 heating channels (Sicem).\n"
-    "You also receive the OPERATING RULES of the system: they are the only procedures and limits you may give.\n"
-    "Rules for your answers:\n"
-    "1. Answer only from the values and the operating rules. If they do not contain the answer, say so.\n"
-    "2. Find the item by the name the operator uses, never by a similar channel number.\n"
-    "3. Quote the panel name, the value and its unit; for a state give the meaning, not only the code.\n"
-    "4. If a line says SAFETY MODE REQUIRED or PROBLEM, say it first, whatever the question.\n"
-    "5. For questions about alarms, faults, problems or whether things are normal, use the lines 'States meaning a "
-    "problem', 'Normal regime' and 'Heating': they cover all devices. Never invent a meaning, a limit or a cause; "
-    "never compare numbers yourself: the lines already say whether each value is inside or outside its range, "
-    "repeat that verdict.\n"
-    "6. You do not send commands from this chat. Actions are done only with the buttons of the panel (SAFETY, "
-    "BACKGROUND BAKING, PLAY). If asked to act, say so, then give the current state of that item.\n"
-    "7. Be brief: at most three sentences, or a plain list when a list is asked. No explanation of your reasoning."
+    "You are the assistant of the vacuum system tube 1500 West. Each question comes with values just read "
+    "from its panel and with the operating rules.\n"
+    "Gauges G21, G22, G4, G5, Ga4, Ga5; Ga3 is the RGA; valves V1, V21, V22; P21 turbo pump, "
+    "P22 dry pump; CH1-CH9 heating.\n"
+    "Rules:\n"
+    "1. Answer only from the given values and rules; if the answer is not there, say so. "
+    "Never invent a value, limit, meaning or cause.\n"
+    "2. Quote the panel name, value and unit; give the meaning of a state, not its code.\n"
+    "3. If a line says SAFETY MODE REQUIRED or PROBLEM, say it first.\n"
+    "4. Never compare numbers yourself: the lines already say whether a value is inside its range.\n"
+    "5. You cannot send commands; actions are done with the panel buttons.\n"
+    "6. Be brief: at most three sentences, or a plain list. No reasoning."
 )
+assert len(SYSTEM_PROMPT.split()) <= 160, "system prompt too long: the model service would cut it"
 
 # Low temperature: the answers must repeat measured values, not be creative.
-llm = LargeLanguageModel(system_prompt=SYSTEM_PROMPT, temperature=CONFIG.get("temperature", 0.2))
+llm = LargeLanguageModel(system_prompt=SYSTEM_PROMPT, temperature=CONFIG.get("temperature", 0.2),
+                         max_tokens=MAX_ANSWER_TOKENS)
 llm_lock = threading.Lock()
 
 
 OPERATING_RULES = rules.OPERATING_RULES
+
+STOPWORDS = set("the is are a an of to in it if what do does should be and or at on for with must not has have can "
+                "cannot this that all how why when which there any now".split())
+
+
+def stems(text):
+    """Words of a text reduced to their first 4 letters, so that 'fails' meets 'failure'."""
+    return set(w[:4] for w in re.findall(r"[a-z0-9]{2,}", text.lower()) if w not in STOPWORDS)
+
+
+def rules_for(question):
+    """The operating rules that share a word with the question; all of them if none does.
+    The prompt is limited in words (MAX_PROMPT_WORDS), so only the useful rules are sent."""
+    lines = [l for l in OPERATING_RULES.splitlines() if l.strip()]
+    asked = stems(question)
+    hit = [l for l in lines if asked & stems(l)]
+    return "\n".join(hit or lines)
 PROCEDURE = re.compile(r"what (should|must|to|do|shall|can)|how (should|do|to)|procedure|safety mode|in case of|what if|what is the normal|interlock|why |protect", re.I)
 
 # A request to act gets a fixed first sentence, whatever the model writes.
@@ -677,8 +712,7 @@ def ask(q: str = ""):
     if not keys and not command and not PROCEDURE.search(q) and STATUS_QUESTION.search(q):
         answer = status_answer(stamp)
         return {"question": q, "answer": answer, "seconds": round(time.time() - t0, 1), "snapshot": answer}
-    fact_text = fact_text[:800]            # the prompt length is limited (see MAX_SNAPSHOT_CHARS)
-    snap = snapshot_text(q, reserve=len(fact_text) + 90 if fact_text else 0)
+    fact_text = fact_text[:800]            # the prompt length is limited (see MAX_PROMPT_WORDS)
     if command:
         # Do not let the model discuss the action: it only reports the item concerned.
         task = ('The operator asked: "%s". This cannot be done from here. In one sentence, give only the '
@@ -691,10 +725,16 @@ def ask(q: str = ""):
         task = q
     recent = ""
     if re.search(r"\b(log|action|actions|did|done|doing|experiment|baking|running|happened)\b", q, re.I):
-        recent = "\n\nRECENT ACTIONS OF THE ASSISTANT (newest last)\n%s" % "\n".join(CONTROL.lines[-8:])
+        recent = "\n\nRECENT ACTIONS OF THE ASSISTANT (newest last)\n%s" % "\n".join(CONTROL.lines[-4:])
+    rule_text = rules_for(q)
+    fixed = "%s %s %s %s" % (fact_text, rule_text, recent, task)
+    snap = snapshot_text(q, reserve=len(fact_text) + 90 if fact_text else 0,
+                         max_words=max(MAX_PROMPT_WORDS - len(fixed.split()) - 22, 0))
     if fact_text:
         snap = "VALUES OF THE ITEMS ASKED ABOUT (use these, never another number for them)\n%s\n\n%s" % (fact_text, snap)
-    prompt = "CURRENT VALUES\n%s\n\nOPERATING RULES\n%s%s\n\nQUESTION\n%s" % (snap, OPERATING_RULES, recent, task)
+    prompt = "CURRENT VALUES\n%s\n\nOPERATING RULES\n%s%s\n\nQUESTION\n%s" % (snap, rule_text, recent, task)
+    if len(prompt.split()) > MAX_PROMPT_WORDS:   # last resort: a longer prompt breaks the model service
+        prompt = " ".join(prompt.split()[:MAX_PROMPT_WORDS - len(task.split()) - 2]) + "\n\nQUESTION\n" + task
     with llm_lock:
         answer, last = None, None
         for attempt in range(2):  # the model service may be reloading: retry once

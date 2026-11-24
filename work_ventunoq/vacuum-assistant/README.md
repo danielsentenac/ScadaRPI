@@ -239,9 +239,27 @@ and the panel's write path with a fake device (see `work_tube1500w`).
 
 ## Limits found
 
-- **Model context: 4096 tokens.** A prompt of about 4500 characters makes the
-  Genie model service fail and restart. Hence the 2500-character budget and the
-  selection of values by question.
+- **Model context: 4096 tokens, but the model service allows much less.** The
+  service (Qualcomm GenAI runner 1.5.0, container `genie-models-runner`) counts
+  words x 1.3 as tokens and:
+  - cuts the system prompt at 256 tokens (about 160 words of ours);
+  - after each answer, if question + answer exceed about 676 tokens, summarises
+    them and "extracts facts" with the model. That step crashes the model
+    process (`Event ...-facts: LLM process socket closed`), and the dead process
+    leaves about 7 GB of NPU memory locked: every later request fails with
+    `500 issue while cleaning up memory`, then `503 not configured correctly to
+    run AI models`, **until the board is rebooted**.
+
+  Hence `MAX_PROMPT_WORDS` (300) and `MAX_ANSWER_TOKENS` (200) in `main.py`:
+  only the operating rules sharing a word with the question are sent, and the
+  values are added most important first within the word limit. Do not raise
+  these limits without redoing the sum given in `main.py`.
+- **Never stop or restart the whole app once the model has answered**
+  (`arduino-app-cli app restart|stop`, or the stop button of App Lab): killing
+  the model service while the model is loaded locks the NPU memory in the same
+  way, and only a reboot clears it. To load a new `main.py`, restart the
+  program only: `docker restart vacuum-assistant-main-1` (verified 2026-11-24:
+  the model keeps answering). For anything else, reboot the board.
 - **The LLM brick keeps the conversation between calls** even without
   `with_memory()`. Without `clear_memory()` the third question overflowed the context.
 - **The model still over-states.** Asked "Is everything OK?" it may add that
@@ -282,10 +300,13 @@ turbo error code, gauge overrange, one device not communicating).
 ```
 arduino-app-cli app new vacuum-assistant -b arduino:llm -b arduino:web_ui --no-sketch
 # copy app.yaml, python/*, assets/index.html into ~/ArduinoApps/vacuum-assistant
-arduino-app-cli app start user:vacuum-assistant        # or: app restart
+arduino-app-cli app start user:vacuum-assistant        # first start only
 arduino-app-cli app logs  user:vacuum-assistant
 ```
 Page: `http://<board address>:7000`.
+
+Later updates: copy the files, then `docker restart vacuum-assistant-main-1`.
+Not `app restart`: see "Limits found".
 
 `config.json` in this repository points at the real panel over the direct
 cable (`192.168.251.1:1288`), and since 2026-11-23 so does the board (set-up of
