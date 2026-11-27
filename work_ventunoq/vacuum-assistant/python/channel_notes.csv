@@ -17,7 +17,7 @@ MG_PR3ST,Ga4,reading status,,0=pressure OK|1=underrange|2=overrange|3=sensor err
 MG_PR1SST,G22,sensor switch,,0=not switchable|1=switched off|2=switched on,
 MG_PR2SST,G21,sensor switch,,0=not switchable|1=switched off|2=switched on,
 MG_PR3SST,Ga4,sensor switch,,0=not switchable|1=switched off|2=switched on,
-MG_PR4,G4,pressure in the H2O vapour line (below conductance 2),mbar,,1
+MG_PR4,G4,pressure in the H2O vapour line (below the disc conductance and the capillary inlet and above PT),mbar,,1
 MG_PR5,G5,pressure in the H2O reservoir,mbar,,1
 MG_PR4ST,G4,reading status,,0=pressure OK|1=underrange|2=overrange|3=sensor error|4=sensor off|5=no sensor|6=sensor identification error,
 MG_PR5ST,G5,reading status,,0=pressure OK|1=underrange|2=overrange|3=sensor error|4=sensor off|5=no sensor|6=sensor identification error,

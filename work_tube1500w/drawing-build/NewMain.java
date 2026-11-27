@@ -85,20 +85,20 @@ public class NewMain {
     place(o.get(90), X1 + 66, 598); place(named("BypassG22Val"), X1 + 150, 597);
     // ---- Sicem channels 8 (heater around VM3) and 9 (heater around V21)
     sicemBlock(8, 150, 202); sicemBlock(9, X1 + 92, 264);
-    // ---- V1 branch (H2O vapour line, sketch of 2026-11-27): V1 - disc conductance - capillary to H2O+G5 - G4 - PT - VS - PS
-    double X2 = 1140;
-    vpipe(X2, 241, 262); fit(named("V1"), X2 - 29, 260, X2 + 29, 298); place(o.get(11), X2 - 55, 270);
-    vpipe(X2, 296, 464);
-    fit(poly(new double[][]{{0,0},{1,0},{1,1},{0,1}}), X2 - 22, 315, X2 + 22, 322); text("DISC COND.", X2 + 30, 308);
-    // capillary: flange on the line, thin line to the top of the H2O reservoir
-    hpipe(362, X2, X2 + 22); fit(poly(new double[][]{{0,0},{1,0},{1,1},{0,1}}), X2 + 21, 353, X2 + 26, 371);
-    fit(dark(poly(new double[][]{{0,0},{1,0},{1,1},{0,1}})), X2 + 26, 361, 1264, 363);
-    fit(dark(poly(new double[][]{{0,0},{1,0},{1,1},{0,1}})), 1262, 361, 1264, 422);
-    text("CAPILLARY", X2 + 50, 338);
-    hpipe(420, X2 - 62, X2);
-    GlgObject g4 = gauge("Ga4", "G4"); fit(g4, X2 - 126, 397, X2 - 61, 443); text("G4", X2 - 103, 444);
-    GlgObject g4v = gauge("Ga4Val", "G4Val"); fit(g4v, X2 - 300, 404, X2 - 132, 437);
-    box(1245, 422, 1420, 482); text("H2O", 1338, 442);
+    // ---- V1 branch (H2O vapour line, real geometry of 2026-11-27): a cross at (X2, YC) with G4 on top, the capillary
+    //      to the H2O reservoir on the right, the DN40 tube with the disc conductance and V1 on the left, PT - VS - PS below
+    double X2 = 1140, XV = 1000, YC = 436;
+    vpipe(XV, 241, 262); fit(named("V1"), XV - 29, 260, XV + 29, 298); place(o.get(11), XV - 55, 270);
+    vpipe(XV, 296, YC + 5); hpipe(YC, XV - 5, X2);
+    fit(poly(new double[][]{{0,0},{1,0},{1,1},{0,1}}), 1060, YC - 22, 1067, YC + 22); text("DISC COND.", 1012, 392);
+    vpipe(X2, 380, 464);
+    GlgObject g4 = gauge("Ga4", "G4"); fit(g4, X2 - 32, 334, X2 + 33, 380); text("G4", X2 - 60, 347);
+    GlgObject g4v = gauge("Ga4Val", "G4Val"); fit(g4v, X2 - 84, 298, X2 + 84, 331);
+    // capillary: flange on the cross, thin line to the H2O reservoir
+    hpipe(YC, X2, X2 + 22); fit(poly(new double[][]{{0,0},{1,0},{1,1},{0,1}}), X2 + 21, YC - 9, X2 + 26, YC + 9);
+    fit(dark(poly(new double[][]{{0,0},{1,0},{1,1},{0,1}})), X2 + 26, YC - 1, 1290, YC + 1);
+    text("CAPILLARY", X2 + 40, YC - 24);
+    box(1290, 422, 1420, 482); text("H2O", 1338, 442);
     vpipe(1355, 482, 506); GlgObject g5 = gauge("G22", "G5"); fit(g5, 1322, 505, 1388, 553); text("G5", 1393, 518);
     GlgObject g5v = gauge("Ga4Val", "G5Val"); fit(g5v, 1262, 556, 1430, 589);
     GlgObject pt = named("TurboP21").CopyObject(); pt.SetSResource("Name", ""); retag(pt, "TurboP21Col", "PassiveCol");
