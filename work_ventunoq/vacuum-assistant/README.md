@@ -191,6 +191,16 @@ HTTP: `/ask` (chat), `/action?name=safety|baking|report|stop`, `/play` (POST
   assistant's own parser (`POST /check`): nothing is run, the bad lines are listed. SAVE writes
   `<name>.exp` in the `play` folder of the panel, where PLAY offers it; OPEN reads a file from
   that folder. The editor only writes files: an experiment starts with PLAY alone.
+- **EXPERIMENT STATUS** (button, or a chat question such as "how is the experiment going?";
+  `GET /experiment`): where the experiment file is. The sequencer records its progress
+  (`Controller.experiment`), and `Controller.experiment_status()` computes the lines shown:
+  running, finished, stopped or failed; the step and how long it has lasted; what a WAIT UNTIL
+  is waiting for, the present value and the time before its timeout; the steps done and left;
+  the time left, as "at least" (fixed waits) and "at most" (every WAIT UNTIL up to its
+  timeout). The language model then words a summary of these lines, shown below them and
+  labelled as AI-written; a sentence quoting a number that is not in the lines is removed
+  (`history_report.checked`). The progress is kept in memory: restarting the app stops a
+  running experiment and forgets the last one.
 - **VACUUM REPORT** (`python/report.py`, `Controller.seq_report`):
   1. If the RGA scan is not running it is started, only with G21 valid and below
      `rga_max_pressure_mbar` (1E-5), to protect the filament.

@@ -184,6 +184,7 @@ class Controller:
             with open(self.log_path) as f:
                 self.lines = f.read().splitlines()[-2000:]
         self.job, self.job_lock, self.abort = None, threading.Lock(), threading.Event()
+        self.experiment = None            # progress of the last experiment file played (experiment_status)
         self.supervising = False          # heating was switched on by the assistant: watch the regime
         threading.Thread(target=self._supervise, daemon=True).start()
         threading.Thread(target=self._sync_loop, daemon=True).start()
@@ -303,6 +304,8 @@ class Controller:
         for i, (number, line, step) in enumerate(steps, 1):
             self.check_abort()
             self.log(" step %d/%d (line %d): %s" % (i, len(steps), number, line))
+            if self.experiment:
+                self.experiment.update(index=i, step_started=time.time(), wait=None)
             kind = step[0]
             if kind == "check_regime":
                 self.regime_or_abort("Experiment")
@@ -330,6 +333,8 @@ class Controller:
                 self.trigger("bypass %s" % ("on" if step[1] else "off"), "M1_BYPASSONOFF", ON if step[1] else OFF,
                              "M1_BYPASSST", 1 if step[1] else 2)
             elif kind == "wait":
+                if self.experiment:
+                    self.experiment["wait"] = {"end": time.time() + step[1]}
                 self.sleep(step[1])
             elif kind == "wait_until":
                 self.wait_until(*step[1:])
@@ -507,6 +512,8 @@ class Controller:
                 value = max(v["SICEM_T%d" % n] for n in range(1, self.heating_channels + 1))
             else:
                 value = v[QUANTITIES[name]]
+            if self.experiment and self.experiment["state"] == "running":
+                self.experiment["wait"] = {"name": name, "op": op, "limit": limit, "value": value, "end": end}
             if (value < limit) if op == "<" else (value > limit):
                 self.log("  %s = %.3g: condition met" % (name, value))
                 return
@@ -564,7 +571,87 @@ class Controller:
             return {"ok": False, "message": "file refused: %s" % e}
         with open(self.instructions_path, "w") as f:
             f.write("# %s, loaded %s\n%s" % (name, time.strftime("%Y-%m-%d %H:%M:%S"), text))
-        return self.start("Experiment '%s' (%d steps)" % (name, len(steps)), lambda: self.seq_experiment(steps))
+        def run():
+            self.experiment = {"name": name, "steps": steps, "started": time.time(), "index": 0,
+                               "step_started": time.time(), "wait": None, "state": "running", "ended": None, "why": ""}
+            mine = self.experiment
+            try:
+                self.seq_experiment(steps)
+                mine.update(state="finished", ended=time.time())
+            except Exception as e:
+                mine.update(state="stopped" if isinstance(e, Abort) else "failed", ended=time.time(), why=str(e)[:200])
+                raise
+
+        return self.start("Experiment '%s' (%d steps)" % (name, len(steps)), run)
+
+    def experiment_status(self):
+        """Where the experiment file is: short lines computed from what the sequencer recorded
+        (step, waits, times). They are the answer shown to the operator, and the only material
+        given to the language model for its summary."""
+        def span(seconds):
+            seconds = max(0, int(seconds))
+            if seconds < 120:
+                return "%d s" % seconds
+            if seconds < 7200:
+                return "%d min" % round(seconds / 60.0)
+            return "%d h %02d min" % (seconds // 3600, seconds % 3600 // 60)
+
+        def clock(t):
+            return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t))
+
+        e, now = self.experiment, time.time()
+        other = self.job if self.job and not self.job.startswith("Experiment") else None
+        if not e:
+            return ["No experiment file has been played since the assistant was last started."] + \
+                   (["%s is running (it is not an experiment file)." % other] if other else [])
+        steps, i, total = e["steps"], e["index"], len(e["steps"])
+        mode = "" if self.enabled else " in DRY RUN (commands to the panel are disabled, steps are only logged)"
+        lines = []
+        if e["state"] == "running":
+            lines.append("Experiment %s is RUNNING%s. Started %s, %s ago." % (e["name"], mode, clock(e["started"]), span(now - e["started"])))
+            if i:
+                number, text, step = steps[i - 1]
+                lines.append("Now at step %d of %d (line %d of the file): %s. This step started %s ago."
+                             % (i, total, number, text, span(now - e["step_started"])))
+                w = e["wait"]
+                if w and "name" in w:
+                    lines.append("It is waiting for %s to be %s %g: %s is now %.3g. If this is not reached within %s, the experiment stops."
+                                 % (w["name"], "below" if w["op"] == "<" else "above", w["limit"], w["name"], w["value"], span(w["end"] - now)))
+                elif w:
+                    lines.append("It is waiting a fixed time: %s left." % span(w["end"] - now))
+        else:
+            word = {"finished": "FINISHED: all %d steps were done" % total,
+                    "stopped": "was STOPPED at step %d of %d" % (i, total),
+                    "failed": "FAILED at step %d of %d" % (i, total)}[e["state"]]
+            lines.append("Experiment %s %s%s. Started %s, ended %s, lasted %s."
+                         % (e["name"], word, mode, clock(e["started"]), clock(e["ended"]), span(e["ended"] - e["started"])))
+            if e["why"]:
+                lines.append("Reason: %s." % e["why"].rstrip("."))
+        done = steps[:max(i - 1, 0)] if e["state"] != "finished" else steps
+        left = steps[i:] if e["state"] != "finished" else []
+        if done:
+            lines.append("Steps done (%d): %s." % (len(done), "; ".join(t for _, t, _ in done[-6:])))
+        if left:
+            word = "Steps still to do" if e["state"] == "running" else "Steps NOT done"
+            lines.append("%s (%d): %s%s." % (word, len(left), "; ".join(t for _, t, _ in left[:6]), " ..." if len(left) > 6 else ""))
+        if e["state"] == "running":
+            w = e["wait"] or {}
+            least = most = max(0, w.get("end", now) - now) if w else 0
+            if "name" in w:
+                least = 0
+            for _, _, step in left:
+                if step[0] == "wait":
+                    least, most = least + step[1], most + step[1]
+                elif step[0] == "wait_until":
+                    most += step[4]
+            if most:
+                lines.append("Time left: at least %s (the fixed waits), at most %s (if every WAIT UNTIL lasts until its timeout)."
+                             % (span(least), span(most)))
+            else:
+                lines.append("No wait left: the remaining steps are immediate.")
+        if other:
+            lines.append("%s is running now (it is not an experiment file)." % other)
+        return lines
 
     def check(self, text):
         """Is `text` a valid experiment file? Nothing is run, nothing is saved."""

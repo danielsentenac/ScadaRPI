@@ -99,6 +99,9 @@ public class AssistantGui extends JFrame {
         JButton edit = button("EDIT EXPERIMENT", new Color(170, 220, 175));
         edit.setToolTipText("Write, check and save an experiment instruction file, with the list of the instructions");
         edit.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) { editExperiment(); } });
+        JButton progress = button("EXPERIMENT STATUS", new Color(170, 220, 175));
+        progress.setToolTipText("Where the experiment file is: step, waits, time left, with a summary by the AI");
+        progress.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) { experimentStatus(); } });
         JButton report = button("VACUUM REPORT", new Color(120, 170, 240));
         report.setToolTipText("Record the RGA until the main masses are stable, then save a vacuum status report");
         report.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) {
@@ -118,8 +121,8 @@ public class AssistantGui extends JFrame {
         stop.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) {
             request("STOP EXPERIMENT", "/action?name=stop"); } });
         play.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) { play(); } });
-        JPanel presets = titled("BASIC INSTRUCTIONS", new GridLayout(7, 1, 0, 6));
-        presets.add(safety); presets.add(baking); presets.add(play); presets.add(edit); presets.add(report); presets.add(history); presets.add(stop);
+        JPanel presets = titled("BASIC INSTRUCTIONS", new GridLayout(8, 1, 0, 5));
+        presets.add(safety); presets.add(baking); presets.add(play); presets.add(edit); presets.add(progress); presets.add(report); presets.add(history); presets.add(stop);
         presets.setPreferredSize(new Dimension(300, 10));
         JPanel instructions = new JPanel(new BorderLayout(8, 0));
         instructions.setOpaque(false);
@@ -127,18 +130,23 @@ public class AssistantGui extends JFrame {
 
         // ---- live log
         log.setEditable(false); log.setFont(MONO); log.setLineWrap(true); log.setWrapStyleWord(true);
-        JPanel logPanel = titled("LIVE LOG - every action of the assistant", new BorderLayout());
+        JPanel logPanel = titled("AI LOG - live, every action of the assistant", new BorderLayout());
         logPanel.add(new JScrollPane(log), BorderLayout.CENTER);
 
         // ---- system files
-        JButton instructionFile = button("INSTRUCTION FILE", new Color(235, 235, 245));
-        JButton logFile = button("LOG FILE", new Color(235, 235, 245));
+        JButton instructionFile = button("LAST EXPERIMENT", new Color(235, 235, 245));
+        JButton logFile = button("AI LOG", new Color(235, 235, 245));
+        instructionFile.setToolTipText("The experiment file last loaded with PLAY, as the assistant received it");
+        logFile.setToolTipText("Log of the assistant: every action it took");
         instructionFile.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) { showFile("instructions"); } });
         logFile.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) { showFile("log"); } });
         JPanel files = titled("SYSTEM FILES", new FlowLayout(FlowLayout.LEFT, 12, 2));
         JButton reports = button("REPORTS", new Color(235, 235, 245));
         reports.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) { showReports(); } });
-        files.add(instructionFile); files.add(logFile); files.add(reports);
+        JButton panelLog = button("PANEL LOG", new Color(235, 235, 245));
+        panelLog.setToolTipText("Log of the panel itself: the commands sent to the instruments and their answers");
+        panelLog.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) { showPanelLog(); } });
+        files.add(instructionFile); files.add(logFile); files.add(panelLog); files.add(reports);
 
         JPanel centre = new JPanel(new GridBagLayout());
         centre.setOpaque(false);
@@ -307,6 +315,16 @@ public class AssistantGui extends JFrame {
             try { say("\n[" + label + "] " + jsonString(http("GET", base + path, null, 10000), "message")); }
             catch (Exception ex) { say("\n[" + label + "] NOT SENT: the assistant cannot be reached (" + ex.getMessage() + ")"); }
         } }, "assistant-request").start();
+    }
+
+    /** EXPERIMENT STATUS: where the experiment file is (computed by the assistant from its sequencer),
+     *  followed by a summary worded by the language model. Shown in the chat. */
+    private void experimentStatus() {
+        say("\n[EXPERIMENT STATUS] asking the assistant...");
+        new Thread(new Runnable() { public void run() {
+            try { say(jsonString(http("GET", base + "/experiment", null, 150000), "answer")); }
+            catch (Exception ex) { say("[EXPERIMENT STATUS] the assistant cannot be reached (" + ex.getMessage() + ")"); }
+        } }, "assistant-experiment").start();
     }
 
     /** HISTORICAL REPORT, from a START to a STOP. START is an event (an item taking a state, or a
@@ -649,6 +667,31 @@ public class AssistantGui extends JFrame {
                                               JOptionPane.PLAIN_MESSAGE);
             } });
         } }, "assistant-file").start();
+    }
+
+    /** PANEL LOG: the end of the log file of the panel itself (commands to the instruments and their
+     *  answers). The panel writes one "<rack>_<start time>.log" per start in its folder; the newest
+     *  is shown. It is a file of this computer, not of the assistant. */
+    private void showPanelLog() {
+        File[] logs = new File(".").getAbsoluteFile().listFiles(new java.io.FilenameFilter() {
+            public boolean accept(File dir, String n) { return n.endsWith(".log"); } });
+        String title = "Panel log", text;
+        if (logs == null || logs.length == 0) text = "No log file in " + new File(".").getAbsolutePath();
+        else {
+            File newest = logs[0];
+            for (File f : logs) if (f.lastModified() > newest.lastModified()) newest = f;
+            title = newest.getName() + " (on the panel)";
+            try (java.io.RandomAccessFile in = new java.io.RandomAccessFile(newest, "r")) {
+                long length = in.length(), from = Math.max(0, length - 200000);     // the end of a long file
+                byte[] bytes = new byte[(int) (length - from)];
+                in.seek(from); in.readFully(bytes);
+                text = new String(bytes, StandardCharsets.UTF_8);
+                if (from > 0) text = "(... beginning not shown)" + text.substring(Math.max(0, text.indexOf('\n')));
+            } catch (IOException ex) { text = "Cannot read " + newest.getName() + ": " + ex.getMessage(); }
+        }
+        JTextArea area = new JTextArea(text, 26, 100);
+        area.setEditable(false); area.setFont(MONO); area.setCaretPosition(area.getDocument().getLength());
+        JOptionPane.showMessageDialog(this, new JScrollPane(area), title, JOptionPane.PLAIN_MESSAGE);
     }
 
     /** List of the saved vacuum reports (newest first); the chosen one is shown as an image. */

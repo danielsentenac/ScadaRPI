@@ -715,6 +715,9 @@ def ask(q: str = ""):
     if when and not COMMAND.match(q):
         answer = past_answer(q, when, named_items(q))
         return {"question": q, "answer": answer, "seconds": round(time.time() - t0, 1), "snapshot": answer}
+    if EXPERIMENT_QUESTION.search(q) and not COMMAND.match(q) and not PROCEDURE.search(q):
+        answer = experiment()["answer"]
+        return {"question": q, "answer": answer, "seconds": round(time.time() - t0, 1), "snapshot": answer}
     read_error = refresh()                 # every question is answered from a read made now
     values, updated, _ = STATE.get()
     if read_error and (not values or time.time() - updated > 15):
@@ -909,6 +912,39 @@ def play(payload: dict):
     return CONTROL.play(str(payload.get("name", "experiment")), str(payload.get("text", "")))
 
 
+EXPERIMENT_TASK = ("Summarise the status of this experiment for the operator in two or three sentences: what is "
+                   "done, what it is doing now, what remains. Use only the facts above, copy their values exactly, "
+                   "and give no advice, cause or value that is not in them.")
+EXPERIMENT_QUESTION = re.compile(
+    r"\b(experiment|exp file|experiment file|sequence)\b.*\b(status|state|going|progress|doing|step|summar\w+|far|"
+    r"finished|done|running|left|remain\w*|long)\b|"
+    r"\b(status|state|progress|summar\w+|how is|how far|how long|what is|where is|left|remain\w*)\b.*\b(experiment|sequence)\b", re.I)
+
+
+def experiment(summary: int = 1):
+    """Status of the experiment file being played (or of the last one): the lines computed by the
+    sequencer, then a summary worded by the model from them, labelled as such and checked."""
+    lines = CONTROL.experiment_status()
+    answer = "\n".join("- " + l for l in lines)
+    note = ""
+    if summary and CONTROL.experiment:
+        facts = list(lines)
+        while len(facts) > 1 and len((" ".join(facts) + " " + EXPERIMENT_TASK).split()) > MAX_PROMPT_WORDS - 12:
+            facts.pop()
+        try:
+            with llm_lock:
+                llm.clear_memory()
+                text = llm.chat("FACTS ABOUT THE EXPERIMENT\n%s\n\nQUESTION\n%s" % ("\n".join(facts), EXPERIMENT_TASK))
+            text, dropped = history_report.checked(text, lines)
+            if text:
+                note = "\n\nAI summary (written by the language model, check it against the lines above):\n%s" % text
+            if dropped:
+                note += "\n(%d sentence(s) of the AI summary removed: they quoted a value that is not in the lines above)" % dropped
+        except Exception as e:
+            note = "\n\n(AI summary not available: the language model did not answer: %s)" % str(e)[:100]
+    return {"lines": lines, "answer": answer + note}
+
+
 def check(payload: dict):
     """Check an experiment file ({"text": ...}) without running it: the editor of the HMI."""
     return CONTROL.check(str(payload.get("text", "")))
@@ -953,6 +989,7 @@ web_ui.expose_api("GET", "/status", status)
 web_ui.expose_api("GET", "/reports", reports)
 web_ui.expose_api("GET", "/event_items", event_items)
 web_ui.expose_api("POST", "/check", check)
+web_ui.expose_api("GET", "/experiment", experiment)
 web_ui.expose_api("GET", "/grammar", grammar)
 web_ui.expose_api("GET", "/events", events)
 web_ui.expose_api("GET", "/report", report_file)
