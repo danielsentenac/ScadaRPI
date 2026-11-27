@@ -24,6 +24,7 @@ public class NewMain {
     for (int i = 0; i < pts.length; i++) ((GlgObject) p.GetElement(i)).SetGResource(null, pts[i][0], pts[i][1], 0.);
     p.SetDResource("FillType", (double) GlgObject.FILL_EDGE); p.SetDResource("OpenType", (double) GlgObject.CLOSED); p.SetGResource("FillColor", 0.62, 0.73, 0.93); p.SetGResource("EdgeColor", 0.2, 0.2, 0.2);
     arr.AddObjectToBottom(p); return p; }
+  static GlgObject dark(GlgObject p) { p.SetGResource("FillColor", 0.2, 0.2, 0.2); return p; }
   // manual valve: bow-tie plus a T handle; vertical = on a vertical pipe (handle to the right), else handle on top
   static void manualValve(double cx, double cy, boolean vertical, String label) {
     double w = 17, h = 17;
@@ -84,16 +85,20 @@ public class NewMain {
     place(o.get(90), X1 + 66, 598); place(named("BypassG22Val"), X1 + 150, 597);
     // ---- Sicem channels 8 (heater around VM3) and 9 (heater around V21)
     sicemBlock(8, 150, 202); sicemBlock(9, X1 + 92, 264);
-    // ---- V1 branch (H2O vapour line): V1 - VM1 - conductance 2 - G4 / H2O+G5 - PT - VS - PS
+    // ---- V1 branch (H2O vapour line, sketch of 2026-11-27): V1 - disc conductance - capillary to H2O+G5 - G4 - PT - VS - PS
     double X2 = 1140;
     vpipe(X2, 241, 262); fit(named("V1"), X2 - 29, 260, X2 + 29, 298); place(o.get(11), X2 - 55, 270);
-    vpipe(X2, 296, 312); manualValve(X2, 327, true, "VM1"); vpipe(X2, 343, 358);
-    box(X2 - 30, 356, X2 + 30, 426); text("COND. 2", X2 + 36, 381); vpipe(X2, 368, 414);
-    vpipe(X2, 426, 464); hpipe(450, X2 - 62, X2);
-    GlgObject g4 = gauge("Ga4", "G4"); fit(g4, X2 - 126, 427, X2 - 61, 473); text("G4", X2 - 103, 476);
-    GlgObject g4v = gauge("Ga4Val", "G4Val"); fit(g4v, X2 - 300, 434, X2 - 132, 467);
-    hpipe(450, X2, 1292);
-    box(1290, 422, 1420, 482); text("H2O", 1338, 442);
+    vpipe(X2, 296, 464);
+    fit(poly(new double[][]{{0,0},{1,0},{1,1},{0,1}}), X2 - 22, 315, X2 + 22, 322); text("DISC COND.", X2 + 30, 308);
+    // capillary: flange on the line, thin line to the top of the H2O reservoir
+    hpipe(362, X2, X2 + 22); fit(poly(new double[][]{{0,0},{1,0},{1,1},{0,1}}), X2 + 21, 353, X2 + 26, 371);
+    fit(dark(poly(new double[][]{{0,0},{1,0},{1,1},{0,1}})), X2 + 26, 361, 1264, 363);
+    fit(dark(poly(new double[][]{{0,0},{1,0},{1,1},{0,1}})), 1262, 361, 1264, 422);
+    text("CAPILLARY", X2 + 50, 338);
+    hpipe(420, X2 - 62, X2);
+    GlgObject g4 = gauge("Ga4", "G4"); fit(g4, X2 - 126, 397, X2 - 61, 443); text("G4", X2 - 103, 444);
+    GlgObject g4v = gauge("Ga4Val", "G4Val"); fit(g4v, X2 - 300, 404, X2 - 132, 437);
+    box(1245, 422, 1420, 482); text("H2O", 1338, 442);
     vpipe(1355, 482, 506); GlgObject g5 = gauge("G22", "G5"); fit(g5, 1322, 505, 1388, 553); text("G5", 1393, 518);
     GlgObject g5v = gauge("Ga4Val", "G5Val"); fit(g5v, 1262, 556, 1430, 589);
     GlgObject pt = named("TurboP21").CopyObject(); pt.SetSResource("Name", ""); retag(pt, "TurboP21Col", "PassiveCol");

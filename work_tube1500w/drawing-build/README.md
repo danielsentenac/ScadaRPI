@@ -1,6 +1,6 @@
 # Rebuilding TUBE1500W.g
 
-`TUBE1500W.g` (main synoptic, layout of 2026-11-23) is generated from the previous
+`TUBE1500W.g` (main synoptic, layout of 2026-11-23, H2O line of 2026-11-27) is generated from the previous
 drawing (commit 491178f2) by `NewMain.java`, using the GLG API in `lib/GlgCE.jar`.
 Needs an X display. Run from `work_tube1500w` with Java 8:
 
