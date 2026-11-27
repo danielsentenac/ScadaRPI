@@ -96,16 +96,16 @@ public class NewMain {
     fit(poly(new double[][]{{0,0},{1,0},{1,1},{0,1}}), 1060, YC - 22, 1067, YC + 22); text("DISC COND.", 1012, 372); text("HOLE 3.5mm", 1012, 392);
     vpipe(X2, 380, 464);
     GlgObject g4 = gauge("Ga4", "G4"); fit(g4, X2 - 32, 334, X2 + 33, 380); text("G4", X2 - 60, 347);
-    GlgObject g4v = gauge("Ga4Val", "G4Val"); fit(g4v, X2 - 84, 298, X2 + 84, 331);
+    GlgObject g4v = gauge("Ga4Val", "G4Val"); fit(g4v, X2 - 84, 298, X2 + 84, 331); text("EXPECTED 1E-5 mbar", X2 - 80, 276);
     // capillary: flange on the cross, thin line to the H2O reservoir
     hpipe(YC, X2, X2 + 22); fit(poly(new double[][]{{0,0},{1,0},{1,1},{0,1}}), X2 + 21, YC - 9, X2 + 26, YC + 9);
     fit(dark(poly(new double[][]{{0,0},{1,0},{1,1},{0,1}})), X2 + 26, YC - 1, 1330, YC + 1);
-    for (int k = 0; k < 4; k++) ring(X2 + 36 + 9 * k, YC, 7, 13);          // the capillary is a coil
-    text("CAPILLARY", X2 + 74, YC - 24); text("0.3mm x 2m", X2 + 74, YC + 3);
+    for (int k = 0; k < 17; k++) ring(X2 + 35 + 9 * k, YC, 7, 13);          // the capillary is a coil
+    text("CAPILLARY", X2 + 62, YC - 36); text("0.3mm", X2 + 80, YC + 15); text("x 2m", X2 + 84, YC + 35);
     text("S = 30 l/s", X2 - 150, YC + 30);                                   // pumping speed of PT at the cross (estimate)
     box(1330, 422, 1420, 482); text("H2O", 1360, 442);
     vpipe(1355, 482, 506); GlgObject g5 = gauge("G22", "G5"); fit(g5, 1322, 505, 1388, 553); text("G5", 1393, 518);
-    GlgObject g5v = gauge("Ga4Val", "G5Val"); fit(g5v, 1262, 556, 1430, 589);
+    GlgObject g5v = gauge("Ga4Val", "G5Val"); fit(g5v, 1262, 556, 1430, 589); text("EXPECTED 23 mbar", 1274, 591);
     GlgObject pt = named("TurboP21").CopyObject(); pt.SetSResource("Name", ""); retag(pt, "TurboP21Col", "PassiveCol");
     ((GlgObject) pt.GetElement(7)).SetSResource("String", "PT"); System.out.println("pt visibility was " + pt.GetDResource("Visibility")); pt.SetDResource("Visibility", 1.); arr.AddObjectToBottom(pt); fit(pt, X2 - 56, 462, X2 + 56, 554);
     vpipe(X2, 552, 568); manualValve(X2, 582, true, "VS"); vpipe(X2, 598, 616);
