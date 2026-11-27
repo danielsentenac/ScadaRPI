@@ -38,6 +38,7 @@ SICEM_TEMPMAX,,bake-out ramp maximum temperature,degC,,
 SICEM_TIMEINTER,,bake-out ramp time interval,,,
 SICEM_TIME,,bake-out ramp time,,,
 SICEM_COMST,,Sicem communication (panel to module M2 serial link),,0=OK|1=FAIL,
+OP_,-,Modbus access to the set point ramp of the panel (same values as SICEM_TEMPSTEP/TEMPMAX/TIMEINTER),,,
 DCU_P21SPEED,P21,turbo pump rotation speed,Hz,,1
 DCU_P21FSPEED,P21,turbo pump nominal (set) rotation speed,Hz,,
 DCU_P21HR,P21,turbo pump operating hours,h,,

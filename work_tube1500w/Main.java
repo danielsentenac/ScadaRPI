@@ -229,6 +229,9 @@ public class Main {
         /**********************************************************************************************/
         // Create Operation instance
         Operation op = new Operation(deviceManager, 5);
+        // Modbus access to the ramp of Operation (registers after those of the last device)
+        Device opdev = new OpDevice("OP", leyspec.mbRegisterEnd, op);
+        deviceManager.addDevice(opdev);
         /**********************************************************************************************/
         // Start ModbusSlave thread
         ModbusSlaveThread modbusSlaveThread = new ModbusSlaveThread(deviceManager);
@@ -253,6 +256,8 @@ public class Main {
         //rgamks.doStart();
         // Start (RgaLeyspec) LEYSPEC RGA device
         leyspec.doStart();
+        // Start (OP) ramp operation device
+        opdev.doStart();
         // Start modbusSlaveThread thread
         modbusSlaveThread.doStart();
         /**********************************************************************************************/

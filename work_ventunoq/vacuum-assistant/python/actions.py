@@ -7,6 +7,7 @@ which the HMI shows live.
 With "commands_enabled": false in config.json (the default) nothing is written to the panel:
 each step is logged as DRY RUN. Set it to true only once the sequences have been approved.
 """
+import math
 import os
 import re
 import threading
@@ -21,6 +22,10 @@ VALVES = {"V1": ("M1_V1CMD", "M1_V1ST"), "V21": ("M1_V21CMD", "M1_V21ST"), "V22"
 PUMPS = {"P21": ("DCU_P21ONOFF", "DCU_P21ST"), "P22": ("M1_P22ONOFF", "M1_P22ST")}
 HEATING = {1: ("M2_CHANNEL_1_ONOFF_CMD", "M2_CHANNEL_1_ONOFF_ST"), 2: ("M2_CHANNEL_2_ONOFF_CMD", "M2_CHANNEL_2_ONOFF_ST")}
 # names usable in WAIT UNTIL
+# The setpoint ramp of the panel (RAMP PROGRAMMATION box), driven through its Modbus device OP
+RAMP = {"step": "OP_TEMPSTEP", "max": "OP_TEMPMAX", "interval": "OP_TIMEINTER", "cmd": "OP_RAMPCMD", "status": "OP_RAMPST"}
+RAMP_START, RAMP_STOP = 1, 2
+MIN_RAMP_INTERVAL = 60.0   # s: the panel needs about 45 s to send one setpoint to the nine channels
 QUANTITIES = {"G22": "MG_PR1", "G21": "MG_PR2", "GA4": "MG_PR3", "G4": "MG_PR4", "G5": "MG_PR5", "GA5": "ROT_PR1",
               "P21SPEED": "DCU_P21SPEED"}
 
@@ -30,6 +35,10 @@ QUANTITIES = {"G22": "MG_PR1", "G21": "MG_PR2", "GA4": "MG_PR3", "G4": "MG_PR4",
 GRAMMAR = [
     ("CHECK REGIME", "stop the experiment unless the normal regime is met"),
     ("SETPOINT <degC>", "same set point on all the heating channels (0 to the maximum allowed)"),
+    ("RAMP <step degC> EVERY <duration> TO <max degC>", "set point ramp run by the panel (RAMP PROGRAMMATION): "
+     "+step at each interval up to the maximum, e.g. RAMP 10 EVERY 30min TO 150; the file goes on at once"),
+    ("WAIT RAMP END [TIMEOUT <duration>]", "until the ramp has reached its maximum, e.g. WAIT RAMP END TIMEOUT 10h"),
+    ("RAMP STOP", "as the STOP button of the panel: ramp stopped, ALL set points and ramp parameters back to 0"),
     ("HEATING ON", "CH1 and CH2 on, only if the normal regime is met"),
     ("HEATING OFF", "CH1 and CH2 off"),
     ("OPEN <valve>", "V1, V21 or V22; refused if an interlock condition is present"),
@@ -39,8 +48,8 @@ GRAMMAR = [
     ("BYPASS ON", "interlock bypass on"),
     ("BYPASS OFF", "interlock bypass off"),
     ("WAIT <duration>", "30 or 30s, 10min, 2h"),
-    ("WAIT UNTIL <name> < <value> [TIMEOUT <duration>]", "until it is BELOW the value, e.g. WAIT UNTIL G21 < 1e-6"),
-    ("WAIT UNTIL <name> > <value> [TIMEOUT <duration>]", "until it is ABOVE the value, e.g. WAIT UNTIL TEMP > 140"),
+    ("WAIT UNTIL <name> < or > <value> [TIMEOUT <duration>]", "until it is BELOW (<) or ABOVE (>) the value, "
+     "e.g. WAIT UNTIL G21 < 1e-6, WAIT UNTIL TEMP > 140"),
     ("LOG <text>", "a line written in the live log"),
     ("SAFETY", "the Safety sequence"),
     ("REPORT", "record the RGA until stable and save a vacuum report"),
@@ -48,10 +57,21 @@ GRAMMAR = [
 ]
 # Words that can follow an instruction: valves, pumps, names usable in WAIT UNTIL, and examples.
 GRAMMAR_WORDS = sorted(VALVES) + sorted(PUMPS) + ["G21", "G22", "G4", "G5", "GA4", "GA5", "P21SPEED", "TEMP",
-                                                  "<", ">", "TIMEOUT", "10min", "1h"]
+                                                  "<", ">", "TIMEOUT", "EVERY", "TO", "END", "10min", "1h"]
 GRAMMAR_NOTES = ("One instruction per line, capital or small letters. Pressures in mbar (e.g. 1e-6), "
                  "P21SPEED in Hz, TEMP = highest heating temperature in degC. The whole file is checked "
-                 "before anything runs. WAIT UNTIL without TIMEOUT waits 1h at most, then the experiment stops.")
+                 "before anything runs. WAIT UNTIL without TIMEOUT waits 1h at most, then the experiment stops. "
+                 "RAMP: interval of 1min at least; the ramp starts from the present set point. WAIT RAMP END without "
+                 "TIMEOUT waits the time of the ramp from 0 degC plus 10min.")
+
+
+def _span(seconds):
+    seconds = max(0, int(seconds))
+    if seconds < 120:
+        return "%d s" % seconds
+    if seconds < 7200:
+        return "%d min" % round(seconds / 60.0)
+    return "%d h %02d min" % (seconds // 3600, seconds % 3600 // 60)
 
 
 class Abort(Exception):
@@ -71,6 +91,9 @@ def parse_experiment(text, heating_channels, max_setpoint):
     One instruction per line, '#' starts a comment:
       CHECK REGIME                    stop unless the normal regime is met
       SETPOINT <degC>                 same setpoint on all heating channels
+      RAMP <step> EVERY <duration> TO <max>     setpoint ramp run by the panel, the file goes on at once
+      WAIT RAMP END [TIMEOUT <duration>]   until the ramp has reached its maximum
+      RAMP STOP                       ramp stopped, all setpoints and ramp parameters back to 0
       HEATING ON | HEATING OFF        CH1 and CH2 (ON only if the normal regime is met)
       OPEN <valve> | CLOSE <valve>    V1, V21, V22
       START <pump> | STOP <pump>      P21, P22
@@ -82,6 +105,7 @@ def parse_experiment(text, heating_channels, max_setpoint):
       REPORT                          record the RGA until stable and save a vacuum status report
     """
     steps, errors = [], []
+    ramp_time = None          # longest duration of the last RAMP of the file: default timeout of WAIT RAMP END
     for number, raw in enumerate(text.splitlines(), 1):
         line = raw.split("#", 1)[0].strip()
         if not line:
@@ -95,6 +119,28 @@ def parse_experiment(text, heating_channels, max_setpoint):
                 if not 0 <= value <= max_setpoint:
                     raise ValueError("setpoint must be between 0 and %g degC" % max_setpoint)
                 step = ("setpoint", value)
+            elif w == ["RAMP", "STOP"]:
+                step = ("ramp_stop",)
+            elif w[0] == "RAMP":
+                m = re.fullmatch(r"RAMP (\S+) EVERY (.+) TO (\S+)", " ".join(w))
+                if not m:
+                    raise ValueError("expected: RAMP <step degC> EVERY <duration> TO <max degC>, or RAMP STOP")
+                size, every, top = float(m.group(1)), duration(m.group(2)), float(m.group(3))
+                if not 0 < size <= max_setpoint:
+                    raise ValueError("ramp step must be above 0 and at most %g degC" % max_setpoint)
+                if not 0 < top <= max_setpoint:
+                    raise ValueError("ramp maximum must be above 0 and at most %g degC" % max_setpoint)
+                if every < MIN_RAMP_INTERVAL:
+                    raise ValueError("ramp interval must be at least %d s" % MIN_RAMP_INTERVAL)
+                step = ("ramp", size, every, top)
+                ramp_time = math.ceil(top / size) * every
+            elif w[:2] == ["WAIT", "RAMP"]:
+                m = re.fullmatch(r"WAIT RAMP END(?: TIMEOUT (.+))?", " ".join(w))
+                if not m:
+                    raise ValueError("expected: WAIT RAMP END [TIMEOUT <duration>]")
+                # without TIMEOUT: the time of the ramp started from 0 degC plus 10 min (1h if no RAMP before)
+                step = ("wait_ramp", duration(m.group(1)) if m.group(1) else
+                        (ramp_time + 600.0 if ramp_time else 3600.0))
             elif w[0] == "HEATING" and w[1:] in (["ON"], ["OFF"]):
                 step = ("heating", w[1] == "ON")
             elif w[0] in ("OPEN", "CLOSE") and len(w) == 2 and w[1] in VALVES:
@@ -268,6 +314,64 @@ class Controller:
         self.log("  %ssetpoint of CH1-CH%d set to %.1f degC%s" % ("" if self.enabled else "DRY RUN: ",
                  self.heating_channels, value, "" if self.enabled else " (nothing written)"))
 
+    def ramp(self, size, every, top):
+        """Ramp parameters written to the panel, then its START: the panel increments the setpoints."""
+        self.check_abort()
+        missing = [c for c in RAMP.values() if c not in self.by_name]
+        if missing:
+            raise Abort("the panel has no ramp registers (%s): panel or registers.csv not up to date" % ", ".join(missing))
+        what = "ramp +%g degC every %d s up to %g degC" % (size, every, top)
+        if not self.enabled:
+            self.log("  DRY RUN: %s (would write %s = %g, %s = %g, %s = %g, then %s = %d)"
+                     % (what, RAMP["step"], size, RAMP["max"], top, RAMP["interval"], every, RAMP["cmd"], RAMP_START))
+            return
+        values = self.values()
+        if values[RAMP["status"]] == 1:
+            raise Abort("a ramp is already running on the panel (RAMP STOP first)")
+        now = values["SICEM_SETP1"]
+        if now >= top:
+            raise Abort("ramp refused: the set point (%g degC) is already at or above the maximum (%g degC)" % (now, top))
+        wanted = ((RAMP["step"], size), (RAMP["max"], top), (RAMP["interval"], every))
+        for channel, value in wanted:
+            self.client.write_float(self.by_name[channel]["offset"], value)
+            time.sleep(0.3)
+        end = time.time() + 15
+        while True:                # the panel shows the parameters it has taken
+            self.sleep(2)
+            shown = self.get_values()[0]
+            if all(abs(shown.get(channel, -1) - value) < 0.01 for channel, value in wanted):
+                break
+            if time.time() > end:
+                raise Abort("ramp parameters not taken by the panel (%s)"
+                            % ", ".join("%s is %s" % (c, shown.get(c)) for c, _ in wanted))
+        self.log("  ramp parameters shown by the panel: step %g degC, maximum %g degC, interval %d s" % (size, top, every))
+        self.trigger("start %s" % what, RAMP["cmd"], RAMP_START, RAMP["status"], 1, timeout=30)
+        self.log("  the ramp starts from %g degC: about %s to reach %g degC"
+                 % (now, _span(math.ceil((top - now) / size) * every), top))
+
+    def ramp_stop(self, even_if_stopped=False):
+        if RAMP["cmd"] not in self.by_name:
+            return
+        self.trigger("stop the ramp (set points and ramp parameters to 0)", RAMP["cmd"], RAMP_STOP,
+                     RAMP["status"], 0, even_if_stopped=even_if_stopped)
+
+    def wait_ramp(self, timeout):
+        if not self.enabled:
+            self.log("  DRY RUN: would wait for the end of the ramp (%s at most)" % _span(timeout))
+            return
+        end = time.time() + timeout
+        self.sleep(6)              # the panel needs a few seconds to show a ramp just started
+        while True:
+            v = self.values()
+            if self.experiment and self.experiment["state"] == "running":
+                self.experiment["wait"] = {"ramp": True, "value": v["SICEM_SETP1"], "limit": v[RAMP["max"]], "end": end}
+            if v[RAMP["status"]] != 1:
+                self.log("  ramp ended: set point %g degC" % v["SICEM_SETP1"])
+                return
+            if time.time() > end:
+                raise Abort("WAIT RAMP END: the ramp is still running after %d s (set point %g degC)" % (timeout, v["SICEM_SETP1"]))
+            self.sleep(5)
+
     def heating(self, on):
         for n, (cmd, st) in HEATING.items():
             self.trigger("CH%d %s" % (n, "ON" if on else "OFF"), cmd, ON if on else OFF, st, 1 if on else 2)
@@ -284,6 +388,7 @@ class Controller:
     def seq_safety(self):
         """Heating off, valves closed, pumping system stopped."""
         self.heating(False)
+        self.ramp_stop()
         self.setpoints(0.0)
         for valve in ("V1", "V21"):
             cmd, st = VALVES[valve]
@@ -311,6 +416,12 @@ class Controller:
                 self.regime_or_abort("Experiment")
             elif kind == "setpoint":
                 self.setpoints(step[1])
+            elif kind == "ramp":
+                self.ramp(*step[1:])
+            elif kind == "ramp_stop":
+                self.ramp_stop()
+            elif kind == "wait_ramp":
+                self.wait_ramp(step[1])
             elif kind == "heating":
                 if step[1]:
                     self.regime_or_abort("Heating")
@@ -546,12 +657,18 @@ class Controller:
             function()
             self.log("%s: DONE" % name)
         except Abort as e:
-            self.log("%s: STOPPED - %s. The system is left as it is." % (name, e))
+            self.log("%s: STOPPED - %s. The system is left as it is.%s" % (name, e, self._ramp_note()))
         except Exception as e:      # a write failed, the panel is unreachable...
-            self.log("%s: FAILED - %s: %s. The system is left as it is." % (name, type(e).__name__, e))
+            self.log("%s: FAILED - %s: %s. The system is left as it is.%s" % (name, type(e).__name__, e, self._ramp_note()))
         finally:
             with self.job_lock:
                 self.job = None
+
+    def _ramp_note(self):
+        values = self.get_values()[0] or {}
+        if values.get(RAMP["status"]) == 1:
+            return " The set point ramp is STILL RUNNING on the panel (its STOP button stops it)."
+        return ""
 
     def stop(self):
         with self.job_lock:
@@ -614,7 +731,10 @@ class Controller:
                 lines.append("Now at step %d of %d (line %d of the file): %s. This step started %s ago."
                              % (i, total, number, text, span(now - e["step_started"])))
                 w = e["wait"]
-                if w and "name" in w:
+                if w and "ramp" in w:
+                    lines.append("It is waiting for the set point ramp of the panel to end: the set point is now %g degC, the ramp goes up to %g degC. If it is not ended within %s, the experiment stops."
+                                 % (w["value"], w["limit"], span(w["end"] - now)))
+                elif w and "name" in w:
                     lines.append("It is waiting for %s to be %s %g: %s is now %.3g. If this is not reached within %s, the experiment stops."
                                  % (w["name"], "below" if w["op"] == "<" else "above", w["limit"], w["name"], w["value"], span(w["end"] - now)))
                 elif w:
@@ -637,13 +757,15 @@ class Controller:
         if e["state"] == "running":
             w = e["wait"] or {}
             least = most = max(0, w.get("end", now) - now) if w else 0
-            if "name" in w:
+            if "name" in w or "ramp" in w:
                 least = 0
             for _, _, step in left:
                 if step[0] == "wait":
                     least, most = least + step[1], most + step[1]
                 elif step[0] == "wait_until":
                     most += step[4]
+                elif step[0] == "wait_ramp":
+                    most += step[1]
             if most:
                 lines.append("Time left: at least %s (the fixed waits), at most %s (if every WAIT UNTIL lasts until its timeout)."
                              % (span(least), span(most)))
@@ -686,8 +808,12 @@ class Controller:
                                       + (["Sicem global alarm"] if alarm else []))
                     self.supervising = False
                     self.log("SAFETY MODE: problem during heating (%s)" % cause)
-                    self.start("Heating off (safety mode)", lambda: self.heating(False), preempt=True)
+                    self.start("Heating off (safety mode)", self._heating_off_safety, preempt=True)
             except Abort as e:
                 self.supervising = False
                 self.log("SAFETY MODE: %s during heating" % e)
-                self.start("Heating off (safety mode)", lambda: self.heating(False), preempt=True)
+                self.start("Heating off (safety mode)", self._heating_off_safety, preempt=True)
+
+    def _heating_off_safety(self):
+        self.heating(False)
+        self.ramp_stop()

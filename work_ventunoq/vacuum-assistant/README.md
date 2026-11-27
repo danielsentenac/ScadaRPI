@@ -174,6 +174,10 @@ HTTP: `/ask` (chat), `/action?name=safety|baking|report|stop`, `/play` (POST
   ```
   CHECK REGIME                     stop unless the normal regime is met
   SETPOINT <degC>                  same setpoint on CH1-CH9 (0 to 150)
+  RAMP <step> EVERY <duration> TO <max>   setpoint ramp run by the panel (RAMP PROGRAMMATION box), e.g.
+                                   RAMP 10 EVERY 30min TO 150; the file goes on at once
+  WAIT RAMP END [TIMEOUT <duration>]   until the ramp has reached its maximum
+  RAMP STOP                        as the STOP button: ramp stopped, all setpoints and ramp parameters to 0
   HEATING ON | HEATING OFF         ON only if the normal regime is met
   OPEN <valve> | CLOSE <valve>     V1, V21, V22 (open refused if an interlock condition is present)
   START <pump> | STOP <pump>       P21, P22

@@ -236,7 +236,7 @@ public class ModbusSlaveThread implements Runnable, DataTypes  {
                  device.modbusmutex.lock();
                  logger.finer("ModbusSlaveThread:writeHoldingRegister> Writing register..");
                  super.writeHoldingRegister(offset, value);
-                 device.addModbusCommand();
+                 device.addModbusCommand(offset, 1);
                  device.modbusmutex.unlock();
                  break;
               }
@@ -276,7 +276,7 @@ public class ModbusSlaveThread implements Runnable, DataTypes  {
             for (Device device : touched) device.modbusmutex.lock();
             try {
                super.writeHoldingRegisterRange(offset, range);
-               for (Device device : touched) device.addModbusCommand();
+               for (Device device : touched) device.addModbusCommand(offset, range.length);
             }
             finally {
                for (Device device : touched) device.modbusmutex.unlock();

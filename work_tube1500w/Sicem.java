@@ -167,6 +167,12 @@ public class Sicem extends Device {
          serDataW = "SETP" + modulenumber + "=" + e.setvalue;
          logger.finer("Sicem::executeCommand> write " + serDataW);
       }
+      if (serDataW.isEmpty()) {
+         // TEMPSTEP, TEMPMAX, TIMEINTER, TIME only show the ramp of Operation.java: nothing to send to
+         // the Sicem. The ramp is set through the Modbus device OP (OpDevice.java) or from the panel.
+         logger.fine("Sicem:executeCommand> " + e.name + " is not a Sicem command: ignored");
+         return;
+      }
       try {
          rs232.Write(serDataW);
       }

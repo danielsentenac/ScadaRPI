@@ -90,10 +90,20 @@ public abstract class Device extends DataManager implements Runnable, DataTypes 
    }
 
    public void addModbusCommand() {
+     addModbusCommand(0, Integer.MAX_VALUE / 2);
+   }
+
+   // Only the data elements written by the Modbus master (registers offset .. offset+count-1) are
+   // looked at. Reading the others again would replace the value of a command still waiting in the
+   // queue by the content of its register, which the device refreshes with the old value meanwhile.
+   public void addModbusCommand(int offset, int count) {
 
      // Check Modbus registers triggers
      for (Map.Entry<String, DataElement > e : dataList.entrySet()) {
         DataElement dataElement = e.getValue();
+        if ( dataElement.mbRegisterOffset >= offset + count ||
+             dataElement.mbRegisterOffset + Math.max(dataElement.mbRegisterLength, 1) <= offset )
+           continue;
         if ( dataElement.type == DataType.TRIGGER ) { // Trigger command
           try {
              dataElement.setvalue = holdingRegisters.getInt16At(dataElement.mbRegisterOffset);

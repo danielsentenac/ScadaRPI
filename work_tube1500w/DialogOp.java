@@ -118,15 +118,16 @@ public class DialogOp extends JDialog {
     void jButtonOK_actionPerformed(ActionEvent e) {
         if (!jTextField.getText().equals("")) {
            logger.finer("Set new parameter for " + origin + "=" + jTextField.getText());
-           int value = Integer.valueOf(jTextField.getText());
 	   // Update parameter
            try {
+            double value = Double.parseDouble(jTextField.getText());
+            if (value < 0) throw new NumberFormatException("negative");
             if ( origin.contains("TempMax") ) op.setTempMax(value);
             else if ( origin.contains("TempStep") ) op.setTempStep(value);
             else if ( origin.contains("TimeInter") ) op.setTimeInter(value);
            }
            catch (NumberFormatException ex) {
-               logger.log(Level.SEVERE,"DialogOp::jButtonOK_actionPerformed> Not a double:" + jTextField.getText());
+               logger.log(Level.WARNING,"DialogOp::jButtonOK_actionPerformed> Not a valid value:" + jTextField.getText());
            }
 	}
     }

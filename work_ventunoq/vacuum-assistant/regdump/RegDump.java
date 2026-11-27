@@ -15,6 +15,7 @@ public class RegDump {
         Device tc = new TCMuxShield("TCMUX", m2.mbRegisterEnd); l.add(tc);
         Device rot = new MksRotor("ROT", tc.mbRegisterEnd, "x", Baud._9600, DataBits._8, Parity.NONE, StopBits._1, FlowControl.NONE); l.add(rot);
         Device ley = new RgaLeyspec("LEYSPEC", rot.mbRegisterEnd, "192.168.250.11", 1024, 1, 100, 3, "EE50"); l.add(ley);
+        Device op = new OpDevice("OP", ley.mbRegisterEnd, null); l.add(op);
         System.out.println("channel,device,element,access,regtype,offset,length");
         for (Device d : l)
             for (Map.Entry<String, DataElement> e : d.dataList.entrySet()) {

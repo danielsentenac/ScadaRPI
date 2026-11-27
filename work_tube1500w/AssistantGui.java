@@ -462,9 +462,11 @@ public class AssistantGui extends JFrame {
     // ------------------------------------------------------------------ experiment editor
     /** Instruction of the grammar: what is inserted in the text when it is touched. A complete
      *  instruction ("CHECK REGIME") is inserted with its end of line, the others up to their
-     *  first parameter ("SETPOINT <degC>" gives "SETPOINT "). */
+     *  first parameter ("SETPOINT <degC>" gives "SETPOINT "). An optional part in brackets is left
+     *  out ("WAIT RAMP END [TIMEOUT <duration>]" gives "WAIT RAMP END "). */
     private static String insertion(String syntax) {
-        int at = syntax.indexOf('<');
+        int at = syntax.indexOf('<'), option = syntax.indexOf(" [");
+        if (option >= 0 && (at < 0 || option < at)) return syntax.substring(0, option) + " ";
         return at < 0 ? syntax + "\n" : syntax.substring(0, at);
     }
 
