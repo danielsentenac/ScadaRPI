@@ -24,6 +24,9 @@ public class NewMain {
     for (int i = 0; i < pts.length; i++) ((GlgObject) p.GetElement(i)).SetGResource(null, pts[i][0], pts[i][1], 0.);
     p.SetDResource("FillType", (double) GlgObject.FILL_EDGE); p.SetDResource("OpenType", (double) GlgObject.CLOSED); p.SetGResource("FillColor", 0.62, 0.73, 0.93); p.SetGResource("EdgeColor", 0.2, 0.2, 0.2);
     arr.AddObjectToBottom(p); return p; }
+  static void ring(double cx, double cy, double rx, double ry) { int n = 24; double[][] pts = new double[n][];
+    for (int i = 0; i < n; i++) pts[i] = new double[]{Math.cos(2 * Math.PI * i / n), Math.sin(2 * Math.PI * i / n)};
+    GlgObject p = poly(pts); fit(p, cx - rx, cy - ry, cx + rx, cy + ry); }
   static GlgObject dark(GlgObject p) { p.SetGResource("FillColor", 0.2, 0.2, 0.2); return p; }
   // manual valve: bow-tie plus a T handle; vertical = on a vertical pipe (handle to the right), else handle on top
   static void manualValve(double cx, double cy, boolean vertical, String label) {
@@ -90,15 +93,17 @@ public class NewMain {
     double X2 = 1140, XV = 1000, YC = 436;
     vpipe(XV, 241, 262); fit(named("V1"), XV - 29, 260, XV + 29, 298); place(o.get(11), XV - 55, 270);
     vpipe(XV, 296, YC + 5); hpipe(YC, XV - 5, X2);
-    fit(poly(new double[][]{{0,0},{1,0},{1,1},{0,1}}), 1060, YC - 22, 1067, YC + 22); text("DISC COND.", 1012, 392);
+    fit(poly(new double[][]{{0,0},{1,0},{1,1},{0,1}}), 1060, YC - 22, 1067, YC + 22); text("DISC COND.", 1012, 372); text("HOLE 3.5mm", 1012, 392);
     vpipe(X2, 380, 464);
     GlgObject g4 = gauge("Ga4", "G4"); fit(g4, X2 - 32, 334, X2 + 33, 380); text("G4", X2 - 60, 347);
     GlgObject g4v = gauge("Ga4Val", "G4Val"); fit(g4v, X2 - 84, 298, X2 + 84, 331);
     // capillary: flange on the cross, thin line to the H2O reservoir
     hpipe(YC, X2, X2 + 22); fit(poly(new double[][]{{0,0},{1,0},{1,1},{0,1}}), X2 + 21, YC - 9, X2 + 26, YC + 9);
-    fit(dark(poly(new double[][]{{0,0},{1,0},{1,1},{0,1}})), X2 + 26, YC - 1, 1290, YC + 1);
-    text("CAPILLARY", X2 + 40, YC - 24);
-    box(1290, 422, 1420, 482); text("H2O", 1338, 442);
+    fit(dark(poly(new double[][]{{0,0},{1,0},{1,1},{0,1}})), X2 + 26, YC - 1, 1330, YC + 1);
+    for (int k = 0; k < 4; k++) ring(X2 + 36 + 9 * k, YC, 7, 13);          // the capillary is a coil
+    text("CAPILLARY", X2 + 74, YC - 24); text("0.3mm x 2m", X2 + 74, YC + 3);
+    text("S = 30 l/s", X2 - 150, YC + 30);                                   // pumping speed of PT at the cross (estimate)
+    box(1330, 422, 1420, 482); text("H2O", 1360, 442);
     vpipe(1355, 482, 506); GlgObject g5 = gauge("G22", "G5"); fit(g5, 1322, 505, 1388, 553); text("G5", 1393, 518);
     GlgObject g5v = gauge("Ga4Val", "G5Val"); fit(g5v, 1262, 556, 1430, 589);
     GlgObject pt = named("TurboP21").CopyObject(); pt.SetSResource("Name", ""); retag(pt, "TurboP21Col", "PassiveCol");
